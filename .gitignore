@@ -1,0 +1,5 @@
+app.sublime-project
+.DS_Store
+fuel/app/logs/*/*/*
+fuel/app/cache/*/*
+!.gitkeep
