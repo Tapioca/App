@@ -1,4 +1,5 @@
 app.sublime-project
+app.sublime-workspace
 .DS_Store
 fuel/app/logs/*/*/*
 fuel/app/cache/*/*
