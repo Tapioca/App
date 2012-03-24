@@ -1,16 +1,10 @@
 <?php
 
-/*
-use Config;
-use FuelException;
-use Cookie;
-use Session;
-*/
-
 use Model\User;
 use Model\UserNotFoundException;
 use Model\Group;
-
+use Model\Attempts;
+use Model\UserSuspendedException;
 
 class AuthException extends FuelException {}
 
@@ -126,6 +120,120 @@ class Auth
 		return new Group();
 	}
 
+	/**
+	 * Gets the Attempts object
+	 *
+	 * @return  Attempts
+	 */
+	 public static function attempts($login_id = null, $ip_address = null)
+	 {
+	 	return new Attempts($login_id, $ip_address);
+	 }
+
+	/**
+	 * Attempt to log a user in.
+	 *
+	 * @param   string  Login column value
+	 * @param   string  Password entered
+	 * @param   bool    Whether to remember the user or not
+	 * @return  bool
+	 * @throws  MontryAuthException
+	 */
+	public static function login($login_column_value, $password, $remember = false)
+	{
+		// log the user out if they hit the login page
+		static::logout();
+
+		// get login attempts
+		if (static::$suspend)
+		{
+			$attempts = static::attempts($login_column_value, \Input::real_ip());
+
+			// if attempts > limit - suspend the login/ip combo
+			if ($attempts->get() >= $attempts->get_limit())
+			{
+				try
+				{
+					$attempts->suspend();
+				}
+				catch(UserSuspendedException $e)
+				{
+					throw new \AuthException($e->getMessage());
+				}
+			}
+		}
+
+		// make sure vars have values
+		if (empty($login_column_value) or empty($password))
+		{
+			return false;
+		}
+
+		// if user is validated
+		if ($user = static::validate_user($login_column_value, $password, 'password'))
+		{
+			if (static::$suspend)
+			{
+				// clear attempts for login since they got in
+				$attempts->clear();
+			}
+
+			// set update array
+			$update = array();
+
+			// if they wish to be remembers, set the cookie and get the hash
+			if ($remember)
+			{
+				$update['remember_me'] = static::remember($login_column_value);
+			}
+
+			// if there is a password reset hash and user logs in - remove the password reset
+			if ($user->get('password_reset_hash'))
+			{
+				$update['password_reset_hash'] = '';
+				$update['temp_password'] = '';
+			}
+
+			$update['last_login'] = new \MongoDate();
+			$update['ip_address'] = \Input::real_ip();
+
+			// update user
+			if (count($update))
+			{
+				$user->update($update, false);
+			}
+
+			// set session vars
+			Session::set(Config::get('auth.session.user'), (string) $user->get('_id'));
+			Session::set(Config::get('auth.session.provider'), 'Tapioca');
+
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Force Login
+	 *
+	 * @param   int|string  user id or login value
+	 * @param   provider    what system was used to force the login
+	 * @return  bool
+	 * @throws  AuthException
+	 */
+	public static function force_login($id, $provider = 'Tapioca-Forced')
+	{
+		// check to make sure user exists
+		if ( ! static::user_exists($id))
+		{
+			throw new \Model\AuthException('user_not_found');
+		}
+
+		Session::set(Config::get('auth.session.user'), $id);
+		Session::set(Config::get('auth.session.provider'), $provider);
+		return true;
+	}
+
 
 	/**
 	 * Checks if the current user is logged in.
@@ -138,7 +246,7 @@ class Auth
 		$user_id = Session::get(Config::get('auth.session.user'));
 		
 		// invalid session values - kill the user session
-		if ($user_id === null or ! is_numeric($user_id))
+		if ($user_id === null)
 		{
 			// if they are not logged in - check for cookie and log them in
 			if (static::is_remembered())

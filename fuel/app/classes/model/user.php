@@ -46,7 +46,7 @@ class User extends \Model
 	{
 		// load and set config
 
-		static::$collection 		= strtolower(Config::get('auth.collection.users'));
+		static::$collection = strtolower(Config::get('auth.collection.users'));
 
 		static::$db = \Mongo_Db::instance();
 
@@ -95,6 +95,29 @@ class User extends \Model
 
 			$this->groups = array();
 		}
+	}
+
+	/**
+	 * Checks if the Field is set or not.
+	 *
+	 * @param   string  Field name
+	 * @return  bool
+	 */
+	public function __isset($field)
+	{
+		return array_key_exists($field, $this->user);
+	}
+
+	/**
+	 * Gets a field value of the user
+	 *
+	 * @param   string  Field name
+	 * @return  mixed
+	 * @throws  MontryUserException
+	 */
+	public function __get($field)
+	{
+		return $this->get($field);
 	}
 
 
@@ -469,6 +492,27 @@ class User extends \Model
 
 		return false;
 	}
+
+
+	/**
+	 * Checks the given password to see if it matches the one in the database.
+	 *
+	 * @param   string  Password to check
+	 * @param   string  Password type
+	 * @return  bool
+	 */
+	public function check_password($password, $field = 'password')
+	{
+		// grabs the salt from the current password
+		$salt = substr($this->user[$field], 0, 16);
+
+		// hash the inputted password
+		$password = $salt.$this->hash_password($password, $salt);
+
+		// check to see if passwords match
+		return $password == $this->user[$field];
+	}
+
 
 	/**
 	 * Generates a random salt and hashes the given password with the salt.
