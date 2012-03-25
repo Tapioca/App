@@ -93,7 +93,7 @@ class User extends \Model
 				throw new \Model\UserNotFoundException('user_not_found');
 			}
 
-			$this->groups = array();
+			$this->groups = $user[0]['groups'];
 		}
 	}
 
@@ -577,44 +577,50 @@ class User extends \Model
 	 * Adds this user to the group.
 	 *
 	 * @param   string|int  Group ID or group name
+	 * @param   array  User's role in group
 	 * @return  bool
 	 * @throws  UserException
 	 */
-	public function add_to_group($id)
+	public function add_to_group($id, $role = array())
 	{
 		if ($this->in_group($id))
 		{
-			throw new \UserException('user_already_in_group');
-		}
-
-		$field = 'name';
-		if (is_numeric($id))
-		{
-			$field = 'id';
+			throw new \Model\UserException('user_already_in_group');
 		}
 
 		try
 		{
-			$group = new \Sentry_Group($id);
+			$group = new Group($id);
 		}
-		catch (SentryGroupNotFoundException $e)
+		catch (GroupNotFoundException $e)
 		{
-			throw new \SentryUserException($e->getMessage());
+			throw new \Model\UserException($e->getMessage());
 		}
 
-		list($insert_id, $rows_affected) = DB::insert($this->table_usergroups)->set(array(
-			'user_id' => $this->user['id'],
-			'group_id' => $group->get('id'),
-		))->execute($this->db_instance);
+		$group_info = array(
+				'_id'      => $group->get('_id'),
+				'name'     => $group->get('name'),
+				'level'    => 0,
+				'is_admin' => 0
+			);
 
-		$this->groups[] = array(
-			'id'       => $group->get('id'),
-			'name'     => $group->get('name'),
-			'level'    => $group->get('level'),
-			'is_admin' => $group->get('is_admin')
-		);
+		$data = array_merge($group_info, $role);
 
-		return true;
+		$update = array('$push' => array('groups' => $data));
+
+		$where = array('_id' => $this->user['_id']);
+
+		$query = static::$db
+					->where($where)
+					->update(static::$collection, $update, array(), true);
+
+		if($query)
+		{
+			$this->groups[] = $data;
+
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -622,50 +628,47 @@ class User extends \Model
 	 *
 	 * @param   string|int  Group ID or group name
 	 * @return  bool
-	 * @throws  SentryUserException
+	 * @throws  UserException
 	 */
 	public function remove_from_group($id)
 	{
 		if ( ! $this->in_group($id))
 		{
-			throw new \SentryUserException(__('sentry.user_not_in_group', array('group' => $id)));
-		}
-
-		$field = 'name';
-		if (is_numeric($id))
-		{
-			$field = 'id';
+			throw new \Model\UserException('user_not_in_group');
 		}
 
 		try
 		{
-			$group = new \Sentry_Group($id);
+			$group = new Group($id);
 		}
-		catch (SentryGroupNotFoundException $e)
+		catch (GroupNotFoundException $e)
 		{
-			throw new \SentryUserException($e->getMessage());
-		}
-
-		$delete = DB::delete($this->table_usergroups)
-				->where('user_id', $this->user['id'])
-				->where('group_id', $group->get('id'))->execute($this->db_instance);
-
-		// remove from array
-		$field = 'name';
-		if (is_numeric($id))
-		{
-			$field = 'id';
+			throw new \Model\UserException($e->getMessage());
 		}
 
-		foreach ($this->groups as $key => $group)
+
+		$update = array('$pull' => array('groups' => array('name' => $id)));
+
+		$where = array('_id' => $this->user['_id']);
+
+		$query = static::$db
+					->where($where)
+					->update(static::$collection, $update, array(), true);
+
+		if($query)
 		{
-			if ($group[$field] == $id)
+			foreach ($this->groups as $key => $group)
 			{
-				unset($group);
+				if ($group['name'] == $id)
+				{
+					unset($group);
+				}
 			}
+
+			return true;
 		}
 
-		return (bool) $delete;
+		return false;
 	}
 
 	/**
