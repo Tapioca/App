@@ -11,4 +11,11 @@ return array(
 			'password'   => 'root',
 		),
 	),
+	'mongo' => array(
+        // This group is used when no instance name has been provided.
+        'default' => array(
+            'hostname' => 'localhost',
+            'database' => 'tapiocapp_dev_v1',
+        ),
+    )
 );
