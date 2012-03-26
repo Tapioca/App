@@ -74,6 +74,11 @@ class Group extends \Model
 	protected $team = array();
 
 	/**
+	 * @var  array  Group's admins array
+	 */
+	protected $admins = array();
+
+	/**
 	 * Gets the collection names
 	 */
 	public static function _init()
@@ -129,6 +134,7 @@ class Group extends \Model
 		{
 			$this->group = $group[0];
 			$this->team = $group[0]['team'];
+			$this->admins = $group[0]['admins'];
 		}
 		// group doesn't exist
 		else
@@ -161,6 +167,11 @@ class Group extends \Model
 		if ( ! array_key_exists('team', $group))
 		{
 			$group['team'] = array();
+		}
+
+		if ( ! array_key_exists('admins', $group))
+		{
+			$group['admins'] = array();
 		}
 
 		$result = static::$db->insert(static::$collection, $group);
@@ -329,14 +340,20 @@ class Group extends \Model
 	/*
 	 * Checks if the current user is part of the given group.
 	 *
-	 * @param   string  User's email
+	 * @param   string user ID | email
+	 * @param   string field to match
 	 * @return  bool
 	 */
-	public function in_group($email)
+	public function in_group($id, $field = 'email')
 	{
+		if($field == '_id' && !($id instanceof \MongoId))
+		{
+			$id = new \MongoId($id);
+		}
+
 		foreach ($this->team as $team)
 		{
-			if ($team['email'] == $email)
+			if ($team[$field] == $id)
 			{
 				return true;
 			}
@@ -419,7 +436,6 @@ class Group extends \Model
 			throw new \Model\GroupException($e->getMessage());
 		}
 
-
 		$update = array('$pull' => array('team' => array('email' => $email)));
 
 		$where = array('_id' => $this->group['_id']);
@@ -435,6 +451,99 @@ class Group extends \Model
 				if ($team['email'] == $email)
 				{
 					unset($team);
+				}
+			}
+
+			return true;
+		}
+
+		return false;
+	}
+
+
+	/**
+	 * Grante user as admin for the group.
+	 *
+	 * @param   string User _ID
+	 * @return  bool
+	 * @throws  GroupException
+	 */
+	public function add_admin($email)
+	{
+		if ( ! $this->in_group($email))
+		{
+			throw new \Model\GroupException('user_not_in_group');
+		}
+
+		try
+		{
+			$user = new User($email);
+		}
+		catch (UserNotFoundException $e)
+		{
+			throw new \Model\GroupException($e->getMessage());
+		}
+
+		$update = array('$addToSet' => array('admins' => $user->get('_id')));
+
+		$where = array('_id' => $this->group['_id']);
+
+		$query = static::$db
+					->where($where)
+					->update(static::$collection, $update, array(), true);
+
+		if($query)
+		{
+			$this->admins[] = $user->get('_id');
+
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Revoke user as admin for the group.
+	 *
+	 * @param   string User _ID
+	 * @return  bool
+	 * @throws  GroupException
+	 */
+	public function revoke_admin($id)
+	{
+		if ( ! $this->in_group($id))
+		{
+			throw new \Model\GroupException('user_not_in_group');
+		}
+
+		try
+		{
+			$user = new User($id);
+		}
+		catch (UserNotFoundException $e)
+		{
+			throw new \Model\GroupException($e->getMessage());
+		}
+
+		$update = array('$pull' => array('admins' => $user->get('_id')));
+
+		$where = array('_id' => $this->group['_id']);
+
+		$query = static::$db
+					->where($where)
+					->update(static::$collection, $update, array(), true);
+
+		if($query)
+		{
+			if(!($id instanceof \MongoId))
+			{
+				$id = new \MongoId($id);
+			}
+
+			foreach ($this->admins as $admin)
+			{
+				if ($admin == $id)
+				{
+					unset($admin);
 				}
 			}
 
