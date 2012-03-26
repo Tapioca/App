@@ -1,4 +1,32 @@
 <?php
+/*
+
+MONGO SCHEMA
+
+{
+	"id" : uniqueid(),
+    "account" : 
+    {
+    	"name": ,
+        "email": ,
+        "password": ,
+		"type": ENUM (master, administrator, user)
+		"activited": bool,
+        "registred": MongoDate(),
+        "last_login": MongoDate(),
+        "banned": false
+    },
+	"apps" : 
+	[
+		{
+			"id" : uniqueid(),
+			"name" ,
+			"slug": ,
+			"granted": ENUM (administrator, editor, author, contributor)
+		}
+	]
+}
+*/
 
 namespace Model;
 
@@ -175,6 +203,8 @@ class User extends \Model
 			'created_at' => new \MongoDate(),
 			'activated' => ($activation) ? 0 : 1,
 			'status' => 1,
+			'remember_me' => null,
+			'password_reset_hash' => null
 		) + $user;
 
 		// set activation hash if activation = true

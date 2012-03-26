@@ -1,5 +1,46 @@
 <?php
 
+/*
+
+APPS SCHEMA
+
+
+{
+	"_id": MongoId(),
+	"name": ,
+	"slug": ,
+	"account':
+	{
+		"registred":,
+		"activited":,
+		"type": ENUM(free, prenium)
+	},
+	"db": 
+	{
+		"name":,
+		"user":,
+		"pass":,
+		"host":,
+		"apikey":
+	},
+	"admins": 
+	[
+		user MongoId,
+	]
+	"team":
+	[
+		{
+			"_id": ,
+			"name": ,
+			"email": , 
+			"is_admin": bool,
+			"level": int 
+		}
+	]
+}
+
+*/
+
 namespace Model;
 
 use Auth;
@@ -28,6 +69,11 @@ class Group extends \Model
 	protected $group = array();
 
 	/**
+	 * @var  array  Group's team array
+	 */
+	protected $team = array();
+
+	/**
 	 * Gets the collection names
 	 */
 	public static function _init()
@@ -35,6 +81,29 @@ class Group extends \Model
 		static::$collection = strtolower(Config::get('auth.collection.groups'));
 
 		static::$db = \Mongo_Db::instance();
+	}
+
+	/**
+	 * Checks if the Field is set or not.
+	 *
+	 * @param   string  Field name
+	 * @return  bool
+	 */
+	public function __isset($field)
+	{
+		return array_key_exists($field, $this->group);
+	}
+
+	/**
+	 * Gets a field value of the group
+	 *
+	 * @param   string  Field name
+	 * @return  mixed
+	 * @throws  MontryGroupException
+	 */
+	public function __get($field)
+	{
+		return $this->get($field);
 	}
 
 	/**
@@ -59,6 +128,7 @@ class Group extends \Model
 		if (count($group) == 1)
 		{
 			$this->group = $group[0];
+			$this->team = $group[0]['team'];
 		}
 		// group doesn't exist
 		else
@@ -261,6 +331,124 @@ class Group extends \Model
 							->count(Config::get('auth.collection.groups'));
 
 		return (bool) $group_exists;
+	}
+
+	/*
+	 * Checks if the current user is part of the given group.
+	 *
+	 * @param   string  User's email
+	 * @return  bool
+	 */
+	public function in_group($email)
+	{
+		foreach ($this->team as $team)
+		{
+			if ($team['email'] == $email)
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Adds auser user to the group.
+	 *
+	 * @param   string|int  User ID or email
+	 * @param   array  User's role in group
+	 * @return  bool
+	 * @throws  GroupException
+	 */
+	public function add_to_group($email, $role = array())
+	{
+		if ($this->in_group($email))
+		{
+			throw new \Model\GroupException('user_already_in_group');
+		}
+
+		try
+		{
+			$user = new User($email);
+		}
+		catch (UserNotFoundException $e)
+		{
+			throw new \Model\GroupException($e->getMessage());
+		}
+
+		$user_info = array(
+				'_id'      => $user->get('_id'),
+				'name'     => $user->get('name'),
+				'email'     => $user->get('email'),
+				'level'    => 0,
+				'is_admin' => 0
+			);
+
+		$data = array_merge($user_info, $role);
+
+		$update = array('$push' => array('team' => $data));
+
+		$where = array('_id' => $this->group['_id']);
+
+		$query = static::$db
+					->where($where)
+					->update(static::$collection, $update, array(), true);
+
+		if($query)
+		{
+			$this->team[] = $data;
+
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Removes this user from the group.
+	 *
+	 * @param   string|int  Group ID or group name
+	 * @return  bool
+	 * @throws  GroupException
+	 */
+	public function remove_from_group($email)
+	{
+		if ( ! $this->in_group($email))
+		{
+			throw new \Model\GroupException('user_not_in_group');
+		}
+
+		try
+		{
+			$user = new User($email);
+		}
+		catch (UserNotFoundException $e)
+		{
+			throw new \Model\GroupException($e->getMessage());
+		}
+
+
+		$update = array('$pull' => array('team' => array('email' => $email)));
+
+		$where = array('_id' => $this->group['_id']);
+
+		$query = static::$db
+					->where($where)
+					->update(static::$collection, $update, array(), true);
+
+		if($query)
+		{
+			foreach ($this->team as $team)
+			{
+				if ($team['email'] == $email)
+				{
+					unset($team);
+				}
+			}
+
+			return true;
+		}
+
+		return false;
 	}
 
 }
