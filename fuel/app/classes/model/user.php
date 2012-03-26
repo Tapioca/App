@@ -4,19 +4,11 @@
 MONGO SCHEMA
 
 {
-	"id" : uniqueid(),
-    "account" : 
-    {
-    	"name": ,
-        "email": ,
-        "password": ,
-		"type": ENUM (master, administrator, user)
-		"activited": bool,
-        "registred": MongoDate(),
-        "last_login": MongoDate(),
-        "banned": false
-    },
-	"apps" : 
+	"_id" : uniqueid(),
+	"email": ,
+	"password": ,
+	"name": ,
+	"groups" : 
 	[
 		{
 			"id" : uniqueid(),
@@ -630,6 +622,7 @@ class User extends \Model
 		$group_info = array(
 				'_id'      => $group->get('_id'),
 				'name'     => $group->get('name'),
+				'slug'     => $group->get('slug'),
 				'level'    => 0,
 				'is_admin' => 0
 			);
