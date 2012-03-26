@@ -8,6 +8,8 @@ MONGO SCHEMA
 	"email": ,
 	"password": ,
 	"name": ,
+	"is_admin": bool,
+	"level": int,  
 	"groups" : 
 	[
 		{
@@ -196,7 +198,9 @@ class User extends \Model
 			'activated' => ($activation) ? 0 : 1,
 			'status' => 1,
 			'remember_me' => null,
-			'password_reset_hash' => null
+			'password_reset_hash' => null,
+			'is_admin' => 0,
+			'level' => 0,
 		) + $user;
 
 		// set activation hash if activation = true
@@ -410,12 +414,12 @@ class User extends \Model
 			unset($fields['status']);
 		}
 
+		$update = $update + $fields;
+
 		if (empty($update))
 		{
 			return true;
 		}
-
-		$update = $update + $fields;
 
 		// add update time
 		$update['updated_at'] = new \MongoDate();
@@ -720,15 +724,7 @@ class User extends \Model
 	 */
 	public function is_admin()
 	{
-		foreach ($this->groups as $group)
-		{
-			if ($group['is_admin'] == 1)
-			{
-				return true;
-			}
-		}
-
-		return false;
+		return $this->user['is_admin'];
 	}
 
 	/**
@@ -739,12 +735,9 @@ class User extends \Model
 	 */
 	public function has_level($level)
 	{
-		foreach ($this->groups as $group)
+		if ($this->user['level'] == $level)
 		{
-			if ($group['level'] == $level)
-			{
-				return true;
-			}
+			return true;
 		}
 
 		return false;
@@ -758,15 +751,33 @@ class User extends \Model
 	 */
 	public function atleast_level($level)
 	{
-		foreach ($this->groups as $group)
+		if ($this->user['level'] >= $level)
 		{
-			if ($group['level'] >= $level)
-			{
-				return true;
-			}
+			return true;
 		}
 
 		return false;
 	}
 
+	/**
+	 * Grante user as admin.
+	 *
+	 * @return  bool
+	 * @throws  UserException
+	 */
+	public function granted_admin()
+	{
+		return $this->update(array('is_admin' => 1));
+	}
+
+	/**
+	 * Revoke user as admin.
+	 *
+	 * @return  bool
+	 * @throws  UserException
+	 */
+	public function revoke_admin()
+	{
+		return $this->update(array('is_admin' => 0));
+	}
 }
