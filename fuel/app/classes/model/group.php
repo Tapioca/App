@@ -150,24 +150,17 @@ class Group extends \Model
 			throw new \Model\GroupException('group_name_empty');
 		}
 
-		if (static::group_exists($group['name']))
+		$slug = \Arr::get($group, 'slug', $group['name']);
+		$group['slug'] = \Inflector::friendly_title($slug, '-', true);
+
+		if (static::group_exists($group['slug']))
 		{
 			throw new \Model\GroupException('group_already_exists');
 		}
 
-		if ( ! array_key_exists('level', $group))
+		if ( ! array_key_exists('team', $group))
 		{
-			throw new \Model\GroupException('group_level_empty');
-		}
-
-		if ( ! array_key_exists('is_admin', $group))
-		{
-			$group['is_admin'] = 0;
-		}
-
-		if ( ! array_key_exists('parent', $group))
-		{
-			$group['parent'] = 0;
+			$group['team'] = array();
 		}
 
 		$result = static::$db->insert(static::$collection, $group);
@@ -326,7 +319,7 @@ class Group extends \Model
 	public static function group_exists($group)
 	{
 		$group_exists = static::$db
-							->where(array('name' => $group))
+							->where(array('slug' => $group))
 							->limit(1)
 							->count(Config::get('auth.collection.groups'));
 
