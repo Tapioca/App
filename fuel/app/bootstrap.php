@@ -14,12 +14,14 @@ Autoloader::add_core_namespace('Tapioca');
 Autoloader::add_classes(array(
 	// Add classes you want to override here
 	// Example: 'View' => APPPATH.'classes/view.php',
+	'Debug'				=> APPPATH.'classes/core/debug.php',
+
 	'Tapioca\\Tapioca'                          => __DIR__.'/classes/tapioca.php',
 
 	'Tapioca\\TapiocaException'                 => __DIR__.'/classes/tapioca.php',
 	'Tapioca\\TapiocaCollectionException'       => __DIR__.'/classes/tapioca/collection.php', 
 
-	'Tapioca\\Tapioca_Collection'   	        => __DIR__.'/classes/tapioca/collection.php'
+	'Tapioca\\Collection'           	        => __DIR__.'/classes/tapioca/collection.php'
 ));
 
 // Register the autoloader

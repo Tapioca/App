@@ -7,7 +7,7 @@ use Config;
 
 class TapiocaCollectionException extends \FuelException {}
 
-class Tapioca_Collection
+class Collection
 {
 	/**
 	 * @var  string  Database instance
@@ -110,29 +110,6 @@ class Tapioca_Collection
 				);
 			}
 		}
-	}
-
-	/**
-	 * Checks if the Field is set or not.
-	 *
-	 * @param   string  Field name
-	 * @return  bool
-	 */
-	public function __isset($field)
-	{
-		return array_key_exists($field, $this->user);
-	}
-
-	/**
-	 * Gets a field value of the user
-	 *
-	 * @param   string  Field name
-	 * @return  mixed
-	 * @throws  CollectionException
-	 */
-	public function __get($field)
-	{
-		return $this->get($field);
 	}
 
 	/**

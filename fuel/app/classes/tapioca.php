@@ -42,7 +42,7 @@ class Tapioca
 	{
 		try
 		{
-			return new \Tapioca_Collection($id);
+			return new \Collection($id);
 		}
 		catch (TapiocaCollectionException $e)
 		{
@@ -51,5 +51,17 @@ class Tapioca
 
 		//\Debug::dump('Tapioca collection call');
 		//
+	}
+
+	public static function set_status($status = array())
+	{
+		$defaults = Config::get('tapioca.status');
+
+		if(count($status) > 1)
+		{
+			return array_merge($defaults, $status);
+		}
+
+		return $defaults;
 	}
 }
