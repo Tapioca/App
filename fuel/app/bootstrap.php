@@ -8,9 +8,18 @@ class_alias('Fuel\\Core\\Autoloader', 'Autoloader');
 require COREPATH.'bootstrap.php';
 
 
+Autoloader::add_core_namespace('Tapioca');
+
+
 Autoloader::add_classes(array(
 	// Add classes you want to override here
 	// Example: 'View' => APPPATH.'classes/view.php',
+	'Tapioca\\Tapioca'                          => __DIR__.'/classes/tapioca.php',
+
+	'Tapioca\\TapiocaException'                 => __DIR__.'/classes/tapioca.php',
+	'Tapioca\\TapiocaCollectionException'       => __DIR__.'/classes/tapioca/collection.php', 
+
+	'Tapioca\\Tapioca_Collection'   	        => __DIR__.'/classes/tapioca/collection.php'
 ));
 
 // Register the autoloader

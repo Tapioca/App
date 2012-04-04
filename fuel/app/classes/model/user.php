@@ -135,7 +135,7 @@ class User extends \Model
 	 *
 	 * @param   string  Field name
 	 * @return  mixed
-	 * @throws  MontryUserException
+	 * @throws  UserException
 	 */
 	public function __get($field)
 	{
@@ -201,6 +201,7 @@ class User extends \Model
 			'password_reset_hash' => null,
 			'is_admin' => 0,
 			'level' => 0,
+			'groups' => array()
 		) + $user;
 
 		// set activation hash if activation = true

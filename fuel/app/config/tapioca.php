@@ -10,4 +10,23 @@ return array(
 		'documents'       => 'documents',
 		'files'           => 'files',
 	),
+
+	/*
+	 * Default documents/collections status
+	 */
+
+	'status' => array(
+		array(
+			-1,
+			'out_of_date'
+		),
+		array(
+			1,
+			'draft'
+		),
+		array(
+			100,
+			'published'
+		)
+	)
 );
