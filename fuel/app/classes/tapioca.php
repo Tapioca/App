@@ -33,16 +33,16 @@ class Tapioca
 	}
 
 	/**
-	 * 
-	 * @param   Collection namespace or ref.
+	 * @param   string group id
+	 * @param   MongoId|string Collection id.
 	 * @throws  TapiocaException
 	 * @return  Tapioca_Collection
 	 */
-	public static function collection($id = null)
+	public static function collection($appid, $id = null)
 	{
 		try
 		{
-			return new \Collection($id);
+			return new \Collection($appid, $id);
 		}
 		catch (TapiocaCollectionException $e)
 		{

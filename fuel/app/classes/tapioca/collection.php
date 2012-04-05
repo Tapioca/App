@@ -15,6 +15,11 @@ class Collection
 	protected static $db = null;
 
 	/**
+	 * @var  array  Group's id
+	 */
+	protected $appid = null;
+
+	/**
 	 * @var  array  Collection's name for exception message
 	 */
 	protected $name = null;
@@ -28,6 +33,11 @@ class Collection
 	 * @var  array  Collection's summary
 	 */
 	protected $summary = null;
+
+	/**
+	 * @var  array  last collection's revision + summary
+	 */
+	protected $combine = null;
 
 	/**
 	 * @var  array  Collection's data
@@ -46,11 +56,12 @@ class Collection
 	 * @return  void
 	 * @throws  TapiocaCollectionException
 	 */
-	public function __construct($id = null, $check_exists = false)
+	public function __construct($appid, $id = null, $check_exists = false)
 	{
 		// load and set config
-
 		static::$collection = strtolower(Config::get('tapioca.tables.collections'));
+		
+		$this->appid = $appid;
 
 		static::$db = \Mongo_Db::instance();
 
@@ -67,13 +78,14 @@ class Collection
 			else
 			{
 				// set field to namespace for query
-				$field = '_namespace';
+				$field = 'namespace';
 			}
 
 			//query database for collection's summary
 			$summary = static::$db->get_where(static::$collection, array(
-				$field => $id,
-				'_type' => 'summary'
+				$field  => $id,
+				'type'  => 'summary',
+				'appid' => $this->appid
 			), 1);
 
 			// if there was a result - update user
@@ -88,19 +100,22 @@ class Collection
 				//query database for collection's summary
 				$data = static::$db
 							->where(array(
-									'_namespace' => $summary[0]['_namespace'],
-									'_type' => 'data'
+								'appid'     => $this->appid,
+								'namespace' => $summary[0]['namespace'],
+								'type'      => 'data'
 							))
 							->order_by(array(
-								'_revision' => 'asc'
+								'revision'  => 'asc'
 							))
 							->get(static::$collection);
 
+				$this->summary   = $summary[0];
+				$this->data      = $data;
+				$this->namespace = $summary[0]['namespace'];
+				$this->name      = $summary[0]['name'];
 
-				$this->summary = $summary[0];
-				$this->data = $data;
-				$this->namespace = $summary[0]['_namespace'];
-				$this->name = $summary[0]['_about']['name'];
+
+				//$this->combine   
 			}
 			// collection doesn't exist
 			else
@@ -113,6 +128,17 @@ class Collection
 	}
 
 	/**
+	 * Magic get method to allow getting class properties but still having them protected
+	 * to disallow writing.
+	 *
+	 * @return  mixed
+	 */
+	public function __get($property)
+	{
+		return $this->$property;
+	}
+
+	/**
 	 * Gets the summaries of all collections
 	 *
 	 * @return  array
@@ -122,7 +148,8 @@ class Collection
 	{
 		//query database for collections's summaries
 		return static::$db->get_where(static::$collection, array(
-			'_type' => 'summary'
+			'appid' => $this->appid,
+			'type'  => 'summary'
 		));
 	}
 
@@ -174,5 +201,156 @@ class Collection
 		}
 
 		return $this->data;
+	}
+
+	private static function validation(array $fields, $check_list)
+	{
+		foreach($check_list as $item)
+		{
+			if(!isset($fields[$item]) || empty($fields[$item]))
+			{
+				throw new \TapiocaException(
+					__('tapioca.collection_column_is_empty', array('column' => $item))
+				);
+			}
+		}		
+	}
+
+	/**
+	 * Create collection's summary
+	 *
+	 * @param   array  Fields
+	 * @return  bool
+	 * @throws  TapiocaException
+	 */
+	public function create_summary(array $fields)
+	{
+		// check for required fields
+		$check_list = Config::get('tapioca.validation.collection.summary');
+		
+		self::validation($fields, $check_list);
+
+		$namespace = \Inflector::friendly_title($fields['namespace'], '-', true);
+
+		if(!self::namespance_exists($namespace))
+		{
+			throw new \TapiocaException(
+				__('tapioca.collection_already_exists', array('name' => $fields['name']))
+			);
+		}
+
+		return static::$db->insert(static::$collection, $fields);
+	}
+
+	/**
+	 * Update the current collection's summary
+	 *
+	 * @param   array  Fields to update
+	 * @return  bool
+	 * @throws  TapiocaException
+	 */
+	public function update_summary(array $fields)
+	{
+		if(is_null($this->summary))
+		{
+			throw new \TapiocaException(__('tapioca.no_collection_selected'));
+		}
+
+		// check for required fields
+		$check_list = Config::get('tapioca.validation.collection.summary');
+		
+		self::validation($fields, $check_list);
+
+		return static::$db
+					->where(array(
+							'namespace' => $this->namespace,
+							'type' => 'summary'
+					))
+					->update(static::$collection, $fields);
+	}
+
+	public function update_data(array $fields, $user)
+	{
+		if(is_null($this->summary))
+		{
+			throw new \TapiocaException(__('tapioca.no_collection_selected'));
+		}
+
+		// check for required fields
+		$check_list = Config::get('tapioca.validation.collection.data');
+		
+		self::validation($fields, $check_list);
+
+		$revision = (count($this->data) + 1);
+
+		$data = array(
+			'appid' => $this->appid,
+			'type' => 'data',
+			'namespace' => $this->namespace,
+			'revision' => $revision,
+		) + $fields;
+
+		$revision = array(
+			'revison' => $revision,
+			'date' => new \MongoDate(),
+			'user' => $user,
+			'status' => (int) 100 
+		);
+
+		$insert_data = static::$db->insert(static::$collection, $data);
+
+		if($insert_data)
+		{
+			//update previous revisions status
+			foreach($this->summary['revisions'] as &$r)
+			{
+				$r['status'] = -1;
+			}
+			
+			$this->summary['revisions'][] = $revision;
+
+			$update_summary = static::$db
+								->where(array(
+									'appid' => $this->appid,
+									'namespace' => $this->namespace,
+									'type' => 'summary'
+								))
+								->update(static::$collection, array('revisions' => $this->summary['revisions']));
+
+			if(!$update_summary)
+			{
+				throw new \TapiocaException(
+					__('tapioca.can_not_update_collection_revision', array('name' => $this->name))
+				);				
+			}
+
+			return true;
+		}
+
+		throw new \TapiocaException(
+			__('tapioca.can_not_insert_collection_data', array('name' => $this->name))
+		);
+	}
+
+	/**
+	 * Check if namespace exists already
+	 *
+	 * @param   string  The namespace value
+	 * @return  bool
+	 */
+	protected static function namespance_exists($namespace)
+	{
+		// query db to check for login_column
+		$result = static::$db->get_where(static::$collection, array(
+			'namespace' => $namespace,
+			'appid' => $this->$appid
+		), 1);
+
+		if (count($result) == 1)
+		{
+			return $result[0];
+		}
+
+		return false;
 	}
 }

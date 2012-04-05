@@ -14,7 +14,6 @@ return array(
 	/*
 	 * Default documents/collections status
 	 */
-
 	'status' => array(
 		array(
 			-1,
@@ -27,6 +26,23 @@ return array(
 		array(
 			100,
 			'published'
+		)
+	),
+
+	/*
+	 * required fileds
+	 */
+	'validation' => array(
+		'collection' => array(
+			'summary' => array(
+				'namespace',
+				'name',
+				'status'
+			),
+			'data' => array(
+				'structure', 
+				'summary'
+			)
 		)
 	)
 );
