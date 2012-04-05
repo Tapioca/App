@@ -170,13 +170,13 @@ class Collection
 
 	/**
 	 * Gets the data of the current collection
+	 * if no revison ID set, return last revision
 	 *
 	 * @param   int Revision number
-	 * @param   int Revision status
 	 * @return  array
 	 * @throws  TapiocaException
 	 */
-	public function data($revision = null, $status = 100)
+	public function data($revision = null)
 	{
 		if(is_null($this->summary))
 		{
@@ -200,7 +200,7 @@ class Collection
 			);
 		}
 
-		return $this->data;
+		return end($this->data);
 	}
 
 	private static function validation(array $fields, $check_list)
