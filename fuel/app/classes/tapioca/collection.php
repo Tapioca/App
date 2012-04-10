@@ -17,7 +17,7 @@ class Collection
 	/**
 	 * @var  array  Group's id
 	 */
-	protected $appid = null;
+	protected $app_id = null;
 
 	/**
 	 * @var  array  Collection's name for exception message
@@ -33,11 +33,6 @@ class Collection
 	 * @var  array  Collection's summary
 	 */
 	protected $summary = null;
-
-	/**
-	 * @var  array  last collection's revision + summary
-	 */
-	protected $combine = null;
 
 	/**
 	 * @var  array  Collection's data
@@ -56,12 +51,12 @@ class Collection
 	 * @return  void
 	 * @throws  TapiocaCollectionException
 	 */
-	public function __construct($appid, $id = null, $check_exists = false)
+	public function __construct($app_id, $id = null, $check_exists = false)
 	{
 		// load and set config
 		static::$collection = strtolower(Config::get('tapioca.tables.collections'));
 		
-		$this->appid = $appid;
+		$this->app_id = $app_id;
 
 		static::$db = \Mongo_Db::instance();
 
@@ -85,7 +80,7 @@ class Collection
 			$summary = static::$db->get_where(static::$collection, array(
 				$field  => $id,
 				'type'  => 'summary',
-				'appid' => $this->appid
+				'app_id' => $this->app_id
 			), 1);
 
 			// if there was a result - update user
@@ -100,7 +95,7 @@ class Collection
 				//query database for collection's summary
 				$data = static::$db
 							->where(array(
-								'appid'     => $this->appid,
+								'app_id'     => $this->app_id,
 								'namespace' => $summary[0]['namespace'],
 								'type'      => 'data'
 							))
@@ -112,10 +107,7 @@ class Collection
 				$this->summary   = $summary[0];
 				$this->data      = $data;
 				$this->namespace = $summary[0]['namespace'];
-				$this->name      = $summary[0]['name'];
-
-
-				//$this->combine   
+				$this->name      = $summary[0]['name']; 
 			}
 			// collection doesn't exist
 			else
@@ -148,7 +140,7 @@ class Collection
 	{
 		//query database for collections's summaries
 		return static::$db->get_where(static::$collection, array(
-			'appid' => $this->appid,
+			'app_id' => $this->app_id,
 			'type'  => 'summary'
 		));
 	}
@@ -284,7 +276,7 @@ class Collection
 		$revision = (count($this->data) + 1);
 
 		$data = array(
-			'appid' => $this->appid,
+			'app_id' => $this->app_id,
 			'type' => 'data',
 			'namespace' => $this->namespace,
 			'revision' => $revision,
@@ -311,7 +303,7 @@ class Collection
 
 			$update_summary = static::$db
 								->where(array(
-									'appid' => $this->appid,
+									'app_id' => $this->app_id,
 									'namespace' => $this->namespace,
 									'type' => 'summary'
 								))
@@ -343,7 +335,7 @@ class Collection
 		// query db to check for login_column
 		$result = static::$db->get_where(static::$collection, array(
 			'namespace' => $namespace,
-			'appid' => $this->$appid
+			'app_id' => $this->$app_id
 		), 1);
 
 		if (count($result) == 1)
