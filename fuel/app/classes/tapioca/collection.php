@@ -139,10 +139,21 @@ class Collection
 	public function all()
 	{
 		//query database for collections's summaries
-		return static::$db->get_where(static::$collection, array(
+		$documents = static::$db->get_where(static::$collection, array(
 			'app_id' => $this->app_id,
 			'type'  => 'summary'
 		));
+
+		$results = array();
+
+		foreach($documents as $doc)
+		{
+			$doc['_sid']	= (string) $doc['_id']; // MongoId as a string
+			$results[]		= $doc;
+			//$results[]		= self::_remap($doc);
+		}
+
+		return $results;
 	}
 
 	/**

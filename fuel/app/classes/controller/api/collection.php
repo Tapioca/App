@@ -10,29 +10,9 @@ class Controller_Api_Collection extends Controller_Api
 		parent::before();
 
 		// to define with api key and query string
-		$this->appid = '4f7977b4c68deebf01000000';
-		$this->namespace = 'blog';
+		$this->appid = Input::get('appid', '4f7977b4c68deebf01000000');
+		$this->namespace = $this->param('namespace', false);
 	}
-
-	public function get_all()
-	{
-		if(self::$granted)
-		{
-			try
-			{
-				$collection = Tapioca::collection($this->appid); //
-				$all = $collection->all();
-
-				self::$data = $all;
-				self::$status = 200;
-			}
-			catch (TapiocaException $e)
-			{
-				self::error($e->getMessage());
-			}
-		}
-	}
-
 
 	/* Data
 	----------------------------------------- */
@@ -43,11 +23,26 @@ class Controller_Api_Collection extends Controller_Api
 		{
 			try
 			{
-				$collection = Tapioca::collection($this->appid, $this->namespace); //
-				$summary = $collection->summary();
-				$data = $collection->data();
+				if($this->namespace)
+				{
+					$revision = Input::get('revision', null);
 
-				self::$data = array_merge($summary, $data);
+					$collection = Tapioca::collection($this->appid, $this->namespace);
+					$summary    = $collection->summary();
+					$data       = $collection->data($revision);
+
+					// Format return
+					$ret            = array_merge($summary, $data);
+					$ret['_sid']    = (string) $ret['_id'];
+					$ret['created'] = (int) $ret['created']->sec;
+				}
+				else
+				{
+					$collection = Tapioca::collection($this->appid);
+					$ret = $collection->all();
+				}
+
+				self::$data = $ret;
 				self::$status = 200;
 			}
 			catch (TapiocaException $e)

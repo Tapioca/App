@@ -4,4 +4,5 @@ app.sublime-workspace
 fuel/app/classes/controller/test
 fuel/app/logs/*/*/*
 fuel/app/cache/*/*
+public/client_test
 !.gitkeep
