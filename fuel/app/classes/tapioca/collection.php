@@ -95,7 +95,7 @@ class Collection
 				//query database for collection's summary
 				$data = static::$db
 							->where(array(
-								'app_id'     => $this->app_id,
+								'app_id'    => $this->app_id,
 								'namespace' => $summary[0]['namespace'],
 								'type'      => 'data'
 							))
@@ -222,16 +222,33 @@ class Collection
 		
 		self::validation($fields, $check_list);
 
-		$namespace = \Inflector::friendly_title($fields['namespace'], '-', true);
+		$fields['namespace'] = \Inflector::friendly_title($fields['namespace'], '-', true);
 
-		if(!self::namespance_exists($namespace))
+		if($this->namespance_exists($fields['namespace']))
 		{
 			throw new \TapiocaException(
 				__('tapioca.collection_already_exists', array('name' => $fields['name']))
 			);
 		}
 
-		return static::$db->insert(static::$collection, $fields);
+		$status = 1;
+
+		if(isset($fields['status']))
+		{
+			$status = (int) $fields['status'];
+			unset($fields['status']);
+		}
+
+		$new_summary = array(
+			'app_id' => $this->app_id,
+			'type' => 'summary',
+			'documents' => (int) 0,
+			'status' => $status,
+			'created' => new \MongoDate(),
+			'revisions' => array()
+		) + $fields;
+
+		return static::$db->insert(static::$collection, $new_summary);
 	}
 
 	/**
@@ -330,12 +347,12 @@ class Collection
 	 * @param   string  The namespace value
 	 * @return  bool
 	 */
-	protected static function namespance_exists($namespace)
+	private function namespance_exists($namespace)
 	{
 		// query db to check for login_column
 		$result = static::$db->get_where(static::$collection, array(
 			'namespace' => $namespace,
-			'app_id' => $this->$app_id
+			'app_id' => $this->app_id
 		), 1);
 
 		if (count($result) == 1)

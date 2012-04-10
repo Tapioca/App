@@ -20,6 +20,12 @@ class Controller_Api extends Controller_Rest
 		}
 	}
 
+	protected static function error($message)
+	{
+		self::$data = array('error' => $message);
+		self::$status = 501;
+	}
+
 	public function after($response)
 	{
 		$this->response(self::$data, self::$status);
