@@ -44,5 +44,25 @@ return array(
 				'summary'
 			)
 		)
+	),
+
+	'collection' => array(
+		'dispatch' => array(
+			'summary' => array(
+				'namespace',
+				'name',
+				'desc',
+				'status',
+				'preview'
+			),
+			'data' => array(
+				'structure', 
+				'summary',
+				'dependencies',
+				'indexes',
+				'callbacks',
+				'templates'
+			)
+		)
 	)
 );

@@ -139,11 +139,11 @@ class Collection
 	public function all()
 	{
 		//query database for collections's summaries
-		$documents = static::$db->get_where(static::$collection, array(
+		return static::$db->get_where(static::$collection, array(
 			'app_id' => $this->app_id,
 			'type'  => 'summary'
 		));
-
+/*
 		$results = array();
 
 		foreach($documents as $doc)
@@ -154,6 +154,29 @@ class Collection
 		}
 
 		return $results;
+*/
+	}
+
+	/**
+	 * Gets the current collections definition
+	 *
+	 * @params  int Revision number 
+	 * @return  array
+	 * @throws  TapiocaException
+	 */
+
+	public function get($revision = null)
+	{
+		$data       = $this->data($revision);
+
+		// Format return
+		$ret            = array_merge($this->summary, $data);
+		//$ret['_sid']    = (string) $ret['_id'];
+		$ret['created'] = (int) $ret['created']->sec;
+
+		unset($ret['type']);
+
+		return $ret;
 	}
 
 	/**

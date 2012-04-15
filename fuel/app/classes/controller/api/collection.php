@@ -28,21 +28,14 @@ class Controller_Api_Collection extends Controller_Api
 					$revision = Input::get('revision', null);
 
 					$collection = Tapioca::collection($this->appid, $this->namespace);
-					$summary    = $collection->summary();
-					$data       = $collection->data($revision);
-
-					// Format return
-					$ret            = array_merge($summary, $data);
-					$ret['_sid']    = (string) $ret['_id'];
-					$ret['created'] = (int) $ret['created']->sec;
+					self::$data = $collection->get($revision);
 				}
 				else
 				{
 					$collection = Tapioca::collection($this->appid);
-					$ret = $collection->all();
+					self::$data = $collection->all();
 				}
 
-				self::$data = $ret;
 				self::$status = 200;
 			}
 			catch (TapiocaException $e)
@@ -57,56 +50,92 @@ class Controller_Api_Collection extends Controller_Api
 	{
 		if(self::$granted)
 		{
-			try
+			$model = json_decode(Input::put('model', false), true);
+			
+			if(!$model)
 			{
-				// fixtures
-				$value = array(
-					'structure' => array(
-						array(
-							"id" => "title",
-							"label" => "Titre",
-							"type" => "text",
-							"rules" => array(
-								"required",
-								"min_length[5]"
+				self::$data   = array('error' => 'tapioca.missing_required_params');
+				self::$status = 500;
+			}
+			else
+			{
+				// init tapioca first to get config
+				$collection = Tapioca::collection($this->appid, $this->namespace); 
+				$values     = $this->dispatch($model);
+
+				try
+				{
+					// fixtures
+					$value = array(
+						'structure' => array(
+							array(
+								"id" => "title",
+								"label" => "Titre",
+								"type" => "text",
+								"rules" => array(
+									"required",
+									"min_length[5]"
+								)
+							),
+							array(
+								"id" => "desc",
+								"label" => "Description",
+								"type" => "textarea"
 							)
 						),
-						array(
-							"id" => "desc",
-							"label" => "Description",
-							"type" => "textarea"
+						'summary' => array(
+							'title' => 'Titre'
 						)
-					),
-					'summary' => array(
-						'title' => 'Titre'
-					)
-				);
+					);
 
-				$app_name = 'dior-backstage';
-				$user = Auth::user();
+					$app_name = 'dior-backstage';
+					$user     = Auth::user();
 
-				$user = array(
-					'id' => $user->get('_id'),
-					'name' => $user->get('name'),
-					'email' => $user->get('email'),
-				);
+					$user = array(
+						'id'    => $user->get('_id'),
+						'name'  => $user->get('name'),
+						'email' => $user->get('email'),
+					);
 
-				$collection = Tapioca::collection($this->appid, $this->namespace); //
-				$data = $collection->update_data($value, $user);
 
-				self::$data = array('status' => $data);
-				self::$status = 200;
+					$data       = $collection->update_data($value, $user);
 
-			}
-			catch (TapiocaException $e)
-			{
-				self::error($e->getMessage());
-			}
+					self::$data   = array('status' => $data);
+					self::$status = 200;
+
+				}
+				catch (TapiocaException $e)
+				{
+					self::error($e->getMessage());
+				}
+			}// if $model
 		} // if granted
 	}
 
+	private function dispatch($values)
+	{
+		$ret     = array('summary' => array(), 'data' => array());
+		$summary = Config::get('tapioca.collection.dispatch.summary');
+		$data    = Config::get('tapioca.collection.dispatch.data');
+
+		foreach($values as $key => $value)
+		{
+			if(in_array($key, $summary))
+			{
+				$ret['summary'][$key] = $value;
+			}
+
+			if(in_array($key, $data))
+			{
+				$ret['data'][$key] = $value;
+			}
+		}
+		Debug::show($ret);
+		exit;
+	}
+
 	/* Summary
-	----------------------------------------- */
+	----------------------------------------- 
 
 	public function get_summary()
 	{
@@ -134,11 +163,13 @@ class Controller_Api_Collection extends Controller_Api
 		{
 			try
 			{
+				\Debug::show(Input::post('model'));
+				exit;
 				// fixtures
 				$value = array(
-					'namespace' => 'articles',
-					'name' => 'Articles',
-					'desc' => 'une courte déscription de la collection avec un peu de détails mise à jour en REST elle même mise à jour',
+					'namespace' => 'blog',
+					'name' => 'Blog',
+					'desc' => 'une courte déscription',
 					'status' => 1
 				);
 
@@ -157,12 +188,14 @@ class Controller_Api_Collection extends Controller_Api
 	}
 
 	//Create a new entry in the collection. 
-	public function post_summary()
+	public function post_summary($values)
 	{
 		if(self::$granted)
 		{
 			try
 			{
+				\Debug::show($values);
+				exit;
 				// fixtures
 				$value = array(
 					'namespace' => 'blog',
@@ -184,4 +217,5 @@ class Controller_Api_Collection extends Controller_Api
 			}
 		} // if granted
 	}
+	*/
 }
