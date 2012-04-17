@@ -301,8 +301,9 @@ class Collection
 
 		return static::$db
 					->where(array(
+							'app_id'    => $this->app_id,
 							'namespace' => $this->namespace,
-							'type' => 'summary'
+							'type'      => 'summary'
 					))
 					->update(static::$collection, $fields);
 	}
@@ -371,6 +372,21 @@ class Collection
 		throw new \TapiocaException(
 			__('tapioca.can_not_insert_collection_data', array('name' => $this->name))
 		);
+	}
+
+	public function delete()
+	{
+		if(is_null($this->summary))
+		{
+			throw new \TapiocaException(__('tapioca.no_collection_selected'));
+		}
+
+		return static::$db
+					->where(array(
+							'namespace' => $this->namespace,
+							'app_id'    => $this->app_id
+					))
+					->delete_all(static::$collection);
 	}
 
 	/**

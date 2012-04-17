@@ -150,6 +150,17 @@ class Controller_Api_Collection extends Controller_Api
 		} // if granted
 	}
 
+	public function delete_index()
+	{
+		if(self::$granted)
+		{
+			$data = Tapioca::collection($this->appid, $this->namespace)->delete(); 
+
+			self::$data   = array('status' => $data);
+			self::$status = 200;
+		}
+	}
+
 	private function dispatch(&$summary, &$data, $values)
 	{
 		$arrSummary = Config::get('tapioca.collection.dispatch.summary');
