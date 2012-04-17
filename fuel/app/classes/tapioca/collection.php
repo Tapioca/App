@@ -143,18 +143,6 @@ class Collection
 			'app_id' => $this->app_id,
 			'type'  => 'summary'
 		));
-/*
-		$results = array();
-
-		foreach($documents as $doc)
-		{
-			$doc['_sid']	= (string) $doc['_id']; // MongoId as a string
-			$results[]		= $doc;
-			//$results[]		= self::_remap($doc);
-		}
-
-		return $results;
-*/
 	}
 
 	/**
@@ -171,7 +159,6 @@ class Collection
 
 		// Format return
 		$ret            = array_merge($this->summary, $data);
-		//$ret['_sid']    = (string) $ret['_id'];
 		$ret['created'] = (int) $ret['created']->sec;
 
 		unset($ret['type']);
@@ -251,12 +238,10 @@ class Collection
 	 */
 	public function create_summary(array $fields)
 	{
-		// check for required fields
-		$check_list = Config::get('tapioca.validation.collection.summary');
-		
-		self::validation($fields, $check_list);
 
-		$fields['namespace'] = \Inflector::friendly_title($fields['namespace'], '-', true);
+		$namespace = (!is_null($fields['namespace'])) ? $fields['namespace'] : $fields['name'];
+
+		$fields['namespace'] = \Inflector::friendly_title($namespace, '-', true);
 
 		if($this->namespance_exists($fields['namespace']))
 		{
@@ -265,7 +250,12 @@ class Collection
 			);
 		}
 
-		$status = 1;
+		// check for required fields
+		$check_list = Config::get('tapioca.validation.collection.summary');
+		
+		self::validation($fields, $check_list);
+
+		$status = (int) 1;
 
 		if(isset($fields['status']))
 		{
@@ -281,6 +271,11 @@ class Collection
 			'created' => new \MongoDate(),
 			'revisions' => array()
 		) + $fields;
+
+		$this->summary   = $new_summary;
+		$this->namespace = $new_summary['namespace'];
+		$this->name      = $new_summary['name'];
+		$this->data      = array();
 
 		return static::$db->insert(static::$collection, $new_summary);
 	}
@@ -324,6 +319,8 @@ class Collection
 		
 		self::validation($fields, $check_list);
 
+		$arrData    = Config::get('tapioca.collection.dispatch.data');
+
 		$revision = (count($this->data) + 1);
 
 		$data = array(
@@ -351,6 +348,7 @@ class Collection
 			}
 			
 			$this->summary['revisions'][] = $revision;
+			$this->data[] = $data;
 
 			$update_summary = static::$db
 								->where(array(

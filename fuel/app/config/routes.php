@@ -6,7 +6,6 @@ return array(
 	'hello(/:name)?' => array('welcome/hello', 'name' => 'hello'),
 
 	// API REST 
-	'api/collection/summary/(:namespace).json' => array('api/collection/summary', 'name' => 'api_collection_summary'),
-	'api/collection/(:namespace).json' => array('api/collection/', 'name' => 'api_collection'),
+	'api/collection/(:namespace)' => array('api/collection/', 'name' => 'api_collection'),
 
 );

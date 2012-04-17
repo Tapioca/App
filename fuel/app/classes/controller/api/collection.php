@@ -45,6 +45,57 @@ class Controller_Api_Collection extends Controller_Api
 		}
 	}
 
+	//create collection data.
+	public function post_index()
+	{
+		if(self::$granted)
+		{
+			$model = json_decode(Input::post('model', false), true);
+			
+			if(!$model)
+			{
+				self::$data   = array('error' => 'tapioca.missing_required_params');
+				self::$status = 500;
+			}
+			else
+			{
+				// init tapioca first to get config
+				$collection = Tapioca::collection($this->appid); 
+				$summary    = array();
+				$data       = array();
+				$values     = $this->dispatch($summary, $data, $model);
+
+				try
+				{
+
+					$app_name = 'dior-backstage';
+					$user     = Auth::user();
+
+					$user = array(
+						'id'    => $user->get('_id'),
+						'name'  => $user->get('name'),
+						'email' => $user->get('email'),
+					);
+
+					$summary = $collection->create_summary($summary);
+
+					if(count($data) > 0)
+					{
+						$data = $collection->update_data($data, $user);
+					}
+
+					self::$data   = $collection->get();
+					self::$status = 200;
+
+				}
+				catch (TapiocaException $e)
+				{
+					self::error($e->getMessage());
+				}
+			}// if $model
+		} // if granted
+	}
+
 	//update collection data.
 	public function put_index()
 	{
@@ -61,32 +112,12 @@ class Controller_Api_Collection extends Controller_Api
 			{
 				// init tapioca first to get config
 				$collection = Tapioca::collection($this->appid, $this->namespace); 
-				$values     = $this->dispatch($model);
+				$summary    = array();
+				$data       = array();
+				$values     = $this->dispatch($summary, $data, $model);
 
 				try
 				{
-					// fixtures
-					$value = array(
-						'structure' => array(
-							array(
-								"id" => "title",
-								"label" => "Titre",
-								"type" => "text",
-								"rules" => array(
-									"required",
-									"min_length[5]"
-								)
-							),
-							array(
-								"id" => "desc",
-								"label" => "Description",
-								"type" => "textarea"
-							)
-						),
-						'summary' => array(
-							'title' => 'Titre'
-						)
-					);
 
 					$app_name = 'dior-backstage';
 					$user     = Auth::user();
@@ -97,8 +128,15 @@ class Controller_Api_Collection extends Controller_Api
 						'email' => $user->get('email'),
 					);
 
+					if(count($summary) > 0)
+					{
+						$summary = $collection->update_summary($summary);
+					}
 
-					$data       = $collection->update_data($value, $user);
+					if(count($data) > 0)
+					{
+						$data = $collection->update_data($data, $user);
+					}
 
 					self::$data   = array('status' => $data);
 					self::$status = 200;
@@ -112,110 +150,24 @@ class Controller_Api_Collection extends Controller_Api
 		} // if granted
 	}
 
-	private function dispatch($values)
+	private function dispatch(&$summary, &$data, $values)
 	{
-		$ret     = array('summary' => array(), 'data' => array());
-		$summary = Config::get('tapioca.collection.dispatch.summary');
-		$data    = Config::get('tapioca.collection.dispatch.data');
+		$arrSummary = Config::get('tapioca.collection.dispatch.summary');
+		$arrData    = Config::get('tapioca.collection.dispatch.data');
 
 		foreach($values as $key => $value)
 		{
-			if(in_array($key, $summary))
+			if(in_array($key, $arrSummary))
 			{
-				$ret['summary'][$key] = $value;
+				$summary[$key] = $value;
 			}
 
-			if(in_array($key, $data))
+			if(in_array($key, $arrData))
 			{
-				$ret['data'][$key] = $value;
-			}
-		}
-		Debug::show($ret);
-		exit;
-	}
-
-	/* Summary
-	----------------------------------------- 
-
-	public function get_summary()
-	{
-		if(self::$granted)
-		{
-			try
-			{
-				$collection = Tapioca::collection($this->appid, $this->namespace); //
-				$summary = $collection->summary();
-
-				self::$data = $summary;
-				self::$status = 200;
-			}
-			catch (TapiocaException $e)
-			{
-				self::error($e->getMessage());
+				$data[$key] = $value;
 			}
 		}
+
+		return;
 	}
-
-	//update collection summary.
-	public function put_summary()
-	{
-		if(self::$granted)
-		{
-			try
-			{
-				\Debug::show(Input::post('model'));
-				exit;
-				// fixtures
-				$value = array(
-					'namespace' => 'blog',
-					'name' => 'Blog',
-					'desc' => 'une courte déscription',
-					'status' => 1
-				);
-
-				$collection = Tapioca::collection($this->appid, $this->namespace); //
-				$summary = $collection->update_summary($value);
-
-				self::$data = array('status' => $summary);
-				self::$status = 200;
-
-			}
-			catch (TapiocaException $e)
-			{
-				self::error($e->getMessage());
-			}
-		} // if granted
-	}
-
-	//Create a new entry in the collection. 
-	public function post_summary($values)
-	{
-		if(self::$granted)
-		{
-			try
-			{
-				\Debug::show($values);
-				exit;
-				// fixtures
-				$value = array(
-					'namespace' => 'blog',
-					'name' => 'Blog',
-					'desc' => 'déscription de la collection blog',
-					'status' => 1
-				);
-
-				$collection = Tapioca::collection($this->appid); //
-				$summary = $collection->create_summary($value);
-
-				self::$data = array('status' => 'ok', 'id' => (string) $summary);
-				self::$status = 200;
-
-			}
-			catch (TapiocaException $e)
-			{
-				self::error($e->getMessage());
-			}
-		} // if granted
-	}
-	*/
 }
