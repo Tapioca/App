@@ -2,6 +2,7 @@ app.sublime-project
 app.sublime-workspace
 .DS_Store
 fuel/app/classes/controller/test
+fuel/app/classes/controller/redis.php
 fuel/app/logs/*/*/*
 fuel/app/cache/*/*
 public/client_test

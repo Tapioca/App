@@ -15,13 +15,18 @@ Autoloader::add_classes(array(
 	// Add classes you want to override here
 	// Example: 'View' => APPPATH.'classes/view.php',
 	'Debug'				=> APPPATH.'classes/core/debug.php',
+	'Phpredis'			=> APPPATH.'classes/phpredis.php',
 
-	'Tapioca\\Tapioca'                          => __DIR__.'/classes/tapioca.php',
 
-	'Tapioca\\TapiocaException'                 => __DIR__.'/classes/tapioca.php',
-	'Tapioca\\TapiocaCollectionException'       => __DIR__.'/classes/tapioca/collection.php', 
+	'Tapioca\\Tapioca'                          => APPPATH.'classes/tapioca.php',
 
-	'Tapioca\\Collection'           	        => __DIR__.'/classes/tapioca/collection.php'
+	'Tapioca\\TapiocaException'                 => APPPATH.'classes/tapioca.php',
+	'Tapioca\\TapiocaCollectionException'       => APPPATH.'classes/tapioca/collection.php', 
+
+	'Tapioca\\Collection'           	        => APPPATH.'classes/tapioca/collection.php',
+
+	// Resque jobs
+	'Tapioca\\Jobs\\PHP_Job' => APPPATH.'classes/tapioca/jobs/job.php',
 ));
 
 // Register the autoloader
