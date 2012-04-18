@@ -82,22 +82,52 @@ class Resque
 		}
 	}
 
+	public static function status($token)
+	{
+		$status = new \Resque_Job_Status($token);
+
+		switch($status->get())
+		{
+			case 1: 
+						$str   = 'waiting';
+						$color = '';
+						break;
+			case 2: 
+						$str   = 'running';
+						$color = '';
+						break;
+			case 3: 
+						$str   = 'failed';
+						$color = 'red';
+						break;
+			case 4: 
+						$str   = 'complete';
+						$color = 'green';
+						break;
+			default:
+						$str   = 'false';
+						$color = 'red';
+		}
+
+		\Cli::write(__('resque.status.'.$str), $color); // Outputs the status
+	}
+
  	public static function help()
  		{
  			echo <<<HELP
 Usage:
-    php oil refine wrench
-    php oil refine wrench:start
-    php oil refine wrench:finish
+    php oil refine resque
+    php oil refine resque:queue
+    php oil refine resque:status "token"
 
 Fuel options:
 
 
 Description:
-	The wrench task will toggle the site on/off for maintenance.
+	Resque is a Redis-backed library for creating background jobs, placing those jobs on multiple queues, and processing them later.
 
 Examples:
-    php oil r wrench
+    php oil r resque
 
 HELP;
 

@@ -14,9 +14,9 @@ class PHP_Job
 		//sleep(20);
 		fwrite(STDOUT, 'Hello '.$this->args['name'].'!');
 		
-		$collection = Tapioca::collection($this->appid, $this->namespace);
+		//$collection = Tapioca::collection($this->appid, $this->namespace);
 		
-		\Cli::write(print_r($collection, true));
+		//\Cli::write(print_r($collection, true));
 		//sleep(30);
 	}
 }

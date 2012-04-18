@@ -26,6 +26,8 @@ class Resque
 	public static function _init()
 	{
 		\Config::load('resque', true);
+		\Lang::load('resque', 'resque');
+
 	}
 
 	/**
