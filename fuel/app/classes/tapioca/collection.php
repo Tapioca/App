@@ -83,7 +83,7 @@ class Collection
 				'app_id' => $this->app_id
 			), 1);
 
-			// if there was a result - update user
+			// if there was a result 
 			if (count($summary) == 1)
 			{
 				// if just a collection exists check - return true, no need for additional queries
@@ -199,7 +199,7 @@ class Collection
 		// get a specific revison
 		if(!is_null($revision))
 		{
-			// revisons is a zero based index
+			// revisons array is zero based index
 			--$revision;
 
 			// revision exists
@@ -216,6 +216,14 @@ class Collection
 		return end($this->data);
 	}
 
+	/**
+	 * check for required fields
+	 *
+	 * @param   array  Fields to update
+	 * @param   string list to check
+	 * @return  bool
+	 * @throws  TapiocaException
+	 */
 	private static function validation(array $fields, $check_list)
 	{
 		foreach($check_list as $item)
@@ -308,6 +316,13 @@ class Collection
 					->update(static::$collection, $fields);
 	}
 
+	/**
+	 * Add a new structure revision to the current collection
+	 *
+	 * @param   array  Fields 
+	 * @return  bool
+	 * @throws  TapiocaException
+	 */
 	public function update_data(array $fields, $user)
 	{
 		if(is_null($this->summary))
@@ -374,6 +389,12 @@ class Collection
 		);
 	}
 
+	/**
+	 * Delete the current collection
+	 *
+	 * @return  bool
+	 * @throws  TapiocaException
+	 */
 	public function delete()
 	{
 		if(is_null($this->summary))
