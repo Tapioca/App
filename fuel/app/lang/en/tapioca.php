@@ -9,5 +9,10 @@ return array(
 	'collection_column_is_empty'     => ':column must not be empty.',
 	'collection_already_exists'      => 'The collection name ":name" already exists.',
 	'can_not_insert_collection_data' => 'Collection ":name" can not be update',
-	'can_not_update_collection_revision' => 'Collection ":name" can not be update'
+	'can_not_update_collection_revision' => 'Collection ":name" can not be update',
+
+	/** Document Exception Messages **/
+	'document_not_found'           => 'Document ":ref" does not exist in collection ":collection".',
+	'document_revision_not_found'  => 'Revison ":revision" does not exist for Document ":ref" in collection ":collection".',
+	'no_document_selected' => 'No document is selected.',
 );

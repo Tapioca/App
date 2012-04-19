@@ -20,9 +20,14 @@ class Controller_Api extends Controller_Rest
 		}
 	}
 
-	protected static function error($message)
+	protected static function error($message, $debug = null)
 	{
 		self::$data = array('error' => $message);
+
+		if(!is_null($debug))
+		{
+			self::$data['debug'] = $debug;
+		}
 		self::$status = 501;
 	}
 

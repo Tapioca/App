@@ -19,11 +19,11 @@ Autoloader::add_classes(array(
 
 
 	'Tapioca\\Tapioca'                          => APPPATH.'classes/tapioca.php',
-
 	'Tapioca\\TapiocaException'                 => APPPATH.'classes/tapioca.php',
 	'Tapioca\\TapiocaCollectionException'       => APPPATH.'classes/tapioca/collection.php', 
 
-	'Tapioca\\Collection'           	        => APPPATH.'classes/tapioca/collection.php',
+	'Tapioca\\Collection'                       => APPPATH.'classes/tapioca/collection.php',
+	'Tapioca\\Document'                         => APPPATH.'classes/tapioca/document.php',
 
 	// Resque jobs
 	'Tapioca\\Jobs\\PHP_Job' => APPPATH.'classes/tapioca/jobs/job.php',

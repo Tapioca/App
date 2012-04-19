@@ -33,10 +33,10 @@ class Tapioca
 	}
 
 	/**
-	 * @param   string group id
+	 * @param   string app id
 	 * @param   MongoId|string Collection id.
 	 * @throws  TapiocaException
-	 * @return  Tapioca_Collection
+	 * @return  Collection
 	 */
 	public static function collection($appid, $id = null)
 	{
@@ -45,6 +45,28 @@ class Tapioca
 			return new \Collection($appid, $id);
 		}
 		catch (TapiocaCollectionException $e)
+		{
+			throw new \TapiocaException($e->getMessage());
+		}
+
+		//\Debug::dump('Tapioca collection call');
+		//
+	}
+
+	/**
+	 * @param   string app slug
+	 * @param   string collection namespace.
+	 * @param   string document reference.
+	 * @throws  TapiocaException
+	 * @return  Document
+	 */
+	public static function document($app_slug, $namespace, $ref = null)
+	{
+		try
+		{
+			return new \Document($app_slug, $namespace, $ref);
+		}
+		catch (TapiocaDocumentException $e)
 		{
 			throw new \TapiocaException($e->getMessage());
 		}
