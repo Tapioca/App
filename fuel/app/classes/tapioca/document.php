@@ -340,13 +340,15 @@ class Document
 	{
 		$date = new \MongoDate();
 		++self::$last_revision;
+		
+		$is_active = $this->set_active();
 
 		$data = array(
 			'_ref' => self::$ref,
 			'_about' => array(
 				'revision' => (int) self::$last_revision,
 				'status' => (int) 1,
-				'active' => (bool) false,
+				'active' => (bool) $is_active,
 				'user' => $user,
 			)
 		) + $document;
@@ -361,8 +363,15 @@ class Document
 													'status' => (int) 1,
 													'user' => $user,
 												);
-//		\Debug::show($data, $this->summary);
-//		exit;
+		// update active revision
+		if($is_active)
+		{
+			$update_active = static::$db
+								->where(array('_ref' => self::$ref))
+								->update_all(static::$collection, array('_about.active' => (bool) false));
+
+			$this->summary['revisions']['active'] = (int) self::$last_revision;
+		}
 
 		$new_data = static::$db->insert(static::$collection, $data);
 
@@ -375,6 +384,18 @@ class Document
 								))
 								->update(static::$collection, $this->summary);
 		}
+	}
+
+	private function set_active()
+	{
+		foreach ($this->summary['revisions']['list'] as $revision)
+		{
+			if($revision['status'] == 100)
+			{
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/**
