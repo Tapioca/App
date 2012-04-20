@@ -18,12 +18,14 @@ Autoloader::add_classes(array(
 	'Phpredis'			=> APPPATH.'classes/phpredis.php',
 
 
-	'Tapioca\\Tapioca'                          => APPPATH.'classes/tapioca.php',
-	'Tapioca\\TapiocaException'                 => APPPATH.'classes/tapioca.php',
-	'Tapioca\\TapiocaCollectionException'       => APPPATH.'classes/tapioca/collection.php', 
+	'Tapioca\\Tapioca'                    => APPPATH.'classes/tapioca.php',
+	'Tapioca\\TapiocaException'           => APPPATH.'classes/tapioca.php',
+	'Tapioca\\TapiocaCollectionException' => APPPATH.'classes/tapioca/collection.php', 
+	'Tapioca\\TapiocaDocumentException'   => APPPATH.'classes/tapioca/document.php', 
 
-	'Tapioca\\Collection'                       => APPPATH.'classes/tapioca/collection.php',
-	'Tapioca\\Document'                         => APPPATH.'classes/tapioca/document.php',
+	'Tapioca\\Collection'                 => APPPATH.'classes/tapioca/collection.php',
+	'Tapioca\\Document'                   => APPPATH.'classes/tapioca/document.php',
+	'Tapioca\\Rules'                      => APPPATH.'classes/tapioca/rules.php',
 
 	// Resque jobs
 	'Tapioca\\Jobs\\PHP_Job' => APPPATH.'classes/tapioca/jobs/job.php',

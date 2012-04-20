@@ -50,6 +50,11 @@ class Document
 	protected $summary = null;
 
 	/**
+	 * @var  array  document validation errors
+	 */
+	protected $errors = array();
+
+	/**
 	 * @var  string  Query arguments
 	 */
 	protected static $operators = array('select', 'where', 'sort', 'limit', 'skip');
@@ -267,11 +272,36 @@ class Document
 	 * @return  array user data
 	 * @throws  TapiocaException
 	 */
-	public function save(array $document, $summary, $user)
+	public function save($appid, array $document, $user)
 	{
 		if(is_null(static::$collection))
 		{
 			throw new \TapiocaException(__('tapioca.no_collection_selected'));
+		}
+
+		// Get Collection Definiton
+		$collection      = Tapioca::collection($appid, self::$namespace); 
+		$collection_data = $collection->data();
+
+		// Set document summary
+		try
+		{
+			$summary = $this->set_summary($collection_data['summary'], $document);
+		}
+		catch (TapiocaDocumentException $e)
+		{
+			throw new \TapiocaException( $e->getMessage() );
+		}
+
+		// Test document rules
+		if(isset($collection_data['rules']))
+		{
+			if(!$this->test_rules($collection_data['rules'], $document))
+			{
+				\Debug::show($this->errors);
+				exit;
+				throw new \TapiocaException( 'fuck' );
+			}
 		}
 
 		// new document
@@ -386,15 +416,107 @@ class Document
 		}
 	}
 
+	/**
+	 * Extract document summary 
+	 *
+	 * @params  array collection summary definition
+	 * @params  array document data
+	 * @return  array document summary
+	 * @throws  TapiocaException
+	 */
+	private function set_summary($structure, $document)
+	{
+		$summary = array('data' => array());
+
+		foreach($structure as $key => $v)
+		{
+			$value = \Arr::get($document, $key, '__DOC_MISSING_VALUE__');
+
+			if($value != '__DOC_MISSING_VALUE__')
+			{
+				$summary['data'][$key] = $value;
+			}
+			else
+			{
+				throw new \TapiocaDocumentException(
+					__('tapioca.document_column_is_empty', array('column' => $v))
+				);
+			}
+		}
+
+		return $summary;
+	}
+
+	/**
+	 * Test each rules in the current document 
+	 *
+	 * @params  array collection rules definition
+	 * @params  array document data
+	 * @return  bool
+	 */
+	private function test_rules($rules_list, $document)
+	{
+		foreach($rules_list as $field => $rules)
+		{
+			$value = \Arr::get($document, $field, null);
+			$args  = array($value);
+			
+			foreach($rules as $rule)
+			{
+				// Strip the parameter (if exists) from the rule
+				// Rules can contain a parameter: max_length[5]
+				$param = false;
+				
+				if (preg_match("/(.*?)\[(.*)\]/", $rule, $match))
+				{
+					$rule	= $match[1];
+					$param	= explode('|', $match[2]);
+					$args	= array_merge($args, $param);
+				}
+				
+				$valid = call_user_func_array(array(__NAMESPACE__ .'\Rules', $rule), $args);
+				
+				if(!$valid)
+				{
+					$obj = new \stdClass;
+					$obj->rule = $rule;
+					$obj->args = array_merge(array('$item[id]'), (array) $param);
+					
+					$this->errors[] = $obj;
+					
+					return false;
+				}
+			}
+		}
+		
+		return true;
+	}
+
+	/**
+	 * Check if new revision has higher status than the others
+	 * If we found a status 100 (published), return false
+	 *
+	 * @return  bool
+	 */
 	private function set_active()
 	{
+		$higher = 1;
+		
 		foreach ($this->summary['revisions']['list'] as $revision)
 		{
+			$higher = ($revision['status'] > $higher) ? $revision['status'] : $higher;
+
 			if($revision['status'] == 100)
 			{
 				return false;
 			}
 		}
+
+		if($higher > 1)
+		{
+			return false;
+		}
+
 		return true;
 	}
 
