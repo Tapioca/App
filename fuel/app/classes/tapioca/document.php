@@ -86,14 +86,20 @@ class Document
 			self::$ref = $ref; 
 
 			//query database for document's summary
-			$summary = static::$db->select(array(), array('_id'))->get_where(static::$collection, array('ref'  => $ref), 1);
+			$summary = static::$db
+						->select(array(), array('_id'))
+						->get_where(static::$collection, array(
+							'_ref'  => $ref,
+							'_summary' => array( '$exists' => true )
+						), 1);
 
 			// if there was a result
 			if (count($summary) == 1)
 			{
 				$this->summary = $summary[0];
 				$this->set('where', array(
-					'_ref' => self::$ref
+					'_ref' => self::$ref,
+					'_summary' => array( '$exists' => false )
 				));
 
 				// cache data
@@ -136,14 +142,26 @@ class Document
 	public function all()
 	{
 		//query database for collections's summaries
-		return static::$db
+		$ret = static::$db
 				->where(array(
-					'summary' => array( '$exists' => true )
+					'_summary' => array( '$exists' => true )
 				))
 				->order_by(array(
 					'date.created' => 'desc'
 				))
 				->get(static::$collection);
+
+		foreach ($ret as &$value)
+		{
+			unset($value['_id']);
+			// format date
+			foreach($value['date'] as $key => $timestamp)
+			{
+				$value['date'][$key] = $timestamp->sec;
+			}
+		}
+
+		return $ret;
 	}
 
 	/**
@@ -211,7 +229,7 @@ class Document
 	 * @return  array
 	 * @throws  TapiocaException
 	 */
-	public function get($revision = null)
+	public function get($revision = null, $mode = null)
 	{
 		if(is_null(static::$collection))
 		{
@@ -219,7 +237,7 @@ class Document
 		}
 
 		$this->set('where', array(
-			'summary' => array( '$exists' => false ),
+			'_summary' => array( '$exists' => false ),
 			'_about.active' => true
 		));
 
@@ -243,6 +261,17 @@ class Document
 
 		if($result)
 		{
+			if($mode == 'edit')
+			{
+				$result[0]['_about']['revisions'] = $this->summary['revisions'];
+			}
+
+			// return individual document
+			if(self::$ref)
+			{
+				return $result[0];
+			}
+
 			return $result;
 		}
 		
@@ -283,6 +312,17 @@ class Document
 		$collection      = Tapioca::collection($appid, self::$namespace); 
 		$collection_data = $collection->data();
 
+		// Test document rules
+		if(isset($collection_data['rules']))
+		{
+			if(!$this->test_rules($collection_data['rules'], $document))
+			{
+				//\Debug::show($this->errors);
+				//exit;
+				throw new \TapiocaException( 'fuck the rules!!' );
+			}
+		}
+
 		// Set document summary
 		try
 		{
@@ -291,17 +331,6 @@ class Document
 		catch (TapiocaDocumentException $e)
 		{
 			throw new \TapiocaException( $e->getMessage() );
-		}
-
-		// Test document rules
-		if(isset($collection_data['rules']))
-		{
-			if(!$this->test_rules($collection_data['rules'], $document))
-			{
-				\Debug::show($this->errors);
-				exit;
-				throw new \TapiocaException( 'fuck' );
-			}
 		}
 
 		// new document
@@ -313,6 +342,8 @@ class Document
 		{
 			$this->update($document, $summary, $user);
 		}
+
+		return $this->get(self::$last_revision);
 	}
 
 	private function create($document, $summary, $user)
@@ -333,8 +364,8 @@ class Document
 		) + $document;
 
 		$summary = array(
-			'ref' => $ref,
-			'summary' => (bool) true,
+			'_ref' => $ref,
+			'_summary' => (bool) true,
 			'date' => array(
 				'created' => $date
 			),
@@ -343,7 +374,7 @@ class Document
 				'active' => (int) 1,
 				'list' => array(
 					array(
-						'revison' => 1,
+						'revision' => 1,
 						'date' => $date,
 						'status' => (int) 1,
 						'user' => $user,
@@ -390,7 +421,7 @@ class Document
 		$this->summary['data']                = $summary['data'];
 		$this->summary['date']['updated']     = $date;
 		$this->summary['revisions']['list'][] = array(
-													'revison' => (int) self::$last_revision,
+													'revision' => (int) self::$last_revision,
 													'date' => $date,
 													'status' => (int) 1,
 													'user' => $user,
@@ -411,8 +442,8 @@ class Document
 		{
 			$new_summary = static::$db
 								->where(array(
-									'ref'       => self::$ref,
-									'summary'   => (bool) true
+									'_ref'       => self::$ref,
+									'_summary'   => (bool) true
 								))
 								->update(static::$collection, $this->summary);
 		}
