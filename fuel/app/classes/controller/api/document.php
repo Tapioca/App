@@ -67,6 +67,12 @@ class Controller_Api_Document extends Controller_Api
 					$document->set($this->query);
 				}
 
+				// Set status restriction
+				if(!is_null($this->doc_status))
+				{
+					$document->set(array('where' => array('_about.status' => (int) $this->doc_status)));
+				}
+
 				self::$data   = $document->get($this->revision);
 				self::$status = 200;
 

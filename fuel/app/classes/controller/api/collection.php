@@ -12,6 +12,7 @@ class Controller_Api_Collection extends Controller_Api
 		// to define with api key and query string
 		$this->appid = Input::get('appid', '4f7977b4c68deebf01000000');
 		$this->namespace = $this->param('namespace', false);
+		$this->app_slug   = $this->param('app_slug', false);
 	}
 
 	/* Data
@@ -157,6 +158,16 @@ class Controller_Api_Collection extends Controller_Api
 			$data = Tapioca::collection($this->appid, $this->namespace)->delete(); 
 
 			self::$data   = array('status' => $data);
+			self::$status = 200;
+		}
+	}
+
+	public function get_documents()
+	{
+		if(self::$granted)
+		{
+			$document = Tapioca::document($this->app_slug, $this->namespace);
+			self::$data = $document->all();
 			self::$status = 200;
 		}
 	}

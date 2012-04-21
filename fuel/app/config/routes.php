@@ -6,6 +6,7 @@ return array(
 	'hello(/:name)?' => array('welcome/hello', 'name' => 'hello'),
 
 	// API REST 
+	'api/:app_slug/collection/:namespace/documents' => array('api/collection/documents', 'name' => 'api_collection_documents'),
 	'api/collection(/:namespace)' => array('api/collection/', 'name' => 'api_collection'),
 	'api/:app_slug/document/:collection/:ref' => array('api/document/', 'name' => 'api_document_ref'),
 	'api/:app_slug/document/:collection' => array('api/document/', 'name' => 'api_document'),

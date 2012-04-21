@@ -60,7 +60,7 @@ class Document
 	protected static $operators = array('select', 'where', 'sort', 'limit', 'skip');
 	protected $select = array();
 	protected $where  = array('_about.status' => array('$ne' => -1));
-	protected $sort   = array('_about.revision' => 'desc');	
+	protected $sort   = array('_about.date' => 'desc');	
 	protected $limit  = 99999;
 	protected $skip   = 0;
 
@@ -324,6 +324,7 @@ class Document
 		$data = array(
 			'_ref' => $ref,
 			'_about' => array(
+				'date' => $date,
 				'revision' => (int) 1,
 				'status' => (int) 1,
 				'active' => (bool) true,
@@ -376,6 +377,7 @@ class Document
 		$data = array(
 			'_ref' => self::$ref,
 			'_about' => array(
+				'date' => $this->summary['date']['created'],
 				'revision' => (int) self::$last_revision,
 				'status' => (int) 1,
 				'active' => (bool) $is_active,
