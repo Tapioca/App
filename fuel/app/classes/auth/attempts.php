@@ -1,13 +1,14 @@
 <?php
 
-namespace Model;
+namespace Auth;
 
-use Auth;
+use Config;
+use FuelException;
 
-class AttemptsException extends \Fuel_Exception {}
-class UserSuspendedException extends \Model\AttemptsException {}
+class AttemptsException extends FuelException {}
+class UserSuspendedException extends AttemptsException {}
 
-class Attempts extends \Model
+class Attempts
 {
 	/**
 	 * @var  string  Database instance
@@ -44,31 +45,31 @@ class Attempts extends \Model
 	 *
 	 * @param   string  user login
 	 * @param   string  ip address
-	 * @return  Montry_Attempts
-	 * @throws  MontryAttemptsException
+	 * @return  Attempts
+	 * @throws  AttemptsException
 	 */
 	public function __construct($login_id = null, $ip_address = null)
 	{
-		\Config::load('auth', true);
+		Config::load('auth', true);
 
-		static::$db = \Mongo_Db::instance();
-		static::$collection = \Config::get('auth.collection.users_suspended');
-		static::$limit = \Config::get('auth.limit');
+		static::$db         = \Mongo_Db::instance();
+		static::$collection = Config::get('auth.collection.users_suspended');
+		static::$limit      = Config::get('auth.limit');
 
-		$this->login_id = $login_id;
-		$this->ip_address = $ip_address;
+		$this->login_id     = $login_id;
+		$this->ip_address   = $ip_address;
 
 		// limit checks
 		if (static::$limit['enabled'] === true)
 		{
 			if ( ! is_int(static::$limit['attempts']) or static::$limit['attempts'] <= 0)
 			{
-				throw new \Model\AuthConfigException('invalid_limit_attempts');
+				throw new \AuthConfigException(__('auth.invalid_limit_attempts'));
 			}
 
 			if ( ! is_int(static::$limit['time']) or static::$limit['time'] <= 0)
 			{
-				throw new \Model\AuthConfigException('invalid_limit_time');
+				throw new \AuthConfigException(__('auth.invalid_limit_time'));
 			}
 		}
 
@@ -147,13 +148,13 @@ class Attempts extends \Model
 		// make sure a login id and ip address are set
 		if (empty($this->login_id) or empty($this->ip_address))
 		{
-			throw new \Model\AttemptsException('login_ip_required');
+			throw new \AttemptsException(__('auth.login_ip_required'));
 		}
 
 		// this shouldn't happen, but put it just to make sure
 		if (is_array($this->attempts))
 		{
-			throw new \Model\AttemptsException('single_user_required');
+			throw new \AttemptsException(__('auth.single_user_required'));
 		}
 
 		if ($this->attempts)
@@ -217,7 +218,7 @@ class Attempts extends \Model
 	{
 		if (empty($this->login_id) or empty($this->ip_address))
 		{
-			throw new \Model\UserSuspendedException('login_ip_required');
+			throw new \UserSuspendedException(__('auth.login_ip_required'));
 		}
 
 		// only updates collection if unsuspended at has no value
@@ -234,6 +235,8 @@ class Attempts extends \Model
 
 		$result = static::$db->where($query)->update(static::$collection, $update);
 
-		throw new \Model\UserSuspendedException('user_suspended');
+		throw new \UserSuspendedException(
+			__('auth.user_suspended', array('account' => $this->login_id, 'time' => static::$limit['time']))
+		);
 	}
 }

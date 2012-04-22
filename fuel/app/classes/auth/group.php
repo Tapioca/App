@@ -1,57 +1,15 @@
 <?php
 
-/*
+namespace Auth;
 
-APPS SCHEMA
-
-
-{
-	"_id": MongoId(),
-	"name": ,
-	"slug": ,
-	"account':
-	{
-		"registred":,
-		"activited":,
-		"type": ENUM(free, prenium)
-	},
-	"db": 
-	{
-		"name":,
-		"user":,
-		"pass":,
-		"host":,
-		"apikey":
-	},
-	"admins": 
-	[
-		user MongoId,
-	]
-	"team":
-	[
-		{
-			"_id": ,
-			"name": ,
-			"email": , 
-			"is_admin": bool,
-			"level": int 
-		}
-	]
-}
-
-*/
-
-namespace Model;
-
-use Auth;
 use Config;
 use Mongo_Db;
 use FuelException;
 
-class GroupException extends \FuelException {}
-class GroupNotFoundException extends \Model\GroupException {}
+class GroupException extends FuelException {}
+class GroupNotFoundException extends GroupException {}
 
-class Group extends \Model
+class Group
 {
 	/**
 	 * @var  string  Database instance
@@ -85,7 +43,7 @@ class Group extends \Model
 	{
 		static::$collection = strtolower(Config::get('auth.collection.groups'));
 
-		static::$db = \Mongo_Db::instance();
+		static::$db = Mongo_Db::instance();
 	}
 
 	/**
@@ -125,6 +83,8 @@ class Group extends \Model
 		}
 
 		$query = (is_array($id)) ? $id : array('id' => $id);
+		$val   = current($query);
+		$key   = key($query);
 
 		//query database for group
 		$group = static::$db->get_where(static::$collection, $query, 1);
@@ -139,7 +99,9 @@ class Group extends \Model
 		// group doesn't exist
 		else
 		{
-			throw new \Model\GroupNotFoundException('group_not_found');
+			throw new \GroupNotFoundException(
+				__('auth.group_not_found', array('group' => $val))
+			);
 		}
 	}
 
@@ -149,11 +111,11 @@ class Group extends \Model
 	 * @param   array  Group info
 	 * @return  int|bool
 	 */
-	public function create($group)
+	public function create(array $group)
 	{
-		if ( ! array_key_exists('name', $group))
+		if ( ! array_key_exists('name', $group) || $group['name'] == '')
 		{
-			throw new \Model\GroupException('group_name_empty');
+			throw new \GroupException(__('auth.group_name_empty'));
 		}
 
 		$slug = \Arr::get($group, 'slug', $group['name']);
@@ -163,12 +125,16 @@ class Group extends \Model
 
 		if(in_array($group['slug'], \Config::get('slug.reserved')))
 		{
-			throw new \Model\GroupException('group_slug_invalid');			
+			throw new \GroupException(
+				__('auth.group_slug_invalid', array('group' => $group['slug']))
+			);		
 		}
 
 		if (static::group_exists($group['slug']))
 		{
-			throw new \Model\GroupException('group_already_exists');
+			throw new \GroupException(
+				__('auth.group_already_exists', array('group' => $group['slug']))
+			);
 		}
 
 		if ( ! array_key_exists('team', $group))
@@ -207,7 +173,7 @@ class Group extends \Model
 		// make sure a group id is set
 		if (empty($this->group['_id']))
 		{
-			throw new \Model\GroupException('no_group_selected');
+			throw new \GroupException(__('auth.no_group_selected'));
 		}
 
 		// if no fields were passed - return entire user
@@ -230,7 +196,9 @@ class Group extends \Model
 				}
 				else
 				{
-					throw new \Model\GroupException('not_found_in_group_object : '.$key);
+					throw new \GroupException(
+						__('auth.not_found_in_group_object', array('field' => $key))
+					);
 				}
 			}
 
@@ -245,7 +213,9 @@ class Group extends \Model
 				return $this->group[$field];
 			}
 
-			throw new \Model\GroupException('not_found_in_group_object : '.$field);
+			throw new \GroupException(
+				__('auth.not_found_in_group_object', array('field' => $field))
+			);
 		}
 	}
 
@@ -262,19 +232,21 @@ class Group extends \Model
 		// make sure a group id is set
 		if (empty($this->group['_id']))
 		{
-			throw new \Model\GroupException('no_group_selected');
+			throw new \GroupException(__('auth.no_group_selected'));
 		}
 
 		// init the update array
 		$update = array();
 
-		// update name
+		// update name ?? check Slug migth be better ?
 		if (array_key_exists('name', $fields) and $fields['name'] != $this->group['name'])
 		{
 			// make sure name does not already exist
 			if (static::group_exists($fields['name']))
 			{
-				throw new \Model\GroupException('group_already_exists');
+				throw new \GroupException(
+					__('auth.group_already_exists', array('group' => $fields['name']))
+				);
 			}
 			$update['name'] = $fields['name'];
 			unset($fields['name']);
@@ -300,7 +272,6 @@ class Group extends \Model
 		return static::$db
 						->where(array('_id' => $this->group['_id']))
 						->update(static::$collection, $update);
-
 	}
 
 
@@ -315,7 +286,7 @@ class Group extends \Model
 		// make sure a user id is set
 		if (empty($this->group['id']))
 		{
-			throw new \Model\GroupException('no_group_selected');
+			throw new \GroupException(__('auth.no_group_selected'));
 		}
 
 		$delete_group = self::$db
@@ -357,11 +328,6 @@ class Group extends \Model
 	 */
 	public function in_group($id, $field = 'email')
 	{
-		if($field == '_id' && !($id instanceof \MongoId))
-		{
-			$id = new \MongoId($id);
-		}
-
 		foreach ($this->team as $team)
 		{
 			if ($team[$field] == $id)
@@ -385,7 +351,9 @@ class Group extends \Model
 	{
 		if ($this->in_group($email))
 		{
-			throw new \Model\GroupException('user_already_in_group');
+			throw new \GroupException(
+				__('auth.user_already_in_group', array('group' => $this->get('name')))
+			);
 		}
 
 		try
@@ -394,7 +362,7 @@ class Group extends \Model
 		}
 		catch (UserNotFoundException $e)
 		{
-			throw new \Model\GroupException($e->getMessage());
+			throw new \GroupException($e->getMessage());
 		}
 
 		$user_info = array(
@@ -435,7 +403,9 @@ class Group extends \Model
 	{
 		if ( ! $this->in_group($email))
 		{
-			throw new \Model\GroupException('user_not_in_group');
+			throw new \GroupException(
+				__('auth.user_not_in_group', array('group' => $this->get('name')))
+			);
 		}
 
 		try
@@ -444,7 +414,7 @@ class Group extends \Model
 		}
 		catch (UserNotFoundException $e)
 		{
-			throw new \Model\GroupException($e->getMessage());
+			throw new \GroupException($e->getMessage());
 		}
 
 		$update = array('$pull' => array('team' => array('email' => $email)));
@@ -483,7 +453,9 @@ class Group extends \Model
 	{
 		if ( ! $this->in_group($email))
 		{
-			throw new \Model\GroupException('user_not_in_group');
+			throw new \GroupException(
+				__('auth.user_not_in_group', array('group' => $this->get('name')))
+			);
 		}
 
 		try
@@ -492,7 +464,7 @@ class Group extends \Model
 		}
 		catch (UserNotFoundException $e)
 		{
-			throw new \Model\GroupException($e->getMessage());
+			throw new \GroupException($e->getMessage());
 		}
 
 		$update = array('$addToSet' => array('admins' => $user->get('id')));
@@ -523,7 +495,9 @@ class Group extends \Model
 	{
 		if ( ! $this->in_group($id))
 		{
-			throw new \Model\GroupException('user_not_in_group');
+			throw new \GroupException(
+				__('auth.user_not_in_group', array('group' => $this->get('name')))
+			);
 		}
 
 		try
@@ -532,7 +506,7 @@ class Group extends \Model
 		}
 		catch (UserNotFoundException $e)
 		{
-			throw new \Model\GroupException($e->getMessage());
+			throw new \GroupException($e->getMessage());
 		}
 
 		$update = array('$pull' => array('admins' => $user->get('id')));

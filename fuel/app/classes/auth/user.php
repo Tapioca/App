@@ -1,14 +1,14 @@
 <?php
 
-namespace Model;
+namespace Auth;
 
 use Config;
 use FuelException;
 
 class UserException extends FuelException {}
-class UserNotFoundException extends \Model\UserException {}
+class UserNotFoundException extends UserException {}
 
-class User extends \Model
+class User
 {
 	/**
 	 * @var  string  Database instance
@@ -85,7 +85,7 @@ class User extends \Model
 			// user doesn't exist
 			else
 			{
-				throw new \Model\UserNotFoundException('user_not_found');
+				throw new \UserNotFoundException(__('auth.user_not_found'));
 			}
 
 			$this->groups = $user[0]['groups'];
@@ -128,8 +128,8 @@ class User extends \Model
 		// check for required fields
 		if (empty($user['email']) or empty($user['password']))
 		{
-			throw new \Model\UserException(
-				'user.email_and_password_empty'
+			throw new \UserException(
+				__('auth.email_and_password_empty')
 			);
 		}
 
@@ -160,7 +160,7 @@ class User extends \Model
 				return false;
 			}
 
-			throw new \Model\UserException('user.already_exists');
+			throw new \UserException(__('auth.email_already_exists'));
 		}
 
 		$user_id = uniqid();
@@ -221,9 +221,9 @@ class User extends \Model
 	public function get($field = null)
 	{
 		// make sure a user id is set
-		if(! ($this->user['_id'] instanceof \MongoId))
+		if (empty($this->user))
 		{
-			throw new \Model\UserException('no_user_selected_to_get');
+			throw new \UserException(__('auth.no_user_selected_to_get'));
 		}
 
 		// if no fields were passed - return entire user
@@ -248,8 +248,8 @@ class User extends \Model
 				}
 				else
 				{
-					throw new \Model\UserException(
-						'not_found_in_user_object : '.$key
+					throw new \UserException(
+						__('auth.not_found_in_user_object', array('field' => $key))
 					);
 				}
 			}
@@ -267,7 +267,9 @@ class User extends \Model
 				return $val;
 			}
 
-			throw new \Model\UserException('not_found_in_user_object : '.$field);
+			throw new \UserException(
+				__('auth.not_found_in_user_object', array('field' => $field))
+			);
 		}
 	}
 
@@ -285,7 +287,7 @@ class User extends \Model
 		// make sure a user id is set
 		if (empty($this->user))
 		{
-			throw new \Model\UserException(__('no_user_selected'));
+			throw new \UserException(__('auth.no_user_selected'));
 		}
 
 		// init update array
@@ -296,12 +298,12 @@ class User extends \Model
 			$fields['email'] != $this->user['email'] and
 			$this->user_exists($fields['email']))
 		{
-			throw new \Model\UserException('email_already_exists');
+			throw new \UserException(__('auth.email_already_exists'));
 		}
 		elseif (array_key_exists('email', $fields) and
 				$fields['email'] == '')
 		{
-			throw new \Model\UserException('email_is_empty');
+			throw new \UserException(__('auth.email_and_password_empty'));
 		}
 		elseif (array_key_exists('email', $fields))
 		{
@@ -314,7 +316,7 @@ class User extends \Model
 		{
 			if (empty($fields['password']))
 			{
-				throw new \Model\UserException('password_empty');
+				throw new \UserException(__('auth.email_and_password_empty'));
 			}
 			if ($hash_password)
 			{
@@ -427,7 +429,7 @@ class User extends \Model
 		// make sure a user id is set
 		if (empty($this->user))
 		{
-			throw new \Model\UserException('no_user_selected_to_delete');
+			throw new \UserException(__('auth.no_user_selected_to_delete'));
 		}
 
 		$delete_user = self::$db
@@ -455,7 +457,7 @@ class User extends \Model
 	{
 		if ($this->user['status'] == 1)
 		{
-			throw new \UserException('user_already_enabled');
+			throw new \UserException(__('auth.user_already_enabled'));
 		}
 		return $this->update(array('status' => 1));
 	}
@@ -470,7 +472,7 @@ class User extends \Model
 	{
 		if ($this->user['status'] == 0)
 		{
-			throw new \UserException('user_already_disabled');
+			throw new \UserException(__('auth.user_already_disabled'));
 		}
 		return $this->update(array('status' => 0));
 	}
@@ -481,12 +483,12 @@ class User extends \Model
 	 * @param   string  The Login Column value
 	 * @return  bool
 	 */
-	protected function user_exists($email)
+	protected function user_exists($id)
 	{
+		$query = (is_array($id)) ? $id : array('email' => $id);
+
 		// query db to check for login_column
-		$result = static::$db->get_where(static::$collection, array(
-			'email' => $email
-		), 1);
+		$result = static::$db->get_where(static::$collection, $query, 1);
 
 		if (count($result) == 1)
 		{
@@ -559,7 +561,7 @@ class User extends \Model
 		// make sure old password matches the current password
 		if ( ! $this->check_password($old_password))
 		{
-			throw new \Model\UserException('invalid_old_password');
+			throw new \UserException(__('auth.invalid_old_password'));
 		}
 
 		return $this->update(array('password' => $password));
@@ -588,7 +590,7 @@ class User extends \Model
 	{
 		if ($this->in_group($id))
 		{
-			throw new \Model\UserException('user_already_in_group');
+			throw new \UserException(__('auth.user_already_in_group'));
 		}
 
 		try
@@ -597,7 +599,7 @@ class User extends \Model
 		}
 		catch (GroupNotFoundException $e)
 		{
-			throw new \Model\UserException($e->getMessage());
+			throw new \UserException($e->getMessage());
 		}
 
 		$group_info = array(
@@ -638,7 +640,7 @@ class User extends \Model
 	{
 		if ( ! $this->in_group($id))
 		{
-			throw new \Model\UserException('user_not_in_group');
+			throw new \UserException(__('auth.user_not_in_group'));
 		}
 
 		try
@@ -647,7 +649,7 @@ class User extends \Model
 		}
 		catch (GroupNotFoundException $e)
 		{
-			throw new \Model\UserException($e->getMessage());
+			throw new \UserException($e->getMessage());
 		}
 
 		$query = (is_array($id)) ? $id : array('id' => $id);

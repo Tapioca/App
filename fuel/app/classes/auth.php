@@ -1,10 +1,12 @@
 <?php
 
-use Model\User;
-use Model\UserNotFoundException;
-use Model\Group;
-use Model\Attempts;
-use Model\UserSuspendedException;
+namespace Auth;
+
+use FuelException;
+use Config;
+use Session;
+use Cookie;
+use Lang;
 
 class AuthException extends FuelException {}
 
@@ -49,6 +51,7 @@ class Auth
 	{
 		// load config
 		Config::load('auth', true);
+		Lang::load('auth', 'auth');
 
 		// set static vars for later use
 		static::$suspend = trim(Config::get('auth.limit.enabled'));
@@ -112,12 +115,19 @@ class Auth
 	 */
 	public static function group($id = null)
 	{
-		if ($id)
+		try
 		{
-			return new Group($id);
-		}
+			if ($id)
+			{
+				return new Group($id);
+			}
 
-		return new Group();
+			return new Group();
+		}
+		catch (GroupNotFoundException $e)
+		{
+			throw new \AuthException($e->getMessage());
+		}
 	}
 
 	/**
@@ -204,7 +214,7 @@ class Auth
 			}
 
 			// set session vars
-			Session::set(Config::get('auth.session.user'), (string) $user->get('_id'));
+			Session::set(Config::get('auth.session.user'), $user->get('id'));
 			Session::set(Config::get('auth.session.provider'), 'Tapioca');
 
 			return true;
@@ -212,28 +222,6 @@ class Auth
 
 		return false;
 	}
-
-	/**
-	 * Force Login
-	 *
-	 * @param   int|string  user id or login value
-	 * @param   provider    what system was used to force the login
-	 * @return  bool
-	 * @throws  AuthException
-	 */
-	public static function force_login($id, $provider = 'Tapioca-Forced')
-	{
-		// check to make sure user exists
-		if ( ! static::user_exists($id))
-		{
-			throw new \Model\AuthException('user_not_found');
-		}
-
-		Session::set(Config::get('auth.session.user'), $id);
-		Session::set(Config::get('auth.session.provider'), $provider);
-		return true;
-	}
-
 
 	/**
 	 * Checks if the current user is logged in.
@@ -288,10 +276,10 @@ class Auth
 		$cookie_string = base64_encode($login_column.':'.$cookie_pass);
 
 		// set cookie
-		\Cookie::set(
-			\Config::get('auth.remember_me.cookie_name'),
+		Cookie::set(
+			Config::get('auth.remember_me.cookie_name'),
 			$cookie_string,
-			\Config::get('auth.remember_me.expire')
+			Config::get('auth.remember_me.expire')
 		);
 
 		return $cookie_pass;
@@ -302,7 +290,7 @@ class Auth
 	 */
 	protected static function is_remembered()
 	{
-		$encoded_val = \Cookie::get(\Config::get('auth.remember_me.cookie_name'));
+		$encoded_val = Cookie::get(Config::get('auth.remember_me.cookie_name'));
 
 		if ($encoded_val)
 		{
@@ -318,7 +306,7 @@ class Auth
 				));
 
 				// set session vars
-				Session::set(Config::get('auth.session.user'), (string) $user->get('_id'));
+				Session::set(Config::get('auth.session.user'), $user->get('id'));
 				Session::set(Config::get('auth.session.provider'), 'Tapioca');
 
 				return true;
