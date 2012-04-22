@@ -124,16 +124,16 @@ class Group extends \Model
 			return;
 		}
 
+		$query = (is_array($id)) ? $id : array('id' => $id);
+
 		//query database for group
-		$group = static::$db->get_where(static::$collection, array(
-			'name' => $id
-		), 1);
+		$group = static::$db->get_where(static::$collection, $query, 1);
 
 		// if there was a result - update user
 		if (count($group) == 1)
 		{
-			$this->group = $group[0];
-			$this->team = $group[0]['team'];
+			$this->group  = $group[0];
+			$this->team   = $group[0]['team'];
 			$this->admins = $group[0]['admins'];
 		}
 		// group doesn't exist
@@ -159,6 +159,13 @@ class Group extends \Model
 		$slug = \Arr::get($group, 'slug', $group['name']);
 		$group['slug'] = \Inflector::friendly_title($slug, '-', true);
 
+		\Config::load('slug', true);
+
+		if(in_array($group['slug'], \Config::get('slug.reserved')))
+		{
+			throw new \Model\GroupException('group_slug_invalid');			
+		}
+
 		if (static::group_exists($group['slug']))
 		{
 			throw new \Model\GroupException('group_already_exists');
@@ -174,11 +181,15 @@ class Group extends \Model
 			$group['admins'] = array();
 		}
 
+		$group_id = uniqid();
+
+		$group['id'] = $group_id;
+
 		$result = static::$db->insert(static::$collection, $group);
 
 		if(count($result) > 0)
 		{
-			return (string) $result;
+			return $group_id;
 		}
 
 		return false;
@@ -387,9 +398,9 @@ class Group extends \Model
 		}
 
 		$user_info = array(
-				'_id'      => $user->get('_id'),
+				'id'       => $user->get('id'),
 				'name'     => $user->get('name'),
-				'email'     => $user->get('email'),
+				'email'    => $user->get('email'),
 				'level'    => 0,
 				'is_admin' => 0
 			);
@@ -484,7 +495,7 @@ class Group extends \Model
 			throw new \Model\GroupException($e->getMessage());
 		}
 
-		$update = array('$addToSet' => array('admins' => $user->get('_id')));
+		$update = array('$addToSet' => array('admins' => $user->get('id')));
 
 		$where = array('_id' => $this->group['_id']);
 
@@ -494,7 +505,7 @@ class Group extends \Model
 
 		if($query)
 		{
-			$this->admins[] = $user->get('_id');
+			$this->admins[] = $user->get('id');
 
 			return true;
 		}
@@ -524,7 +535,7 @@ class Group extends \Model
 			throw new \Model\GroupException($e->getMessage());
 		}
 
-		$update = array('$pull' => array('admins' => $user->get('_id')));
+		$update = array('$pull' => array('admins' => $user->get('id')));
 
 		$where = array('_id' => $this->group['_id']);
 
@@ -534,11 +545,12 @@ class Group extends \Model
 
 		if($query)
 		{
+			/*
 			if(!($id instanceof \MongoId))
 			{
 				$id = new \MongoId($id);
 			}
-
+			*/
 			foreach ($this->admins as $admin)
 			{
 				if ($admin == $id)

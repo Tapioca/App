@@ -1,26 +1,4 @@
 <?php
-/*
-
-MONGO SCHEMA
-
-{
-	"_id" : uniqueid(),
-	"email": ,
-	"password": ,
-	"name": ,
-	"is_admin": bool,
-	"level": int,  
-	"groups" : 
-	[
-		{
-			"id" : uniqueid(),
-			"name" ,
-			"slug": ,
-			"granted": ENUM (administrator, editor, author, contributor)
-		}
-	]
-}
-*/
 
 namespace Model;
 
@@ -60,7 +38,7 @@ class User extends \Model
 	/**
 	 * Loads in the user object
 	 *
-	 * @param   int|string  User id or Login Column value
+	 * @param   string  User id or Email value
 	 * @return  void
 	 * @throws  UserNotFoundException
 	 */
@@ -84,13 +62,8 @@ class User extends \Model
 			// if ID is not an email
 			else
 			{
-				if(! ($id instanceof \MongoId))
-				{
-					$id = new \MongoId($id);
-				}
-
 				// set field to id for query
-				$field = '_id';
+				$field = 'id';
 			}
 
 			//query database for user
@@ -180,7 +153,7 @@ class User extends \Model
 				if ($this->update($update))
 				{
 					return array(
-						'_id'   => $this->user['_id'],
+						'id'   => $this->user['id'],
 						'hash' => base64_encode($user['email']).'/'.$hash
 					);
 				}
@@ -190,8 +163,11 @@ class User extends \Model
 			throw new \Model\UserException('user.already_exists');
 		}
 
+		$user_id = uniqid();
+
 		// set new user values
 		$new_user = array(
+			'id' => $user_id,
 			'email' => $user['email'],
 			'password' => $this->generate_password($user['password']),
 			'created_at' => new \MongoDate(),
@@ -223,12 +199,12 @@ class User extends \Model
 			{
 				// return array of id and hash
 				return array(
-					'_id'   => (string) $insert_id,
+					'id'   => $user_id,
 					'hash' => base64_encode($user['email']).'/'.$hash
 				);
 			}
 
-			return $insert_id;
+			return $user_id;
 		}
 
 		return false;
@@ -625,7 +601,7 @@ class User extends \Model
 		}
 
 		$group_info = array(
-				'_id'      => $group->get('_id'),
+				'id'       => $group->get('id'),
 				'name'     => $group->get('name'),
 				'slug'     => $group->get('slug'),
 				'level'    => 0,
@@ -674,20 +650,24 @@ class User extends \Model
 			throw new \Model\UserException($e->getMessage());
 		}
 
+		$query = (is_array($id)) ? $id : array('id' => $id);
 
-		$update = array('$pull' => array('groups' => array('name' => $id)));
+		$update = array('$pull' => array('groups' => $query));
 
 		$where = array('_id' => $this->user['_id']);
 
-		$query = static::$db
+		$remove = static::$db
 					->where($where)
 					->update(static::$collection, $update, array(), true);
 
-		if($query)
+		if($remove)
 		{
-			foreach ($this->groups as $key => $group)
+			$val = current($query);
+			$key = key($query);
+
+			foreach ($this->groups as $group)
 			{
-				if ($group['name'] == $id)
+				if ($group[$key] == $val)
 				{
 					unset($group);
 				}
@@ -702,14 +682,18 @@ class User extends \Model
 	/**
 	 * Checks if the current user is part of the given group.
 	 *
-	 * @param   string  Group name
+	 * @param   string|array  Group ID or specific filed
 	 * @return  bool
 	 */
-	public function in_group($name)
+	public function in_group($query)
 	{
+		$query = (is_array($query)) ? $query : array('id' => $query);
+		$val   = current($query);
+		$key   = key($query);
+
 		foreach ($this->groups as $group)
 		{
-			if ($group['name'] == $name)
+			if ($group[$key] == $val)
 			{
 				return true;
 			}
