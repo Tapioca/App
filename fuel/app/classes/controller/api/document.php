@@ -2,40 +2,35 @@
 
 class Controller_Api_Document extends Controller_Api
 {
-	private $appid;
-	private $app_slug;
-	private $collection;
-	private $ref;
-	private $revision;
-	private $doc_status;
-	private $query;
-	private $debug;
+	private static $collection;
+	private static $ref;
+	private static $revision;
+	private static $doc_status;
+	private static $query;
+	private static $mode;
 
 	public function before()
 	{
 		parent::before();
 
 		// to define with api key and query string
-		$this->appid      = Input::get('appid', '4f7977b4c68deebf01000000');
-		$this->app_slug   = $this->param('app_slug', false);
-		$this->collection = $this->param('collection', false);
-		$this->ref        = $this->param('ref', null);
-		$this->revision   = Input::get('revision', null);
-		$this->doc_status = Input::get('status', null);
-		$this->query      = Input::get('q', null);
-		$this->mode       = Input::get('mode', null);
-		$this->debug      = Input::get('debug', false);
+		static::$collection = $this->param('collection', false);
+		static::$ref        = $this->param('ref', null);
+		static::$revision   = Input::get('revision', null);
+		static::$doc_status = Input::get('status', null);
+		static::$query      = Input::get('q', null);
+		static::$mode       = Input::get('mode', null);
 
 		// cast revision ID as integer
-		if(!is_null($this->revision))
+		if(!is_null(static::$revision))
 		{
-			$this->revision = (int) $this->revision;
+			static::$revision = (int) static::$revision;
 		}
 
 		// decode query
-		if(!is_null($this->query))
+		if(!is_null(static::$query))
 		{
-			$this->query = json_decode($this->query, true);
+			static::$query = json_decode(static::$query, true);
 		}
 
 	}
@@ -49,46 +44,39 @@ class Controller_Api_Document extends Controller_Api
 		{
 			try
 			{
-				$document = Tapioca::document($this->app_slug, $this->collection, $this->ref);
+				$document = Tapioca::document(self::$group, static::$collection, static::$ref);
 
-				if($this->query)
+				if(static::$query)
 				{
-					$document->set($this->query);
+					$document->set(static::$query);
 				}
 
 				// Set status restriction
-				if(!is_null($this->doc_status))
+				if(!is_null(static::$doc_status))
 				{
-					$document->set(array('where' => array('_about.status' => (int) $this->doc_status)));
+					$document->set(array('where' => array('_about.status' => (int) static::$doc_status)));
 				}
 
 				// list for back-office
-				if($this->mode == 'list')
+				if(static::$mode == 'list')
 				{
 					self::$data = $document->all();
 				}
 				else // standard API call
 				{
-					self::$data   = $document->get($this->revision, $this->mode);
+					self::$data   = $document->get(static::$revision, static::$mode);
 				}
 
 				self::$status = 200;
 
-				if($this->debug)
+				if(static::$debug)
 				{
 					self::$data['debug'] = $document->last_query();
 				}
 			}
 			catch (TapiocaException $e)
 			{
-				self::error($e->getMessage(), array(
-								'app_slug' => $this->app_slug,
-								'collection' => $this->collection,
-								'ref' => $this->ref,
-								'revision' => $this->revision,
-								'status' => $this->doc_status,
-								'query' => $this->query
-							));
+				self::error($e->getMessage());
 			}
 		} // if granted
 	}
@@ -102,22 +90,15 @@ class Controller_Api_Document extends Controller_Api
 			
 			if(!$model)
 			{
-				self::$data   = array('error' => 'tapioca.missing_required_params');
+				self::$data   = array('error' => __('tapioca.missing_required_params'));
 				self::$status = 500;
 			}
 			else
 			{
 				$this->clean($model);
 
-				$user = Auth::user();
-				$user = array(
-					'id'    => $user->get('_id'),
-					'name'  => $user->get('name'),
-					'email' => $user->get('email'),
-				);
-
-				$document     = Tapioca::document($this->app_slug, $this->collection);
-				self::$data   = $document->save($this->appid, $model, $user);
+				$document     = Tapioca::document(self::$group, static::$collection);
+				self::$data   = $document->save($model, self::$user);
 				self::$status = 200;
 			}
 		} // if granted
@@ -132,22 +113,15 @@ class Controller_Api_Document extends Controller_Api
 			
 			if(!$model)
 			{
-				self::$data   = array('error' => 'tapioca.missing_required_params');
+				self::$data   = array('error' => __('tapioca.missing_required_params'));
 				self::$status = 500;
 			}
 			else
 			{
 				$this->clean($model);
 
-				$user = Auth::user();
-				$user = array(
-					'id'    => $user->get('_id'),
-					'name'  => $user->get('name'),
-					'email' => $user->get('email'),
-				);
-
-				$document     = Tapioca::document($this->app_slug, $this->collection, $this->ref);
-				self::$data   = $document->save($this->appid, $model, $user);
+				$document     = Tapioca::document(self::$group, static::$collection, static::$ref);
+				self::$data   = $document->save($model, self::$user);
 				self::$status = 200;
 			}
 		} // if granted

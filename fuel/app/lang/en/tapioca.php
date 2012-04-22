@@ -14,6 +14,9 @@ return array(
 	/** Document Exception Messages **/
 	'document_not_found'           => 'Document ":ref" does not exist in collection ":collection".',
 	'document_revision_not_found'  => 'Revison ":revision" does not exist for Document ":ref" in collection ":collection".',
-	'no_document_selected' => 'No document is selected.',
+	'no_document_selected'         => 'No document is selected.',
 	'document_column_is_empty'     => ':column must not be empty.',
+
+	/** API Execption Messages **/
+	'missing_required_params'      => 'Some required params are missing',
 );

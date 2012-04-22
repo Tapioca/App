@@ -5,7 +5,7 @@ namespace Tapioca;
 use FuelException;
 use Config;
 
-class TapiocaDocumentException extends \FuelException {}
+class TapiocaDocumentException extends FuelException {}
 
 class Document
 {
@@ -18,6 +18,11 @@ class Document
 	 * @var  string  MongoDb collection's name
 	 */
 	protected static $collection = null;
+
+	/**
+	 * @var  object  Active group
+	 */
+	protected static $group = null;
 
 	/**
 	 * @var  string  Tapioca collection's namespace
@@ -72,10 +77,11 @@ class Document
 	 * @param   string  Document ref
 	 * @return  void
 	 */
-	public function __construct($app_slug, $namespace, $ref = null, $check_exists = false)
+	public function __construct(\Auth\Group $group, $namespace, $ref = null, $check_exists = false)
 	{
 		// load and set config
-		static::$collection = $app_slug.'-'.$namespace;
+		static::$group      = $group;
+		static::$collection = static::$group->get('slug').'-'.$namespace;
 		static::$namespace  = $namespace;
 		
 		static::$db = \Mongo_Db::instance();
@@ -150,20 +156,6 @@ class Document
 					'date.created' => 'desc'
 				))
 				->get(static::$collection);
-
-		/*
-		foreach ($ret as &$value)
-		{
-			unset($value['_id']);
-			// format date
-			foreach($value['date'] as $key => $timestamp)
-			{
-				$value['date'][$key] = $timestamp->sec;
-			}
-		}
-
-		return $ret;
-		*/
 	}
 
 	/**
@@ -303,7 +295,7 @@ class Document
 	 * @return  array user data
 	 * @throws  TapiocaException
 	 */
-	public function save($appid, array $document, $user)
+	public function save(array $document, \Auth\User $user)
 	{
 		if(is_null(static::$collection))
 		{
@@ -311,7 +303,7 @@ class Document
 		}
 
 		// Get Collection Definiton
-		$collection      = Tapioca::collection($appid, self::$namespace); 
+		$collection      = Tapioca::collection(static::$group->get('id'), static::$namespace); 
 		$collection_data = $collection->data();
 
 		// Test document rules
@@ -335,17 +327,23 @@ class Document
 			throw new \TapiocaException( $e->getMessage() );
 		}
 
+		$user_data = array(
+				'id'    => $user->get('id'),
+				'name'  => $user->get('name'),
+				'email' => $user->get('email'),
+			);
+
 		// new document
 		if(is_null(static::$ref))
 		{
-			$this->create($document, $summary, $user);
+			$this->create($document, $summary, $user_data);
 		}
 		else // update Document
 		{
-			$this->update($document, $summary, $user);
+			$this->update($document, $summary, $user_data);
 		}
 
-		return $this->get(self::$last_revision);
+		return $this->get(static::$last_revision);
 	}
 
 	private function create($document, $summary, $user)

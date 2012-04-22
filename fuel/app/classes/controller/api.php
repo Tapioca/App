@@ -5,6 +5,9 @@ class Controller_Api extends Controller_Rest
 	protected static $granted = true;
 	protected static $data    = array('message' => 'Method Not Implemented');
 	protected static $status  = 501;
+	protected static $user    = null;
+	protected static $group   = null;
+	protected static $debug   = null;
 
 	public function before()
 	{
@@ -18,6 +21,32 @@ class Controller_Api extends Controller_Rest
 				'message' => 'Access not allowed'
 			);
 		}
+		else
+		{
+			static::$debug = Input::get('debug', false);
+			
+			try
+			{
+				self::$user = Auth::user();
+			}
+			catch (UserException $e)
+			{
+				$errors = $e->getMessage();
+				Debug::dump($errors);
+			}
+
+			try
+			{
+				$app_slug = $this->param('app_slug', false);
+				self::$group = Auth::group(array('slug' => $app_slug));
+			}
+			catch (UserException $e)
+			{
+				$errors = $e->getMessage();
+				Debug::dump($errors);
+			}
+
+		}// if Auth
 	}
 
 	protected static function error($message, $debug = null)

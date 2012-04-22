@@ -5,7 +5,7 @@ namespace Tapioca;
 use FuelException;
 use Config;
 
-class TapiocaCollectionException extends \FuelException {}
+class TapiocaCollectionException extends FuelException {}
 
 class Collection
 {
@@ -15,9 +15,9 @@ class Collection
 	protected static $db = null;
 
 	/**
-	 * @var  array  Group's id
+	 * @var  object  Active group
 	 */
-	protected $app_id = null;
+	protected static $group = null;
 
 	/**
 	 * @var  array  Collection's name for exception message
@@ -51,13 +51,11 @@ class Collection
 	 * @return  void
 	 * @throws  TapiocaCollectionException
 	 */
-	public function __construct($app_id, $id = null, $check_exists = false)
+	public function __construct(\Auth\Group $group, $id = null, $check_exists = false)
 	{
 		// load and set config
-		static::$collection = strtolower(Config::get('tapioca.tables.collections'));
-		
-		$this->app_id = $app_id;
-
+		static::$group      = $group;
+		static::$collection = strtolower(Config::get('tapioca.tables.collections'));		
 		static::$db = \Mongo_Db::instance();
 
 		// if an ID was passed
@@ -80,7 +78,7 @@ class Collection
 			$summary = static::$db->get_where(static::$collection, array(
 				$field  => $id,
 				'type'  => 'summary',
-				'app_id' => $this->app_id
+				'app_id' => static::$group->get('id')
 			), 1);
 
 			// if there was a result 
@@ -95,7 +93,7 @@ class Collection
 				//query database for collection's summary
 				$data = static::$db
 							->where(array(
-								'app_id'    => $this->app_id,
+								'app_id'    => static::$group->get('id'),
 								'namespace' => $summary[0]['namespace'],
 								'type'      => 'data'
 							))
@@ -140,7 +138,7 @@ class Collection
 	{
 		//query database for collections's summaries
 		return static::$db->get_where(static::$collection, array(
-			'app_id' => $this->app_id,
+			'app_id' => static::$group->get('id'),
 			'type'  => 'summary'
 		));
 	}
@@ -272,7 +270,7 @@ class Collection
 		}
 
 		$new_summary = array(
-			'app_id' => $this->app_id,
+			'app_id' => static::$group->get('id'),
 			'type' => 'summary',
 			'documents' => (int) 0,
 			'status' => $status,
@@ -309,7 +307,7 @@ class Collection
 
 		return static::$db
 					->where(array(
-							'app_id'    => $this->app_id,
+							'app_id'    => static::$group->get('id'),
 							'namespace' => $this->namespace,
 							'type'      => 'summary'
 					))
@@ -320,10 +318,11 @@ class Collection
 	 * Add a new structure revision to the current collection
 	 *
 	 * @param   array  Fields 
+	 * @param   object User object instance 
 	 * @return  bool
 	 * @throws  TapiocaException
 	 */
-	public function update_data(array $fields, $user)
+	public function update_data(array $fields, \Auth\User $user)
 	{
 		if(is_null($this->summary))
 		{
@@ -339,8 +338,14 @@ class Collection
 
 		$revision = (count($this->data) + 1);
 
+		$user_data = array(
+			'id'    => $user->get('id'),
+			'name'  => $user->get('name'),
+			'email' => $user->get('email'),
+		);
+
 		$data = array(
-			'app_id' => $this->app_id,
+			'app_id' => static::$group->get('id'),
 			'type' => 'data',
 			'namespace' => $this->namespace,
 			'revision' => $revision,
@@ -349,7 +354,7 @@ class Collection
 		$revision = array(
 			'revison' => $revision,
 			'date' => new \MongoDate(),
-			'user' => $user,
+			'user' => $user_data,
 			'status' => (int) 100 
 		);
 
@@ -368,7 +373,7 @@ class Collection
 
 			$update_summary = static::$db
 								->where(array(
-									'app_id' => $this->app_id,
+									'app_id' => static::$group->get('id'),
 									'namespace' => $this->namespace,
 									'type' => 'summary'
 								))
@@ -405,7 +410,7 @@ class Collection
 		return static::$db
 					->where(array(
 							'namespace' => $this->namespace,
-							'app_id'    => $this->app_id
+							'app_id'    => static::$group->get('id')
 					))
 					->delete_all(static::$collection);
 	}
@@ -421,7 +426,7 @@ class Collection
 		// query db to check for login_column
 		$result = static::$db->get_where(static::$collection, array(
 			'namespace' => $namespace,
-			'app_id' => $this->app_id
+			'app_id' => static::$group->get('id')
 		), 1);
 
 		if (count($result) == 1)

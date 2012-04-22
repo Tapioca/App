@@ -2,17 +2,14 @@
 
 class Controller_Api_Collection extends Controller_Api
 {
-	private $appid;
-	private $namespace;
+	private static $namespace;
 
 	public function before()
 	{
 		parent::before();
 
 		// to define with api key and query string
-		$this->appid = Input::get('appid', '4f7977b4c68deebf01000000');
-		$this->namespace = $this->param('namespace', false);
-		$this->app_slug   = $this->param('app_slug', false);
+		static::$namespace = $this->param('namespace', false);
 	}
 
 	/* Data
@@ -24,16 +21,16 @@ class Controller_Api_Collection extends Controller_Api
 		{
 			try
 			{
-				if($this->namespace)
+				if(static::$namespace)
 				{
 					$revision = Input::get('revision', null);
 
-					$collection = Tapioca::collection($this->appid, $this->namespace);
+					$collection = Tapioca::collection(static::$group, static::$namespace);
 					self::$data = $collection->get($revision);
 				}
 				else
 				{
-					$collection = Tapioca::collection($this->appid);
+					$collection = Tapioca::collection(static::$group);
 					self::$data = $collection->all();
 				}
 
@@ -61,7 +58,7 @@ class Controller_Api_Collection extends Controller_Api
 			else
 			{
 				// init tapioca first to get config
-				$collection = Tapioca::collection($this->appid); 
+				$collection = Tapioca::collection(static::$group); 
 				$summary    = array();
 				$data       = array();
 				$values     = $this->dispatch($summary, $data, $model);
@@ -69,20 +66,11 @@ class Controller_Api_Collection extends Controller_Api
 				try
 				{
 
-					$app_name = 'dior-backstage';
-					$user     = Auth::user();
-
-					$user = array(
-						'id'    => $user->get('_id'),
-						'name'  => $user->get('name'),
-						'email' => $user->get('email'),
-					);
-
 					$summary = $collection->create_summary($summary);
 
 					if(count($data) > 0)
 					{
-						$data = $collection->update_data($data, $user);
+						$data = $collection->update_data($data, self::$user);
 					}
 
 					self::$data   = $collection->get();
@@ -112,7 +100,7 @@ class Controller_Api_Collection extends Controller_Api
 			else
 			{
 				// init tapioca first to get config
-				$collection = Tapioca::collection($this->appid, $this->namespace); 
+				$collection = Tapioca::collection(static::$group, static::$namespace); 
 				$summary    = array();
 				$data       = array();
 				$values     = $this->dispatch($summary, $data, $model);
@@ -121,13 +109,6 @@ class Controller_Api_Collection extends Controller_Api
 				{
 
 					$app_name = 'dior-backstage';
-					$user     = Auth::user();
-
-					$user = array(
-						'id'    => $user->get('_id'),
-						'name'  => $user->get('name'),
-						'email' => $user->get('email'),
-					);
 
 					if(count($summary) > 0)
 					{
@@ -136,7 +117,7 @@ class Controller_Api_Collection extends Controller_Api
 
 					if(count($data) > 0)
 					{
-						$data = $collection->update_data($data, $user);
+						$data = $collection->update_data($data, self::$user);
 					}
 
 					self::$data   = array('status' => $data);
@@ -155,19 +136,9 @@ class Controller_Api_Collection extends Controller_Api
 	{
 		if(self::$granted)
 		{
-			$data = Tapioca::collection($this->appid, $this->namespace)->delete(); 
+			$data = Tapioca::collection(static::$group, static::$namespace)->delete(); 
 
 			self::$data   = array('status' => $data);
-			self::$status = 200;
-		}
-	}
-
-	public function get_documents()
-	{
-		if(self::$granted)
-		{
-			$document = Tapioca::document($this->app_slug, $this->namespace);
-			self::$data = $document->all();
 			self::$status = 200;
 		}
 	}
