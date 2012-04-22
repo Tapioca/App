@@ -142,7 +142,7 @@ class Document
 	public function all()
 	{
 		//query database for collections's summaries
-		$ret = static::$db
+		return static::$db
 				->where(array(
 					'_summary' => array( '$exists' => true )
 				))
@@ -151,6 +151,7 @@ class Document
 				))
 				->get(static::$collection);
 
+		/*
 		foreach ($ret as &$value)
 		{
 			unset($value['_id']);
@@ -162,6 +163,7 @@ class Document
 		}
 
 		return $ret;
+		*/
 	}
 
 	/**
@@ -258,7 +260,7 @@ class Document
 			->where($this->where)
 			->order_by($this->sort)
 			->get(static::$collection);
-
+			
 		if($result)
 		{
 			if($mode == 'edit')
