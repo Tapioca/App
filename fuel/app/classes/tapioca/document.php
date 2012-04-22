@@ -303,8 +303,15 @@ class Document
 		}
 
 		// Get Collection Definiton
-		$collection      = Tapioca::collection(static::$group->get('id'), static::$namespace); 
-		$collection_data = $collection->data();
+		try
+		{
+			$collection      = Tapioca::collection(static::$group, static::$namespace); 
+			$collection_data = $collection->data();
+		}
+		catch (TapiocaException $e)
+		{
+			throw new \TapiocaException( $e->getMessage() );
+		}
 
 		// Test document rules
 		if(isset($collection_data['rules']))
@@ -336,7 +343,12 @@ class Document
 		// new document
 		if(is_null(static::$ref))
 		{
-			$this->create($document, $summary, $user_data);
+			$ret = $this->create($document, $summary, $user_data);
+
+			if($ret)
+			{
+				$collection->inc_document();
+			}
 		}
 		else // update Document
 		{
@@ -392,8 +404,10 @@ class Document
 			if($new_summary)
 			{
 				$this->summary = $summary;
-				self::$ref = $ref;
-				self::$active = 1;
+				self::$ref     = $ref;
+				self::$active  = 1;
+
+				return true;
 			}
 		}
 	}
@@ -446,6 +460,66 @@ class Document
 									'_summary'   => (bool) true
 								))
 								->update(static::$collection, $this->summary);
+		}
+	}
+
+	public function delete()
+	{
+		if(is_null(static::$collection))
+		{
+			throw new \TapiocaException(__('tapioca.no_collection_selected'));
+		}
+
+		if(is_null(static::$ref))
+		{
+			throw new \TapiocaException(__('tapioca.no_document_selected'));
+		}
+
+		$delete =  static::$db
+						->where(array(
+								'_ref' => static::$ref
+						))
+						->delete_all(static::$collection);
+
+		if($delete)
+		{
+			// Get Collection Definiton
+			try
+			{
+				$collection = Tapioca::collection(static::$group, static::$namespace); 
+				$collection->inc_document(-1);
+			}
+			catch (TapiocaException $e)
+			{
+				throw new \TapiocaException( $e->getMessage() );
+			}
+
+			return true;
+		}
+	}
+
+	/**
+	 * Empty the Collection from all this document  
+	 * /!\ WARNING: no backup!!
+	 *
+	 * @return  void
+	 */
+	public function drop()
+	{
+		if(is_null(static::$collection))
+		{
+			throw new \TapiocaException(__('tapioca.no_collection_selected'));
+		}
+
+		$database = Config::get('db.mongo.default.database');
+		$delete   = static::$db->drop_collection($database, static::$collection);
+
+		if($delete)
+		{
+			$collection = Tapioca::collection(static::$group, static::$namespace); 
+			$collection->reset_document();
+
+			return true;
 		}
 	}
 

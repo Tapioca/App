@@ -45,6 +45,11 @@ class Collection
 	protected static $collection = null;
 
 	/**
+	 * @var  array 	Cache Summary where clause
+	 */
+	protected static $summary_where = array();
+
+	/**
 	 * Loads in the Collection object
 	 *
 	 * @param   MongoId|string  Collection id or Name Column value
@@ -54,9 +59,9 @@ class Collection
 	public function __construct(\Auth\Group $group, $id = null, $check_exists = false)
 	{
 		// load and set config
-		static::$group      = $group;
-		static::$collection = strtolower(Config::get('tapioca.tables.collections'));		
-		static::$db = \Mongo_Db::instance();
+		static::$group         = $group;
+		static::$collection    = strtolower(Config::get('tapioca.tables.collections'));		
+		static::$db            = \Mongo_Db::instance();
 
 		// if an ID was passed
 		if ($id)
@@ -105,7 +110,11 @@ class Collection
 				$this->summary   = $summary[0];
 				$this->data      = $data;
 				$this->namespace = $summary[0]['namespace'];
-				$this->name      = $summary[0]['name']; 
+				$this->name      = $summary[0]['name'];
+
+				static::$summary_where = array( 'app_id'    => static::$group->get('id'),
+												'namespace' => $this->namespace,
+												'type'      => 'summary');
 			}
 			// collection doesn't exist
 			else
@@ -306,11 +315,7 @@ class Collection
 		self::validation($fields, $check_list);
 
 		return static::$db
-					->where(array(
-							'app_id'    => static::$group->get('id'),
-							'namespace' => $this->namespace,
-							'type'      => 'summary'
-					))
+					->where(static::$summary_where)
 					->update(static::$collection, $fields);
 	}
 
@@ -372,11 +377,7 @@ class Collection
 			$this->data[] = $data;
 
 			$update_summary = static::$db
-								->where(array(
-									'app_id' => static::$group->get('id'),
-									'namespace' => $this->namespace,
-									'type' => 'summary'
-								))
+								->where(static::$summary_where)
 								->update(static::$collection, array('revisions' => $this->summary['revisions']));
 
 			if(!$update_summary)
@@ -392,6 +393,55 @@ class Collection
 		throw new \TapiocaException(
 			__('tapioca.can_not_insert_collection_data', array('name' => $this->name))
 		);
+	}
+
+	/**
+	 * Increment/decrement total documents in Collection
+	 *
+	 * @param   int   Increment|Decrement
+	 * @return  void
+	 */
+	public function inc_document($direction = 1)
+	{
+		if(is_null($this->summary))
+		{
+			throw new \TapiocaException(__('tapioca.no_collection_selected'));
+		}
+
+		$ret = static::$db->command(
+					array('findandmodify' => static::$collection,
+						  'query' => static::$summary_where,
+						  'update' => array('$inc' => array('documents' => (int) $direction)),
+						  'new' => TRUE
+					)
+				);
+
+		if($ret['ok'] == 1)
+		{
+			$this->summary['documents'] = $ret['value']['documents'];
+		}
+	}
+
+	/**
+	 * Reset total documents in Collection
+	 *
+	 * @return  void
+	 */
+	public function reset_document()
+	{
+		if(is_null($this->summary))
+		{
+			throw new \TapiocaException(__('tapioca.no_collection_selected'));
+		}
+		
+		$update = static::$db
+					->where(static::$summary_where)
+					->update(static::$collection, array('$set' => array('documents' => (int) 0)), array(), true);
+
+		if($update)
+		{
+			$this->summary['documents'] = (int) 0;
+		}
 	}
 
 	/**
@@ -424,10 +474,7 @@ class Collection
 	private function namespance_exists($namespace)
 	{
 		// query db to check for login_column
-		$result = static::$db->get_where(static::$collection, array(
-			'namespace' => $namespace,
-			'app_id' => static::$group->get('id')
-		), 1);
+		$result = static::$db->get_where(static::$collection, static::$summary_where, 1);
 
 		if (count($result) == 1)
 		{

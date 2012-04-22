@@ -131,7 +131,10 @@ class Controller_Api_Document extends Controller_Api
 	{
 		if(self::$granted)
 		{
-
+				$document     = Tapioca::document(self::$group, static::$collection, static::$ref);
+				
+				self::$data   = array('status' => $document->delete());
+				self::$status = 200;
 		} // if granted
 	}
 

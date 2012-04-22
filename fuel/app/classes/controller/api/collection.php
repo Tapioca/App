@@ -26,6 +26,7 @@ class Controller_Api_Collection extends Controller_Api
 					$revision = Input::get('revision', null);
 
 					$collection = Tapioca::collection(static::$group, static::$namespace);
+
 					self::$data = $collection->get($revision);
 				}
 				else
@@ -139,6 +140,18 @@ class Controller_Api_Collection extends Controller_Api
 			$data = Tapioca::collection(static::$group, static::$namespace)->delete(); 
 
 			self::$data   = array('status' => $data);
+			self::$status = 200;
+		}
+	}
+
+	public function delete_drop()
+	{
+		if(self::$granted)
+		{
+			$documents = Tapioca::document(self::$group, static::$namespace);
+			$delete    = $documents->drop();
+			self::$data   = array('status' => $delete);
+			
 			self::$status = 200;
 		}
 	}
