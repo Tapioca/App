@@ -86,8 +86,9 @@ class Controller_Api_Document extends Controller_Api
 	{
 		if(self::$granted)
 		{
-			$model = json_decode(Input::post('model', false), true);
-			
+			$model    = json_decode(Input::post('model', false), true);
+			$document = Tapioca::document(self::$group, static::$collection);
+
 			if(!$model)
 			{
 				self::$data   = array('error' => __('tapioca.missing_required_params'));
@@ -97,7 +98,6 @@ class Controller_Api_Document extends Controller_Api
 			{
 				$this->clean($model);
 
-				$document     = Tapioca::document(self::$group, static::$collection);
 				self::$data   = $document->save($model, self::$user);
 				self::$status = 200;
 			}
@@ -109,8 +109,9 @@ class Controller_Api_Document extends Controller_Api
 	{
 		if(self::$granted)
 		{
-			$model = json_decode(Input::put('model', false), true);
-			
+			$model    = json_decode(Input::put('model', false), true);
+			$document = Tapioca::document(self::$group, static::$collection, static::$ref);
+
 			if(!$model)
 			{
 				self::$data   = array('error' => __('tapioca.missing_required_params'));
@@ -120,7 +121,6 @@ class Controller_Api_Document extends Controller_Api
 			{
 				$this->clean($model);
 
-				$document     = Tapioca::document(self::$group, static::$collection, static::$ref);
 				self::$data   = $document->save($model, self::$user);
 				self::$status = 200;
 			}
@@ -136,6 +136,25 @@ class Controller_Api_Document extends Controller_Api
 				self::$data   = array('status' => $document->delete());
 				self::$status = 200;
 		} // if granted
+	}
+
+	public function get_status()
+	{
+		if(self::$granted)
+		{
+			$document     = Tapioca::document(self::$group, static::$collection, static::$ref);
+
+			if(is_null(static::$doc_status))
+			{
+				self::$data   = array('error' => __('tapioca.missing_required_params'));
+				self::$status = 500;
+			}
+			else
+			{
+				self::$data   = array('status' => $document->update_status(static::$doc_status, static::$revision));
+				self::$status = 200;
+			}
+		}
 	}
 
 	private function clean(&$model)

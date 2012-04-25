@@ -4,6 +4,7 @@ namespace Tapioca;
 
 use FuelException;
 use Config;
+use Set;
 
 class TapiocaDocumentException extends FuelException {}
 
@@ -292,7 +293,7 @@ class Document
 	 * API facade for create or update a document
 	 *
 	 * @params  array document data
-	 * @return  array user data
+	 * @return  object User instance
 	 * @throws  TapiocaException
 	 */
 	public function save(array $document, \Auth\User $user)
@@ -496,6 +497,80 @@ class Document
 
 			return true;
 		}
+	}
+
+	public function update_status($status, $revision = null)
+	{
+		if(is_null(static::$collection))
+		{
+			throw new \TapiocaException(__('tapioca.no_collection_selected'));
+		}
+
+		if(is_null(static::$ref))
+		{
+			throw new \TapiocaException(__('tapioca.no_document_selected'));
+		}
+
+		if(is_null($revision))
+		{
+			$revision = self::$active;
+		}
+
+		$set_out_of_date = ($status == 100);
+
+		foreach ($this->summary['revisions']['list'] as &$value)
+		{
+			if($value['revision'] == $revision)
+			{
+				$value['status'] = (int) $status;
+			}
+			else if($set_out_of_date) // set other revision "Out of date"
+			{
+				$value['status'] = -1;
+			}
+		}
+
+		// new revison's status
+		$update = array('_about.status' => (int) $status);
+
+		// if new status is 100 (Published),
+		// we set other revison at -1 (out of date)
+		// and define the revision as "Active"
+		if($set_out_of_date)
+		{
+			$this->summary['revisions']['active'] = $revision;
+
+			$update_no_active = static::$db
+									->where(array(
+										'_ref'            => self::$ref,
+										'_about.revision' => array('$ne' => $revision),
+										'_summary'        => array( '$exists' => false )
+									))
+									->update_all(static::$collection, array(
+										'_about.active' => (bool) false,
+										'_about.status' => (int) -1
+									));
+
+			$update['_about.active'] = (bool) true;
+		}
+
+		// Update revision status
+		$update_doc = static::$db
+							->where(array(
+								'_ref'            => self::$ref,
+								'_about.revision' => $revision
+							))
+							->update(static::$collection, $update);
+
+		// Update Documant summary 
+		$new_summary = static::$db
+							->where(array(
+								'_ref'       => self::$ref,
+								'_summary'   => (bool) true
+							))
+							->update(static::$collection, $this->summary);
+
+		return true;
 	}
 
 	/**
