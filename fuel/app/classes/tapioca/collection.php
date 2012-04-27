@@ -139,17 +139,19 @@ class Collection
 	}
 
 	/**
-	 * Gets the summaries of all collections
+	 * Gets the summaries of all collections,
+	 * only admins can see non published (status 100) Collection
 	 *
 	 * @return  array
 	 * @throws  TapiocaException
 	 */
-	public function all()
+	public function all($status = 100)
 	{
 		//query database for collections's summaries
 		return static::$db->get_where(static::$collection, array(
 			'app_id' => static::$group->get('id'),
-			'type'  => 'summary'
+			'type'   => 'summary',
+			'status' => array('$gte' => (int) $status)
 		));
 	}
 
@@ -314,6 +316,11 @@ class Collection
 		$check_list = Config::get('tapioca.validation.collection.summary');
 		
 		self::validation($fields, $check_list);
+
+		if(isset($fields['status']))
+		{
+			$fields['status'] = (int) $fields['status'];
+		}
 
 		return static::$db
 					->where(static::$summary_where)

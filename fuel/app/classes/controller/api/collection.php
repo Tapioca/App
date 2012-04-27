@@ -3,6 +3,7 @@
 class Controller_Api_Collection extends Controller_Api
 {
 	private static $namespace;
+	private static $is_allowed;
 
 	public function before()
 	{
@@ -10,14 +11,14 @@ class Controller_Api_Collection extends Controller_Api
 
 		// to define with api key and query string
 		static::$namespace = $this->param('namespace', false);
+
+		static::$is_allowed = self::$group->is_admin(self::$user->get('id'));
 	}
 
 	// Only admins are allowed to edit Collections
 	private static function is_granted()
-	{
-		$is_allowed = self::$group->is_admin(self::$user->get('id'));
-		
-		if(!$is_allowed)
+	{		
+		if(!static::$is_allowed)
 		{
 			self::restricted();
 		}
@@ -44,12 +45,13 @@ class Controller_Api_Collection extends Controller_Api
 				}
 				else
 				{
+					$status     = (static::$is_allowed) ? 0 : 100;
+
 					$collection = Tapioca::collection(static::$group);
-					$all        = $collection->all();
+					$all        = $collection->all($status);
 
 					if(count($all) == 0)
 					{
-						//$all = array('message' => __('tapioca.no_collections'));
 						self::$status = 204;
 					}
 
@@ -132,9 +134,6 @@ class Controller_Api_Collection extends Controller_Api
 
 				try
 				{
-
-					$app_name = 'dior-backstage';
-
 					if(count($summary) > 0)
 					{
 						$summary = $collection->update_summary($summary);
@@ -145,7 +144,7 @@ class Controller_Api_Collection extends Controller_Api
 						$data = $collection->update_data($data, self::$user);
 					}
 
-					self::$data   = array('status' => $data);
+					self::$data   = $collection->get();
 					self::$status = 200;
 
 				}
