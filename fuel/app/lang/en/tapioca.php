@@ -19,4 +19,5 @@ return array(
 
 	/** API Execption Messages **/
 	'missing_required_params'      => 'Some required params are missing',
+	'no_collections'               => 'No collections define yet',
 );

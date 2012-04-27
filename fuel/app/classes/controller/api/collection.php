@@ -32,6 +32,8 @@ class Controller_Api_Collection extends Controller_Api
 		{
 			try
 			{
+				self::$status = 200;
+
 				if(static::$namespace)
 				{
 					$revision = Input::get('revision', null);
@@ -43,10 +45,16 @@ class Controller_Api_Collection extends Controller_Api
 				else
 				{
 					$collection = Tapioca::collection(static::$group);
-					self::$data = $collection->all();
-				}
+					$all        = $collection->all();
 
-				self::$status = 200;
+					if(count($all) == 0)
+					{
+						//$all = array('message' => __('tapioca.no_collections'));
+						self::$status = 204;
+					}
+
+					self::$data = $all;
+				}
 			}
 			catch (TapiocaException $e)
 			{
@@ -63,23 +71,23 @@ class Controller_Api_Collection extends Controller_Api
 		if(self::$granted)
 		{
 			$model = json_decode(Input::post('model', false), true);
+
+			// init tapioca first to get config & translation
+			$collection = Tapioca::collection(static::$group); 
 			
 			if(!$model)
 			{
-				self::$data   = array('error' => 'tapioca.missing_required_params');
+				self::$data   = array('error' => __('tapioca.missing_required_params'));
 				self::$status = 500;
 			}
 			else
 			{
-				// init tapioca first to get config
-				$collection = Tapioca::collection(static::$group); 
 				$summary    = array();
 				$data       = array();
 				$values     = $this->dispatch($summary, $data, $model);
 
 				try
 				{
-
 					$summary = $collection->create_summary($summary);
 
 					if(count($data) > 0)
@@ -107,16 +115,17 @@ class Controller_Api_Collection extends Controller_Api
 		if(self::$granted)
 		{
 			$model = json_decode(Input::put('model', false), true);
-			
+
+			// init tapioca first to get config & translation
+			$collection = Tapioca::collection(static::$group, static::$namespace); 
+
 			if(!$model)
 			{
-				self::$data   = array('error' => 'tapioca.missing_required_params');
+				self::$data   = array('error' => __('tapioca.missing_required_params'));
 				self::$status = 500;
 			}
 			else
 			{
-				// init tapioca first to get config
-				$collection = Tapioca::collection(static::$group, static::$namespace); 
 				$summary    = array();
 				$data       = array();
 				$values     = $this->dispatch($summary, $data, $model);
@@ -164,7 +173,7 @@ class Controller_Api_Collection extends Controller_Api
 	public function delete_drop()
 	{
 		self::is_granted();
-		
+
 		if(self::$granted)
 		{
 			$documents = Tapioca::document(self::$group, static::$namespace);

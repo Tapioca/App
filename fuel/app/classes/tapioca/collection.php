@@ -52,6 +52,7 @@ class Collection
 	/**
 	 * Loads in the Collection object
 	 *
+	 * @param   object  Group instace
 	 * @param   MongoId|string  Collection id or Name Column value
 	 * @return  void
 	 * @throws  TapiocaCollectionException
@@ -474,8 +475,11 @@ class Collection
 	private function namespance_exists($namespace)
 	{
 		// query db to check for login_column
-		$result = static::$db->get_where(static::$collection, static::$summary_where, 1);
-
+		$result = static::$db->get_where(static::$collection, array(
+												'app_id'    => static::$group->get('id'),
+												'namespace' => $namespace,
+												'type'      => 'summary'
+											), 1);
 		if (count($result) == 1)
 		{
 			return $result[0];
