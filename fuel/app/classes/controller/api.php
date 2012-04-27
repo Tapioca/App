@@ -15,11 +15,7 @@ class Controller_Api extends Controller_Rest
 
 		if (!Auth::check())
 		{
-			self::$granted = false;
-			self::$status  = 401;
-			self::$data    = array(
-				'message' => 'Access not allowed'
-			);
+			self::restricted();
 		}
 		else
 		{
@@ -46,7 +42,25 @@ class Controller_Api extends Controller_Rest
 				Debug::dump($errors);
 			}
 
+			// Check if user is a member of the group
+			$user_email = self::$user->get('email');
+			$in_group   = self::$group->in_group($user_email);
+
+			if(!$in_group)
+			{
+				self::restricted();
+			}
+
 		}// if Auth
+	}
+
+	protected static function restricted()
+	{
+		self::$granted = false;
+		self::$status  = 401;
+		self::$data    = array(
+			'message' => 'Access not allowed'
+		);
 	}
 
 	protected static function error($message, $debug = null)

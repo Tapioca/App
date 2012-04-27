@@ -443,6 +443,19 @@ class Group
 
 
 	/**
+	 * Checks if the user is admin of the current group.
+	 *
+	 * @param   string  User ID
+	 * @return  bool
+	 */
+	public function is_admin($user_id)
+	{
+		$admins = $this->get('admins');
+		
+		return in_array($user_id, $admins);
+	}
+
+	/**
 	 * Grante user as admin for the group.
 	 *
 	 * @param   string User _ID

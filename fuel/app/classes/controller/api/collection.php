@@ -12,6 +12,17 @@ class Controller_Api_Collection extends Controller_Api
 		static::$namespace = $this->param('namespace', false);
 	}
 
+	// Only admins are allowed to edit Collections
+	private static function is_granted()
+	{
+		$is_allowed = self::$group->is_admin(self::$user->get('id'));
+		
+		if(!$is_allowed)
+		{
+			self::restricted();
+		}
+	} 
+
 	/* Data
 	----------------------------------------- */
 
@@ -47,6 +58,8 @@ class Controller_Api_Collection extends Controller_Api
 	//create collection data.
 	public function post_index()
 	{
+		self::is_granted();
+
 		if(self::$granted)
 		{
 			$model = json_decode(Input::post('model', false), true);
@@ -89,6 +102,8 @@ class Controller_Api_Collection extends Controller_Api
 	//update collection data.
 	public function put_index()
 	{
+		self::is_granted();
+		
 		if(self::$granted)
 		{
 			$model = json_decode(Input::put('model', false), true);
@@ -135,6 +150,8 @@ class Controller_Api_Collection extends Controller_Api
 
 	public function delete_index()
 	{
+		self::is_granted();
+
 		if(self::$granted)
 		{
 			$data = Tapioca::collection(static::$group, static::$namespace)->delete(); 
@@ -146,6 +163,8 @@ class Controller_Api_Collection extends Controller_Api
 
 	public function delete_drop()
 	{
+		self::is_granted();
+		
 		if(self::$granted)
 		{
 			$documents = Tapioca::document(self::$group, static::$namespace);
