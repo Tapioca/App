@@ -20,6 +20,7 @@ class Controller_Api extends Controller_Rest
 		else
 		{
 			static::$debug = Input::get('debug', false);
+			$valid = true;
 			
 			try
 			{
@@ -27,8 +28,8 @@ class Controller_Api extends Controller_Rest
 			}
 			catch (UserException $e)
 			{
-				$errors = $e->getMessage();
-				Debug::dump($errors);
+				$valid = false;
+				static::error($e->getMessage());
 			}
 
 			try
@@ -36,19 +37,22 @@ class Controller_Api extends Controller_Rest
 				$app_slug = $this->param('app_slug', false);
 				self::$group = Auth::group(array('slug' => $app_slug));
 			}
-			catch (UserException $e)
+			catch (AuthException $e)
 			{
-				$errors = $e->getMessage();
-				Debug::dump($errors);
+				$valid = false;
+				static::error($e->getMessage());
 			}
 
-			// Check if user is a member of the group
-			$user_email = self::$user->get('email');
-			$in_group   = self::$group->in_group($user_email);
-
-			if(!$in_group)
+			if($valid)
 			{
-				self::restricted();
+				// Check if user is a member of the group
+				$user_email = self::$user->get('email');
+				$in_group   = self::$group->in_group($user_email);
+
+				if(!$in_group)
+				{
+					self::restricted();
+				}
 			}
 
 		}// if Auth
