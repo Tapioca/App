@@ -57,7 +57,7 @@
 			<div class="pane-content">
 <?php
 	
-	foreach($user['groups'] as $group)
+	foreach($app_settings['user']['groups'] as $group)
 	{
 ?>
 				<div class="app-nav">
@@ -87,28 +87,7 @@
 						<h6>Documents</h6>
 						<ul id="app-nav-collections-<?= $group['slug']; ?>">
 							<li>
-								<a href="#">Articles</a>
-							</li>
-							<li>
-								<a href="#">Chaines Vidéos</a>
-							</li>
-							<li>
-								<a href="#">Diaporama</a>
-							</li>
-							<li>
-								<a href="#">Dossiers Spéciaux</a>
-							</li>
-							<li>
-								<a href="#">Homepage</a>
-							</li>
-							<li>
-								<a href="#">Items</a>
-							</li>
-							<li>
-								<a href="#">Meta</a>
-							</li>
-							<li>
-								<a href="#">Vidéos</a>
+								<span class="no-collection">Pas de collections</span>
 							</li>
 						</ul>
 
@@ -184,7 +163,7 @@
 	<script>
 	define('config', function()
 	{
-		return <?= json_encode($user); ?>;
+		return <?= json_encode($app_settings); ?>;
 	});
 	</script>
 </body>

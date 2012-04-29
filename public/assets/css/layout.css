@@ -277,7 +277,8 @@ header#tapp {
 	background:rgba(37,40,42,.8);
 }
 
-#apps-nav a {
+#apps-nav a,
+.app-nav-lists span.no-collection {
 	color: #fff;
 }
 
@@ -362,7 +363,8 @@ header#tapp {
     line-height: 20px;
 }
 
-.app-nav-lists a {
+.app-nav-lists a, 
+.app-nav-lists span.no-collection {
 	display: block;
 	padding: 2px 0 2px 25px;
 }
