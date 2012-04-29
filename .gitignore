@@ -6,4 +6,5 @@ fuel/app/classes/controller/redis.php
 fuel/app/logs/*/*/*
 fuel/app/cache/*/*
 public/client_test
+public/dynamic
 !.gitkeep
