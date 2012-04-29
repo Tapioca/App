@@ -4,21 +4,14 @@ class Controller_App_Index extends Controller_App
 {
 	public function action_index()
 	{
+		Tapioca::base();
+		
 		$tpl_data = array(
 						'user' => array(
 							'id'     => static::$user->get('id'),
-							'groups' => array()
+							'groups' => static::$user->get('groups')
 						)
 					);
-
-
-		// User Group
-		$groups = static::$user->get('groups');
-
-		foreach ($groups as $group)
-		{
-			$tpl_data['user']['groups'][] = $group['id'];
-		}
 
 		return View::forge('templates/app', $tpl_data);
 	}

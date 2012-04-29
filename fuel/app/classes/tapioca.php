@@ -33,6 +33,15 @@ class Tapioca
 	}
 
 	/**
+	 * Called to init Lang in UI
+	 *
+	 * @return  void
+	 */
+	public static function base()
+	{
+	}
+
+	/**
 	 * @param   string app id
 	 * @param   MongoId|string Collection id.
 	 * @throws  TapiocaException

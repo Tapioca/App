@@ -1,0 +1,15 @@
+.subgroup {
+	padding-left: 20px;
+}
+
+legend {
+	margin-bottom: 13px;
+}
+
+.dropdown legend {
+	cursor: pointer;
+}
+
+.dropdown legend .caret {
+	margin-top: 16px;
+}

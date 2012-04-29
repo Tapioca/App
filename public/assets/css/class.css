@@ -1,0 +1,204 @@
+
+	/* ---------------------------
+		font-style
+	--------------------------- */
+	
+.strong  {
+	font-weight:bold;
+}
+
+.italic {
+	font-style:italic;
+}
+
+.normal {
+	font-weight:normal;
+}
+
+.uppercase {
+	text-transform:uppercase;
+}
+
+.lowercase {
+	text-transform:lowercase;
+}
+
+.capitalize {
+	text-transform:capitalize
+}
+
+.decoration-none {
+	text-decoration:none;
+}
+
+.underline {
+	text-decoration: underline;
+}
+
+	/* --------------------------
+		Lists
+	-------------------------- */
+
+.no-list {
+	list-style:none;
+}
+
+.list-inline li {
+	display:inline
+}
+
+	/* --------------------------
+		Position
+	-------------------------- */
+
+.absolute {
+	position: absolute;
+}
+
+.relative {
+	position:relative;
+}
+
+	/* --------------------------
+		Aligns
+	-------------------------- */
+
+.align-right {
+	text-align:right;
+}
+
+.align-left {
+	text-align:left;
+}
+
+.align-center {
+	text-align:center;
+}
+
+.align-justify {
+	text-align:justify;
+}
+
+.valign-middle {
+	vertical-align:middle;
+}
+
+	/* --------------------------
+		Borders
+	-------------------------- */
+
+.border-less {
+	border:none;
+}
+
+	/* --------------------------
+		Clear
+	-------------------------- */
+
+.clear-both {
+	clear:both;
+}
+
+.clear-left {
+	clear:left;
+}
+
+.clear-right {
+	clear:right;
+}
+
+	/* --------------------------
+		Display
+	-------------------------- */
+	
+.block {
+	display:block
+}
+
+.hide {
+	display:none
+}
+
+.inline {
+	display:inline;
+}
+
+.inline-block {
+	display:inline;
+}
+
+.visible {
+	visibility:visible;
+}
+
+.hidden {
+	visibility:hidden;
+}
+
+	/* --------------------------
+		Floats
+	-------------------------- */
+	
+.float-left {
+	float:left;
+}
+
+.float-right {
+	float:right;
+}
+
+.float-none {
+	float:none;
+}
+
+.float-fixer {
+	overflow:hidden;
+	width:100%;
+}
+
+.overflow-hidden {
+	overflow:hidden;
+}
+
+	/* ---------------------------------
+		Non-semantic helper classes 
+	-------------------------------- */
+
+/* for image replacement */
+	
+.text-replace {
+	background-repeat:no-repeat;
+	display:block;
+	text-align:left;
+	text-indent:-9000px;
+}
+
+/* Hide only visually, but have it available for screenreaders 
+   www.webaim.org/techniques/css/invisiblecontent/ 
+   Solution from: j.mp/visuallyhidden - Thanks Jonathan Neal! */
+   
+.visually-hidden {
+	position:absolute !important;
+	clip: rect(1px 1px 1px 1px); /* IE6, IE7 */
+	clip: rect(1px, 1px, 1px, 1px); 
+}
+
+/* >> The Magnificent CLEARFIX << */
+/* http://nicolasgallagher.com/better-float-containment-in-ie/ */
+
+.cf {
+    /* for IE 6/7 */
+   /* *zoom: expression(this.runtimeStyle.zoom="1",this.innerHTML+='<br\ style="clear:both;font:0/0">');*/
+    /* non-JS fallback */
+    *zoom: 1;
+}
+
+.cf:before,
+.cf:after {
+    content: "";
+    display: table;
+}
+
+.cf:after {
+    clear: both;
+}

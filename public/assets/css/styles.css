@@ -1,0 +1,22 @@
+@charset "UTF-8";
+/* CSS Document */
+
+/*------------------------------------------------------------------
+# 	[Master Stylesheet]
+#
+# 	Project:		Tapioca - Schema Driven Data Engine
+#	Copyright:		Michael Lefebvre
+#	License:		Apache2
+# 	Version:		1.0.0
+# 	Last change:	02/03/2012
+# -------------------------------------------------------------------*/
+
+@import "class.css";
+@import "layout.css";
+@import "font-awesome.css";
+@import "bootstrap.css";
+@import "bootstrap-overload.css";
+@import "colorpicker.css";
+@import "datepicker.css";
+@import "bootstrap-wysihtml5.css";
+

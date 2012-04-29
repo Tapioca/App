@@ -1,32 +1,191 @@
 <!doctype html>
-<html lang="en">
+<!--[if lt IE 7]> <html class="ie ie6 oldie" lang="fr"> <![endif]-->
+<!--[if IE 7]>    <html class="ie ie7 oldie" lang="fr"> <![endif]-->
+<!--[if IE 8]>    <html class="ie ie8 oldie" lang="fr"> <![endif]-->
+<!--[if IE 9]>    <html class="ie ie9" lang="fr"> <![endif]-->
+<!--[if gt IE 9]><!--> <html lang="fr"> <!--<![endif]-->
 <head>
+
+
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+	<title>Tapioca - Schema Driven Data Engine</title>
+	<meta name="description" content="">
+	<meta name="author" content="">
+
 	<meta name="viewport" content="width=device-width,initial-scale=1">
 
-	<title>Tapioca</title>
+	<!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+	<!--[if lt IE 9]>
+	<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
 
-	<!-- Application styles
-	<link rel="stylesheet" href="/assets/css/index.css">
-	-->
+	<!-- Le styles -->
+	<link rel="stylesheet" href="/assets/css/styles.css">
+
+
 </head>
-
 <body>
 
-	<!-- Main container -->
-	<div role="main" id="main">
+
+	<header id="tapp">
+
+		<a id="header-logo" href="javascript:void(0)">
+			<img alt="tapioca logo" src="/assets/img/header-logo.png">
+		</a><!-- /#header-logo -->
+
+		<div id="user-shortcuts">
+			<a href="#" class="avatar">
+				<img src="<?= Gravy::from_email(Auth::user()->get('email'), 37, 'g', null, true); ?>" alt="" height="37" width="37">
+			</a>
+			<h5>Hello <strong><?= Auth::user()->get('name'); ?></strong></h5>
+			<nav>
+
+				<?= Html::anchor(Uri::create('#'), __('tapioca.ui.user_account')); ?>
+
+				<?= Html::anchor(Uri::create('/log/out'), __('tapioca.ui.user_logout')); ?>
+
+			</nav>
+		</div><!-- /#user-shortcuts -->
+	</header><!-- /#tapp -->
+
+
+	<div id="main">
+
 		<div id="apps-nav" class="pane nano">
 			<div class="pane-content">
+<?php
+	
+	foreach($user['groups'] as $group)
+	{
+?>
+				<div class="app-nav">
+					<a href="javascript:void(0)" class="app-nav-header" data-app-id="<?= $group['id']; ?>" data-app-slug="<?= $group['slug']; ?>">
+						<span class="avatar">
+							<img src="/dynamic/apps/dior-logo.jpg" alt="" />
+						</span>
+						<h5 class="app-nav-name"><?= $group['name']; ?></h5>
+					</a><!-- /.app-nav-header -->
+					<div class="app-nav-lists">
+<?php
+	if($group['is_admin'])
+	{
+?>
+						<h6>Admin</h6>
+						<ul>
+							<li>
+								<a href="#">application</a>
+							</li>
+							<li>
+								<a href="#">utilisateurs</a>
+							</li>
+						</ul>
+<?php
+	} // if is_admin
+?>
+						<h6>Documents</h6>
+						<ul id="app-nav-collections-<?= $group['slug']; ?>">
+							<li>
+								<a href="#">Articles</a>
+							</li>
+							<li>
+								<a href="#">Chaines Vidéos</a>
+							</li>
+							<li>
+								<a href="#">Diaporama</a>
+							</li>
+							<li>
+								<a href="#">Dossiers Spéciaux</a>
+							</li>
+							<li>
+								<a href="#">Homepage</a>
+							</li>
+							<li>
+								<a href="#">Items</a>
+							</li>
+							<li>
+								<a href="#">Meta</a>
+							</li>
+							<li>
+								<a href="#">Vidéos</a>
+							</li>
+						</ul>
 
-			</div>
-		</div>
-	</div>
+						<h6>Fichiers</h6>
+						<ul id="app-nav-files-<?= $group['slug']; ?>">
+							<li>
+								<a href="#">Images</a>
+							</li>
+							<li>
+								<a href="#">Videos</a>
+							</li>
+							<li>
+								<a href="#">Autres</a>
+							</li>
+						</ul>
+					</div><!-- /.app-nav-lists -->
+				</div><!-- /.app-nav -->
+<?php
+	} // foreach $groups
+?>
+			</div><!-- /.pane-content -->
+		</div><!-- /#apps-nav -->
+
+		<div id="app-container" class="pane">
+
+            <div id="app-subnav">
+                <ul id="breadcrumb">
+                    <li>
+                        <a href="#">Home</a> <span class="divider">/</span>
+                    </li>
+                    <li>
+                        <a href="#">Library</a> <span class="divider">/</span>
+                    </li>
+                    <li class="active">
+                        <a href="#">Data</a>
+                    </li>
+                </ul><!-- /#breadcrumb -->
+                <form action="#" id="search-form">
+                    <p>
+                        <input type="text" id="search-query">
+                    </p>
+                </form><!-- /#search-form -->
+            </div><!-- /#app-subnav -->
+			<div id="app-content" class="pane nano" style="background:#ccc">
+				<div class="app-content-header">
+					<h2 class="page-name">Document name</h2>
+
+					<div class="btn-group">
+						<a class="btn" href="#">
+							<i class="icon-plus"></i>
+							Ajouter
+						</a>
+						<a class="btn" href="#">
+							<i class="icon-edit"></i>
+							Editer
+						</a>
+						<a class="btn btn-danger" href="#">
+							<i class="icon-trash"></i>
+							Vider
+						</a>
+					</div>
+				</div><!-- /#app-content-header -->
+				<div class="pane-content header-active">
+<div style="height:200%">&nbsp;</div>
+				</div><!-- /.pane-content -->
+			</div><!-- #app-content -->
+
+		</div><!-- #app-container -->
+	</div><!-- /#main -->
 
 	<!-- Application source -->
-	<script data-main="/tapioca_test/config" src="/assets/library/require/require.js"></script>
+	<script data-main="/tapioca/bootstrap" src="/assets/library/require/require.js"></script>
 	<script>
-		var tapp_settings = <?= json_encode($user); ?>;
+	define('config', function()
+	{
+		return <?= json_encode($user); ?>;
+	});
 	</script>
 </body>
 </html>
