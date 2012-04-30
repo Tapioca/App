@@ -7,12 +7,12 @@ define([
 		urlRoot: '/api',
 		url: function()
 		{
-			return this.urlRoot + '/' + this.get('appslug') + '/collection' + '/' + this.get('namespace');
+			return this.urlRoot + '/' + this.get('app_id') + '/collection' + '/' + this.get('namespace');
 		},
 		defaults:{
 			'name': '',
 			'namespace': null,
-			'appslug': null,
+			'app_id': null,
 			'desc': '',
 			'status': 1,
 			'structure': '',

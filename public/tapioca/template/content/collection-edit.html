@@ -1,0 +1,38 @@
+				<div class="pane-content">
+
+<label>Id:</label>
+<input id="namespace" name="namespace" type="text" value="{{ namespace }}" disabled />
+
+<hr>
+
+<label>Name:</label>
+<input type="text" id="name" name="name" value="{{ name }}" required />
+
+<hr>
+
+<label>Description:</label>
+<textarea id="desc" name="desc">{{ desc }}</textarea>
+
+<hr>
+
+<label>Status:</label>
+<input type="text" id="status" name="status" value="{{ status }}" required />
+
+<hr>
+
+<label>Structure:</label>
+<textarea id="structure" name="structure">{{ structure }}</textarea>
+
+<hr>
+
+<label>Summary:</label>
+<textarea id="summary" name="summary">{{ summary }}</textarea>
+
+<hr>
+
+<button class="save">Save</button>
+<button class="delete">Delete</button>
+
+<input type="text" id="app_id" name="app_id" value="{{ app_id }}" required />
+
+				</div><!-- /.pane-content -->

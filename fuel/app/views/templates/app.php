@@ -31,7 +31,7 @@
 
 	<header id="tapp">
 
-		<a id="header-logo" href="javascript:void(0)">
+		<a id="header-logo" href="<?= Uri::create('app'); ?>">
 			<img alt="tapioca logo" src="/assets/img/header-logo.png">
 		</a><!-- /#header-logo -->
 
@@ -44,7 +44,7 @@
 
 				<?= Html::anchor(Uri::create('#'), __('tapioca.ui.user_account')); ?>
 
-				<?= Html::anchor(Uri::create('/log/out'), __('tapioca.ui.user_logout')); ?>
+				<?= Html::anchor(Uri::create('log/out'), __('tapioca.ui.user_logout')); ?>
 
 			</nav>
 		</div><!-- /#user-shortcuts -->
@@ -90,6 +90,16 @@
 								<span class="no-collection">Pas de collections</span>
 							</li>
 						</ul>
+<?php
+	if($group['is_admin'])
+	{
+?>
+						<p>
+							<a href="<?= $group['slug']; ?>/collections/add">Ajouter une collection</a>
+						</p>
+<?php
+	} // if is_admin
+?>
 
 						<h6>Fichiers</h6>
 						<ul id="app-nav-files-<?= $group['slug']; ?>">

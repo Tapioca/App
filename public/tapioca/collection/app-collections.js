@@ -15,6 +15,7 @@ define([
 		{
 			return this.urlRoot + '/' + this.appSlug + '/collection';
 		},
+		idAttribute: 'namespace'
 	});
 
 	return collection;

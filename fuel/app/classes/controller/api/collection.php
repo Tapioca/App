@@ -41,7 +41,7 @@ class Controller_Api_Collection extends Controller_Api
 
 					$collection = Tapioca::collection(static::$group, static::$namespace);
 
-					self::$data = $collection->get($revision);
+					self::$data = $collection->get($revision, self::$user);
 				}
 				else
 				{
@@ -97,7 +97,7 @@ class Controller_Api_Collection extends Controller_Api
 						$data = $collection->update_data($data, self::$user);
 					}
 
-					self::$data   = $collection->get();
+					self::$data   = $collection->get(null, self::$user);
 					self::$status = 200;
 
 				}
@@ -144,7 +144,7 @@ class Controller_Api_Collection extends Controller_Api
 						$data = $collection->update_data($data, self::$user);
 					}
 
-					self::$data   = $collection->get();
+					self::$data   = $collection->get(null, self::$user);
 					self::$status = 200;
 
 				}

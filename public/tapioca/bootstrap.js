@@ -19,15 +19,16 @@ require([
 	'module/collection'
 ], function($, nanoScroller, tapioca, mediator, vAppCollections, Collections)
 {
-
 	// Defining the application router, you can attach sub routers here.
 	var Router = Backbone.Router.extend(
 	{
 		instance: false,
 
 		routes: {
-			'': 'index',
-			'app/:appslug/collections/:namespace': 'collectionHome'
+			''                                    : 'index',
+			':appslug/collections/add'            : 'collectionAdd',
+			':appslug/collections/:namespace/edit': 'collectionEdit',
+			':appslug/collections/:namespace'     : 'collectionHome'
 		},
 
 		onRequest: function(fnc, args)
@@ -55,7 +56,39 @@ require([
 				this.requestedArgs = [appslug, namespace];
 				this.index();
 			}
+		},
+
+		collectionEdit: function(appslug, namespace)
+		{
+			if(this.instance)
+			{
+				var model = tapioca.apps[appslug].models.get(namespace);
+				model.fetch();
+		
+				mediator.publish('callCollectionEdit', appslug, namespace);
+			}
+			else
+			{
+				this.requestedFnc  = 'collectionEdit';
+				this.requestedArgs = [appslug, namespace];
+				this.index();
+			}
+		},
+
+		collectionAdd: function(appslug)
+		{
+			if(this.instance)
+			{
+				mediator.publish('callCollectionAdd', appslug);
+			}
+			else
+			{
+				this.requestedFnc  = 'collectionEdit';
+				this.requestedArgs = [appslug];
+				this.index();
+			}
 		}
+
 	});
 
 	// Shorthand the application namespace
@@ -70,15 +103,16 @@ require([
 			// Create an instance for the group
 			tapioca.apps[slug] = {};
 
-			var model = tapioca.apps[slug].model   = new Collections.Collection(slug);
+			tapioca.apps[slug].models = new Collections.Collection(slug);
+			tapioca.apps[slug].models.model = Collections.Model;
 
 			new vAppCollections({
 				el: $('#app-nav-collections-'+slug),
-				model: model, 
+				model: tapioca.apps[slug].models, 
 				appSlug: slug
 			});
 
-			model.fetch();
+			tapioca.apps[slug].models.fetch();
 		}
 
 		app.router.instance = true;
@@ -135,7 +169,6 @@ require([
 			}
 		});
 
-
 		// Define master router on the application namespace and trigger all
 		// navigation from this instance.		
 		app.router = new Router();
@@ -143,7 +176,7 @@ require([
 		init();
 
 		// Trigger the initial route and enable HTML5 History API support
-		Backbone.history.start({ pushState: true });
+		Backbone.history.start(); //{ pushState: true });
 	});
 
 	// All navigation that is relative should be passed through the navigate

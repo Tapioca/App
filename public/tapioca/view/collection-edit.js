@@ -1,7 +1,10 @@
 define([
+	'order!jquery',
+	'order!nanoScroller',
 	'backbone',
-	'text!template/content/content.html',
-], function(Backbone, tContent)
+	'tapioca',
+	'text!template/content/collection-edit.html',
+], function($, nanoScroller, Backbone, tapioca, tContent)
 {
 	var view = Backbone.View.extend(
 	{
@@ -12,21 +15,34 @@ define([
 
 		initialize: function()
 		{
-			this.model.bind("change", this.render, this);
+			this.model.bind('change', this.render, this);
+			this.render();
 		},
 
 		render: function(eventName)
 		{
-			console.log(this.model.toJSON());
-			//$(this.el).html(this.template(this.model.toJSON()));
+			var view           = this.model.toJSON();
+				view.structure = JSON.stringify(view.structure);
+				view.summary   = JSON.stringify(view.summary);
+
+			var _html = Mustache.render(tContent, view);
+			var _options = {
+				classPane: 'track',
+				contentSelector: 'div.pane-content'
+			};
+
+			this.$el
+				.html(_html)
+				.nanoScroller(_options);
+			
 			return this;
 		},
 
 		events:
 		{
-			"change input": "change",
-			"click .save": "save",
-			"click .delete": "delete"
+			'change input': 'change',
+			'click .save'  : 'save',
+			'click .delete': 'delete'
 		},
 
 		change: function(event)
@@ -41,17 +57,24 @@ define([
 
 		save: function()
 		{
-			this.model.set({
-			name: $('#name').val(),
-			desc: $('#desc').val(),
-			status: $('#status').val(),
-			structure: jQuery.parseJSON($('#structure').val()),
-			summary: jQuery.parseJSON($('#summary').val())
+			var slug = $('#app_id').val();
+			
+			this.model.set(
+			{
+				name     : $('#name').val(),
+				desc     : $('#desc').val(),
+				status   : $('#status').val(),
+				structure: jQuery.parseJSON($('#structure').val()),
+				summary  : jQuery.parseJSON($('#summary').val())
 			});
-			if (this.model.isNew()) {
-			app.TapiocaList.create(this.model);
-			} else {
-			this.model.save();
+
+			if (this.model.isNew())
+			{
+				tapioca.apps[slug].models.create(this.model);
+			}
+			else
+			{
+				this.model.save();
 			}
 			return false;
 		},
@@ -70,7 +93,7 @@ define([
 		close: function()
 		{
 			this.$el.unbind();
-			this.el.empty();
+			this.$el.empty();
 		}
 	});
 

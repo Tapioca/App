@@ -2,9 +2,10 @@ define([
 	'config',
 	'underscore',
 	'backbone'
-], function(config)
+], function(config, _, Backbone)
 {
-
+	Backbone.emulateJSON = true;
+	
 	var tapioca = {
 		
 		// User config

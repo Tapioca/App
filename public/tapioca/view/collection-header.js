@@ -2,7 +2,6 @@ define([
 	'tapioca',
 	'backbone',
 	'underscore',
-	'module/collection',
 	'view/apps-list-item'
 ], function(tapioca, Backbone, _, Collections, vAppsListItem)
 {
@@ -25,8 +24,8 @@ define([
 			});
 			*/
 
-			this.model.bind('reset', this.render, this); 	
-			this.model.bind('add', this.renderItem, this);
+			this.model.bind('reset', this.render, this);
+			this.model.bind('add', this.renderItem);
 		},
  
 		render: function()

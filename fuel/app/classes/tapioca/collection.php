@@ -163,7 +163,7 @@ class Collection
 	 * @throws  TapiocaException
 	 */
 
-	public function get($revision = null)
+	public function get(int $revision = null, \Auth\User $user)
 	{
 		$data       = $this->data($revision);
 
@@ -172,6 +172,10 @@ class Collection
 		$ret['created'] = (int) $ret['created']->sec;
 
 		unset($ret['type']);
+
+		// Is User is an admin
+		$user_id = $user->get('id');
+		$ret['editable'] = (static::$group->is_admin($user_id));
 
 		return $ret;
 	}
@@ -322,9 +326,18 @@ class Collection
 			$fields['status'] = (int) $fields['status'];
 		}
 
-		return static::$db
-					->where(static::$summary_where)
-					->update(static::$collection, $fields);
+		$update =  static::$db
+						->where(static::$summary_where)
+						->update(static::$collection, $fields);
+
+		if($update)
+		{
+			$this->summary = array_merge($this->summary, $fields);
+
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
