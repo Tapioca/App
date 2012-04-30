@@ -19,7 +19,7 @@ define([
 //	Collections.Views.Edit  = vCollectionEdit;
 
 	var model = null,
-		view = null;
+		view  = null;
 
 	// Subscription 'modules' for our views.
 	mediator.subscribe('callCollectionHome', function(appslug, namespace)
@@ -29,7 +29,8 @@ define([
 		
 		if(view != null) view.close();
 		view  = new vCollectionHome({
-						model: model
+						model: model,
+						forceRender:  true
 					});
 	});
 

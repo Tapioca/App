@@ -26,10 +26,10 @@ define([
 			return this;
 		},
 
-		close: function()
+		onClose: function()
 		{
-			this.$el.unbind();
-			this.$el.remove();
+			this.model.unbind('change', this.render);
+			this.model.unbind('destroy', this.close);
 		}
 	});
 });

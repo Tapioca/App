@@ -23,6 +23,29 @@ require([
 	var Router = Backbone.Router.extend(
 	{
 		instance: false,
+		
+		initialize: function()
+		{
+			// Load Collections per Groups
+			for(var i in tapioca.config.user.groups)
+			{
+				var slug = tapioca.config.user.groups[i].slug;
+
+				// Create an instance for the group
+				tapioca.apps[slug] = {};
+
+				tapioca.apps[slug].models = new Collections.Collection(slug);
+				tapioca.apps[slug].models.model = Collections.Model;
+
+				new vAppCollections({
+					el: $('#app-nav-collections-'+slug),
+					model: tapioca.apps[slug].models, 
+					appSlug: slug
+				});
+
+				tapioca.apps[slug].models.fetch();
+			}
+		},
 
 		routes: {
 			''                                    : 'index',
@@ -38,90 +61,31 @@ require([
 
 		index: function()
 		{
-			if(!this.instance)
-			{
-				init();
-			}
+			console.log('router index')
 		},
 
 		collectionHome: function(appslug, namespace)
 		{
-			if(this.instance)
-			{
-				mediator.publish('callCollectionHome', appslug, namespace);
-			}
-			else
-			{
-				this.requestedFnc  = 'collectionHome';
-				this.requestedArgs = [appslug, namespace];
-				this.index();
-			}
+			mediator.publish('callCollectionHome', appslug, namespace);
 		},
 
 		collectionEdit: function(appslug, namespace)
 		{
-			if(this.instance)
-			{
-				var model = tapioca.apps[appslug].models.get(namespace);
-				model.fetch();
+			var model = tapioca.apps[appslug].models.get(namespace);
+			model.fetch();
 		
-				mediator.publish('callCollectionEdit', appslug, namespace);
-			}
-			else
-			{
-				this.requestedFnc  = 'collectionEdit';
-				this.requestedArgs = [appslug, namespace];
-				this.index();
-			}
+			mediator.publish('callCollectionEdit', appslug, namespace);
 		},
 
 		collectionAdd: function(appslug)
 		{
-			if(this.instance)
-			{
-				mediator.publish('callCollectionAdd', appslug);
-			}
-			else
-			{
-				this.requestedFnc  = 'collectionEdit';
-				this.requestedArgs = [appslug];
-				this.index();
-			}
+			mediator.publish('callCollectionAdd', appslug);
 		}
 
 	});
 
 	// Shorthand the application namespace
 	var app = tapioca.app;
-	var init = function()
-	{
-		// Load Collections
-		for(var i in tapioca.config.user.groups)
-		{
-			var slug = tapioca.config.user.groups[i].slug;
-
-			// Create an instance for the group
-			tapioca.apps[slug] = {};
-
-			tapioca.apps[slug].models = new Collections.Collection(slug);
-			tapioca.apps[slug].models.model = Collections.Model;
-
-			new vAppCollections({
-				el: $('#app-nav-collections-'+slug),
-				model: tapioca.apps[slug].models, 
-				appSlug: slug
-			});
-
-			tapioca.apps[slug].models.fetch();
-		}
-
-		app.router.instance = true;
-
-		if(app.router.requestedFnc)
-		{
-			app.router.onRequest(this.requestedFnc, this.requestedArgs);
-		}
-	}
 
 	$(function()
 	{
@@ -172,8 +136,6 @@ require([
 		// Define master router on the application namespace and trigger all
 		// navigation from this instance.		
 		app.router = new Router();
-
-		init();
 
 		// Trigger the initial route and enable HTML5 History API support
 		Backbone.history.start(); //{ pushState: true });

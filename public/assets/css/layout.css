@@ -325,6 +325,10 @@ header#tapp {
 	width:100%;
 }
 
+.app-nav-header:hover .app-nav-name {
+	color: #fff;
+}
+
 .app-nav .avatar {
 	float: left;
 	margin:0 20px 0 10px;

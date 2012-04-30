@@ -12,18 +12,6 @@ define([
 		{
 			this.appSlug = options.appSlug;
 			this.baseUri = 'app/'+this.appSlug;
-			/*
-			this.model   = new Collections.Collection(this.appSlug);
-			
-			var self     = this;
-
-			this.model.fetch({
-				success: function()
-				{
-					self.render();
-				}
-			});
-			*/
 
 			this.model.bind('reset', this.render, this); 	
 			this.model.bind('add', this.renderItem, this);

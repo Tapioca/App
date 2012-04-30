@@ -58,7 +58,7 @@ define([
 		save: function()
 		{
 			var slug = $('#app_id').val();
-			
+
 			this.model.set(
 			{
 				name     : $('#name').val(),
@@ -90,10 +90,9 @@ define([
 			return false;
 		},
 
-		close: function()
+		onClose: function()
 		{
-			this.$el.unbind();
-			this.$el.empty();
+			this.model.unbind('reset', this.render);
 		}
 	});
 

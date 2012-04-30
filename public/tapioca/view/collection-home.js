@@ -10,11 +10,22 @@ define([
 	{
 		el: $('#app-content'),
 
-		initialize: function()
+		initialize: function(options)
 		{
 			console.log('initialize collection-home')
-			this.model.bind('change', this.render, this);
-			this.model.bind('reset', this.render, this);
+
+			// stupid hacks because i don't get which event to use!!
+			if(options.forceRender)
+			{
+				this.render();
+			}
+			//_.bindAll(this, 'render');
+			//this.model.bind('all', this.render);
+			//this.model.bind('all', this.render);
+			/**/
+			this.model.bind('fetch', this.render, this);
+			//this.model.bind('refresh', this.render, this);
+			/**/
 		},
 
 		render: function()
@@ -35,10 +46,10 @@ define([
 			return this;
 		},
 
-		close: function()
+		onClose: function()
 		{
-			this.$el.unbind();
-			this.$el.empty();
+			//this.model.unbind('change', this.render);
+			//this.model.unbind('reset', this.render);
 		}
 	});
 

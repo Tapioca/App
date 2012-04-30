@@ -145,14 +145,29 @@ class Collection
 	 * @return  array
 	 * @throws  TapiocaException
 	 */
-	public function all($status = 100)
+	public function all($status = 100, \Auth\User $user)
 	{
 		//query database for collections's summaries
-		return static::$db->get_where(static::$collection, array(
+		$ret = static::$db->get_where(static::$collection, array(
 			'app_id' => static::$group->get('slug'),
 			'type'   => 'summary',
 			'status' => array('$gte' => (int) $status)
 		));
+
+		if($ret)
+		{
+			// Is User is an admin
+			$user_id  = $user->get('id');
+			$editable = (static::$group->is_admin($user_id));
+
+			foreach($ret as &$result)
+			{
+				$result['editable'] = $editable;
+				unset($result['_id']);
+			}
+		}
+
+		return $ret;
 	}
 
 	/**

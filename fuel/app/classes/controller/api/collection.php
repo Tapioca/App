@@ -48,7 +48,7 @@ class Controller_Api_Collection extends Controller_Api
 					$status     = (static::$is_allowed) ? 0 : 100;
 
 					$collection = Tapioca::collection(static::$group);
-					$all        = $collection->all($status);
+					$all        = $collection->all($status, static::$user);
 
 					if(count($all) == 0)
 					{

@@ -5,7 +5,18 @@ define([
 ], function(config, _, Backbone)
 {
 	Backbone.emulateJSON = true;
-	
+
+	Backbone.View.prototype.close = function()
+	{
+		this.$el.empty();
+		this.unbind();
+		if (this.onClose)
+		{
+			this.onClose();
+		}
+	}
+
+
 	var tapioca = {
 		
 		// User config
