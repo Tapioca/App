@@ -30,6 +30,12 @@ define([
 		{
 			collection.set('base_uri', this.baseUri);
 			this.$el.append(new vAppsListItem({model: collection}).render().el);
+		},
+
+		onClose: function()
+		{
+			this.model.unbind('reset', this.render);
+			this.model.unbind('add', this.close);
 		}
 	});
 });

@@ -15,20 +15,15 @@ define([
 
 	Collections.Collection  = cCollection;	
 	Collections.Model       = mCollection;
-//	Collections.Views.Home  = vCollectionHome;
-//	Collections.Views.Edit  = vCollectionEdit;
 
-	var model = null,
-		view  = null;
+	var model = null;
 
-	// Subscription 'modules' for our views.
 	mediator.subscribe('callCollectionHome', function(appslug, namespace)
 	{
 		model = tapioca.apps[appslug].models.get(namespace);
-		model.fetch();
 		
-		if(view != null) view.close();
-		view  = new vCollectionHome({
+		if(tapioca.view != null) tapioca.view.close();
+		tapioca.view  = new vCollectionHome({
 						model: model,
 						forceRender:  true
 					});
@@ -38,8 +33,8 @@ define([
 	{
 		model = tapioca.apps[appslug].models.get(namespace);
 
-		if(view != null) view.close();
-		view  = new vCollectionEdit({
+		if(tapioca.view != null) tapioca.view.close();
+		tapioca.view  = new vCollectionEdit({
 						model: model
 					});
 	});
@@ -49,8 +44,8 @@ define([
 		console.log('callCollectionAdd')
 		console.log(tapioca.apps[appslug].models);
 
-		if(view != null) view.close();
-		view  = new vCollectionEdit({
+		if(tapioca.view != null) tapioca.view.close();
+		tapioca.view  = new vCollectionEdit({
 						model: new Collections.Model({
 							app_id: appslug
 						})

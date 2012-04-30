@@ -95,7 +95,7 @@
 	{
 ?>
 						<p>
-							<a href="<?= $group['slug']; ?>/collections/add">Ajouter une collection</a>
+							<a href="app/<?= $group['slug']; ?>/collections/add">Ajouter une collection</a>
 						</p>
 <?php
 	} // if is_admin

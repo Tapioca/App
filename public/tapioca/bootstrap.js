@@ -48,10 +48,10 @@ require([
 		},
 
 		routes: {
-			''                                    : 'index',
-			':appslug/collections/add'            : 'collectionAdd',
-			':appslug/collections/:namespace/edit': 'collectionEdit',
-			':appslug/collections/:namespace'     : 'collectionHome'
+			''                                        : 'index',
+			'app/:appslug/collections/add'            : 'collectionAdd',
+			'app/:appslug/collections/:namespace/edit': 'collectionEdit',
+			'app/:appslug/collections/:namespace'     : 'collectionHome'
 		},
 
 		onRequest: function(fnc, args)
@@ -138,7 +138,7 @@ require([
 		app.router = new Router();
 
 		// Trigger the initial route and enable HTML5 History API support
-		Backbone.history.start(); //{ pushState: true });
+		Backbone.history.start({ pushState: true });
 	});
 
 	// All navigation that is relative should be passed through the navigate

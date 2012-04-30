@@ -12,20 +12,8 @@ define([
 
 		initialize: function(options)
 		{
-			console.log('initialize collection-home')
-
-			// stupid hacks because i don't get which event to use!!
-			if(options.forceRender)
-			{
-				this.render();
-			}
-			//_.bindAll(this, 'render');
-			//this.model.bind('all', this.render);
-			//this.model.bind('all', this.render);
-			/**/
+			this.render();
 			this.model.bind('fetch', this.render, this);
-			//this.model.bind('refresh', this.render, this);
-			/**/
 		},
 
 		render: function()
@@ -48,7 +36,7 @@ define([
 
 		onClose: function()
 		{
-			//this.model.unbind('change', this.render);
+			this.model.unbind('fetch', this.render);
 			//this.model.unbind('reset', this.render);
 		}
 	});

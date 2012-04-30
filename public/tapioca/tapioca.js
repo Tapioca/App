@@ -24,6 +24,8 @@ define([
 
 		// Apps state
 		apps: {},
+
+		view: null,
 		
 		// Create a custom object with a nested Views object
 		module: function(additionalProps)
