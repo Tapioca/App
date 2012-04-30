@@ -1,10 +1,12 @@
 define([
 	'tapioca',
 	'backbone',
-	'underscore',
-	'module/collection',
-	'view/apps-list-item'
-], function(tapioca, Backbone, _, Collections, vAppsListItem)
+	'underscore'
+	/*,
+	'view/subnav-item'
+	'view/subnav-search'
+	*/
+], function(tapioca, Backbone, _) //, vSubNavItem, vSubNavSeach)
 {
 	return Backbone.View.extend(
 	{
@@ -12,18 +14,7 @@ define([
 		{
 			this.appSlug = options.appSlug;
 			this.baseUri = 'app/'+this.appSlug;
-			/*
-			this.model   = new Collections.Collection(this.appSlug);
 			
-			var self     = this;
-
-			this.model.fetch({
-				success: function()
-				{
-					self.render();
-				}
-			});
-			*/
 
 			this.model.bind('reset', this.render, this); 	
 			this.model.bind('add', this.renderItem);

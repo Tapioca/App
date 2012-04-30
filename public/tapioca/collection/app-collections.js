@@ -1,19 +1,21 @@
 define([
-	'backbone',
-	'model/app-collection'
-], function(Backbone, AppDetails)
+	'backbone'
+], function(Backbone)
 {
-	return Backbone.Collection.extend(
+	var collection =  Backbone.Collection.extend(
 	{
 		initialize: function(appSlug)
 		{
 			this.appSlug = appSlug;
+			//this.model = new AppDetails();
     	},
-		model: AppDetails,
+		//model: mCollection,
 		urlRoot: '/api',
 		url: function()
 		{
 			return this.urlRoot + '/' + this.appSlug + '/collection';
 		},
-	})
+	});
+
+	return collection;
 });

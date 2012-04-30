@@ -2,21 +2,24 @@ define([
 	'backbone'
 ], function(Backbone)
 {
-	return Backbone.Model.extend(
+	var model = Backbone.Model.extend(
 	{
 		urlRoot: '/api',
 		url: function()
 		{
-			return this.urlRoot + '/' + this.get('namespace') + '/collection';
+			return this.urlRoot + '/' + this.get('appslug') + '/collection' + '/' + this.get('namespace');
 		},
 		defaults:{
 			'name': '',
 			'namespace': null,
+			'appslug': null,
 			'desc': '',
 			'status': 1,
 			'structure': '',
 			'summary': ''
 		},
 		idAttribute: 'namespace'
-	})
+	});
+
+	return model;
 });

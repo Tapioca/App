@@ -113,46 +113,12 @@
 
 		<div id="app-container" class="pane">
 
-            <div id="app-subnav">
-                <ul id="breadcrumb">
-                    <li>
-                        <a href="#">Home</a> <span class="divider">/</span>
-                    </li>
-                    <li>
-                        <a href="#">Library</a> <span class="divider">/</span>
-                    </li>
-                    <li class="active">
-                        <a href="#">Data</a>
-                    </li>
-                </ul><!-- /#breadcrumb -->
-                <form action="#" id="search-form">
-                    <p>
-                        <input type="text" id="search-query">
-                    </p>
-                </form><!-- /#search-form -->
-            </div><!-- /#app-subnav -->
-			<div id="app-content" class="pane nano" style="background:#ccc">
-				<div class="app-content-header">
-					<h2 class="page-name">Document name</h2>
+			<div id="app-subnav">
+				<ul id="breadcrumb">
+				</ul><!-- /#breadcrumb -->
+			</div><!-- /#app-subnav -->
+			<div id="app-content" class="pane nano">
 
-					<div class="btn-group">
-						<a class="btn" href="#">
-							<i class="icon-plus"></i>
-							Ajouter
-						</a>
-						<a class="btn" href="#">
-							<i class="icon-edit"></i>
-							Editer
-						</a>
-						<a class="btn btn-danger" href="#">
-							<i class="icon-trash"></i>
-							Vider
-						</a>
-					</div>
-				</div><!-- /#app-content-header -->
-				<div class="pane-content header-active">
-<div style="height:200%">&nbsp;</div>
-				</div><!-- /.pane-content -->
 			</div><!-- #app-content -->
 
 		</div><!-- #app-container -->

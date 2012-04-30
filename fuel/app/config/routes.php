@@ -1,10 +1,11 @@
 <?php
 return array(
-	'_root_'  => 'welcome/index',  // The default route
+	'_root_'  => 'app/index',  // The default route
 	'_404_'   => 'welcome/404',    // The main 404 route
 	
 	//'log' => array(array('GET', new Route('log/index')), array('POST', new Route('log/in'))),
-	'app' => 'app/index',
+	'app/(:any)' => 'app/index',
+	'app'        => 'app/index',
 
 	// API REST 
 	'api/:app_slug/collection/:namespace/drop'   => array('api/collection/drop', 'name' => 'api_collection_drop'),

@@ -2,7 +2,7 @@ define([
 	'backbone',
 	'underscore',
 	'Mustache',
-	'text!/tapioca/template/sidebar/apps-list-item.html'
+	'text!template/sidebar/apps-list-item.html'
 ], function(Backbone, _, Mustache, tAppsListItem)
 {
 	return Backbone.View.extend(

@@ -13,27 +13,81 @@ require.config({
 require([
 	'order!jquery',
 	'order!nanoScroller', 
-	'namespace',
-	'globals',
-	'view/apps-list'
-], function($, nanoScroller, namespace, globals, vAppCollections)
+	'tapioca',
+	'aura/mediator',
+	'view/apps-list',
+	'module/collection'
+], function($, nanoScroller, tapioca, mediator, vAppCollections, Collections)
 {
 
 	// Defining the application router, you can attach sub routers here.
 	var Router = Backbone.Router.extend(
 	{
+		instance: false,
+
 		routes: {
-			'': 'index'
+			'': 'index',
+			'app/:appslug/collections/:namespace': 'collectionHome'
 		},
 
-		index: function(hash)
+		onRequest: function(fnc, args)
 		{
-			console.log('call index');
+			this[fnc].apply(this, args || []);
+		},
+
+		index: function()
+		{
+			if(!this.instance)
+			{
+				init();
+			}
+		},
+
+		collectionHome: function(appslug, namespace)
+		{
+			if(this.instance)
+			{
+				mediator.publish('callCollectionHome', appslug, namespace);
+			}
+			else
+			{
+				this.requestedFnc  = 'collectionHome';
+				this.requestedArgs = [appslug, namespace];
+				this.index();
+			}
 		}
 	});
 
 	// Shorthand the application namespace
-	//var app = namespace.app;
+	var app = tapioca.app;
+	var init = function()
+	{
+		// Load Collections
+		for(var i in tapioca.config.user.groups)
+		{
+			var slug = tapioca.config.user.groups[i].slug;
+
+			// Create an instance for the group
+			tapioca.apps[slug] = {};
+
+			var model = tapioca.apps[slug].model   = new Collections.Collection(slug);
+
+			new vAppCollections({
+				el: $('#app-nav-collections-'+slug),
+				model: model, 
+				appSlug: slug
+			});
+
+			model.fetch();
+		}
+
+		app.router.instance = true;
+
+		if(app.router.requestedFnc)
+		{
+			app.router.onRequest(this.requestedFnc, this.requestedArgs);
+		}
+	}
 
 	$(function()
 	{
@@ -81,29 +135,21 @@ require([
 			}
 		});
 
-		// Load Collections
-		for(var i in globals.user.groups)
-		{
-			var slug = globals.user.groups[i].slug;
-
-			new vAppCollections({
-				el: $('#app-nav-collections-'+slug),
-				appSlug: slug
-			})
-		}
 
 		// Define master router on the application namespace and trigger all
 		// navigation from this instance.		
-		//app.router = new Router();
+		app.router = new Router();
+
+		init();
 
 		// Trigger the initial route and enable HTML5 History API support
-		//Backbone.history.start({ pushState: true });
+		Backbone.history.start({ pushState: true });
 	});
 
 	// All navigation that is relative should be passed through the navigate
 	// method, to be processed by the router.  If the link has a data-bypass
 	// attribute, bypass the delegation completely.
-	$(document).on("click", "a:not([data-bypass])", function(event)
+	$(document).on('click', 'a:not([data-bypass])', function(event)
 	{
 		// Get the anchor href and protcol
 		var href = $(this).attr("href");
