@@ -84,7 +84,7 @@ class Collection
 			$summary = static::$db->get_where(static::$collection, array(
 				$field  => $id,
 				'type'  => 'summary',
-				'app_id' => static::$group->get('id')
+				'app_id' => static::$group->get('slug')
 			), 1);
 
 			// if there was a result 
@@ -99,7 +99,7 @@ class Collection
 				//query database for collection's summary
 				$data = static::$db
 							->where(array(
-								'app_id'    => static::$group->get('id'),
+								'app_id'    => static::$group->get('slug'),
 								'namespace' => $summary[0]['namespace'],
 								'type'      => 'data'
 							))
@@ -113,7 +113,7 @@ class Collection
 				$this->namespace = $summary[0]['namespace'];
 				$this->name      = $summary[0]['name'];
 
-				static::$summary_where = array( 'app_id'    => static::$group->get('id'),
+				static::$summary_where = array( 'app_id'    => static::$group->get('slug'),
 												'namespace' => $this->namespace,
 												'type'      => 'summary');
 			}
@@ -149,7 +149,7 @@ class Collection
 	{
 		//query database for collections's summaries
 		return static::$db->get_where(static::$collection, array(
-			'app_id' => static::$group->get('id'),
+			'app_id' => static::$group->get('slug'),
 			'type'   => 'summary',
 			'status' => array('$gte' => (int) $status)
 		));
@@ -282,7 +282,7 @@ class Collection
 		}
 
 		$new_summary = array(
-			'app_id' => static::$group->get('id'),
+			'app_id' => static::$group->get('slug'),
 			'type' => 'summary',
 			'documents' => (int) 0,
 			'status' => $status,
@@ -358,7 +358,7 @@ class Collection
 		);
 
 		$data = array(
-			'app_id' => static::$group->get('id'),
+			'app_id' => static::$group->get('slug'),
 			'type' => 'data',
 			'namespace' => $this->namespace,
 			'revision' => $revision,
@@ -468,7 +468,7 @@ class Collection
 		return static::$db
 					->where(array(
 							'namespace' => $this->namespace,
-							'app_id'    => static::$group->get('id')
+							'app_id'    => static::$group->get('slug')
 					))
 					->delete_all(static::$collection);
 	}
@@ -483,7 +483,7 @@ class Collection
 	{
 		// query db to check for login_column
 		$result = static::$db->get_where(static::$collection, array(
-												'app_id'    => static::$group->get('id'),
+												'app_id'    => static::$group->get('slug'),
 												'namespace' => $namespace,
 												'type'      => 'summary'
 											), 1);
