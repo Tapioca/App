@@ -86,20 +86,24 @@
 ?>
 						<h6>Documents</h6>
 						<ul id="app-nav-collections-<?= $group['slug']; ?>">
-							<li>
+							<li class="app-nav-collections-empty">
 								<span class="no-collection">Pas de collections</span>
 							</li>
-						</ul>
 <?php
 	if($group['is_admin'])
 	{
 ?>
-						<p>
-							<a href="app/<?= $group['slug']; ?>/collections/add">Ajouter une collection</a>
-						</p>
+ 							<li class="divider"></li>
+							<li>
+								<a href="app/<?= $group['slug']; ?>/collections/add" class="admin-action">
+									<i class="icon-plus"></i>
+									Ajouter une collection
+								</a>
+							</li>
 <?php
 	} // if is_admin
 ?>
+						</ul>
 
 						<h6>Fichiers</h6>
 						<ul id="app-nav-files-<?= $group['slug']; ?>">

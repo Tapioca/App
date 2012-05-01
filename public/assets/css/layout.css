@@ -355,7 +355,7 @@ header#tapp {
 
 .app-nav-lists h6 {
 	padding-left: 15px;
-	text-shadow: 1px 1px 1px #000000;
+	text-shadow: 1px 1px 1px #000;
 }
 
 .app-nav-lists ul {
@@ -364,13 +364,29 @@ header#tapp {
 }
 
 .app-nav-lists li {
-    line-height: 20px;
+	line-height: 20px;
+}
+
+.app-nav-lists li.divider {
+	border-bottom: 1px solid #3D4548;
+	height: 1px;
+	margin: 5px 25px;
+	overflow: hidden;
 }
 
 .app-nav-lists a, 
 .app-nav-lists span.no-collection {
 	display: block;
 	padding: 2px 0 2px 25px;
+}
+
+#apps-nav a.admin-action {
+	color: #999;
+	font-size:10px;
+}
+
+#apps-nav a.admin-action:hover {
+	color: #fff;
 }
 
 .app-nav-lists a.active,
