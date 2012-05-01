@@ -78,9 +78,16 @@ require([
 
 		routes: {
 			''                                        : 'index',
+			'app'                                     : 'index',
 			'app/:appslug/collections/add'            : 'collectionAdd',
 			'app/:appslug/collections/:namespace/edit': 'collectionEdit',
-			'app/:appslug/collections/:namespace'     : 'collectionHome'
+			'app/:appslug/collections/:namespace'     : 'collectionHome',
+			'*path'                                   : 'notFound'
+		},
+
+		notFound: function(path) {
+			var msg = "Unable to find path: " + path;
+			console.log(msg);
 		},
 
 		onRequest: function(fnc, args)
@@ -190,7 +197,11 @@ require([
 		// Define master router on the application namespace and trigger all
 		// navigation from this instance.		
 		app.router = new Router();
-
+		app.router.bind('all',function(route, router)
+		{
+			console.log("Different Page: " + route + ' '+router +' '+Backbone.history.fragment);
+		});
+	
 		// Trigger the initial route and enable HTML5 History API support
 		Backbone.history.start({ pushState: true });
 	});
