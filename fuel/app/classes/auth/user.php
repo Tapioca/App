@@ -630,6 +630,53 @@ class User
 	}
 
 	/**
+	 * Update user level in a specific group.
+	 *
+	 * @param   string  Group ID
+	 * @param   array  User's role in group
+	 * @return  bool
+	 * @throws  UserException
+	 */
+	public function update_group_status($id, $role = array())
+	{
+		if (!$this->in_group($id))
+		{
+			throw new \UserException(__('auth.user_not_in_group'));
+		}
+
+		try
+		{
+			$group = new Group($id);
+		}
+		catch (GroupNotFoundException $e)
+		{
+			throw new \UserException($e->getMessage());
+		}
+
+		foreach($this->groups as &$group)
+		{
+			if($group['id'] == $id)
+			{
+				$group = array_merge($group, $role);				
+			}
+		}
+
+		$update = array('groups' => $this->groups);
+
+		$where = array('_id' => $this->user['_id']);
+
+		$query = static::$db
+					->where($where)
+					->update(static::$collection, $update);
+
+		if($query)
+		{
+			return true;
+		}
+		return false;
+	}
+
+	/**
 	 * Removes this user from the group.
 	 *
 	 * @param   string|int  Group ID or group name

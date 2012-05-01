@@ -490,7 +490,7 @@ class Group
 				$member['is_admin'] = 1;
 			}
 		}
-		
+
 		$update = array(
 						'$addToSet' => array('admins' => $user_id),
 						'$set' => array('team' => $this->team)
@@ -504,6 +504,8 @@ class Group
 
 		if($query)
 		{
+			$user->update_group_status($this->group['id'], array('level' => 100, 'is_admin' => 1));
+			
 			$this->admins[] = $user->get('id');
 
 			return true;
