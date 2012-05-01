@@ -2,11 +2,10 @@ define([
 	'tapioca',
 	'backbone',
 	'underscore',
-	'subrouter',
 	'aura/mediator',
 	'view/collection-home',
 	'view/collection-edit'
-], function(tapioca, Backbone, _, subrouter, mediator, vCollectionHome, vCollectionEdit) 
+], function(tapioca, Backbone, _, mediator, vCollectionHome, vCollectionEdit) 
 {
 	// Create a new module
 	var Collections         = tapioca.module();
