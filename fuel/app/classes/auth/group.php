@@ -480,7 +480,21 @@ class Group
 			throw new \GroupException($e->getMessage());
 		}
 
-		$update = array('$addToSet' => array('admins' => $user->get('id')));
+		$user_id = $user->get('id');
+
+		foreach($this->team as &$member)
+		{
+			if($member['id'] == $user_id)
+			{
+				$member['level']    = 100;
+				$member['is_admin'] = 1;
+			}
+		}
+		
+		$update = array(
+						'$addToSet' => array('admins' => $user_id),
+						'$set' => array('team' => $this->team)
+					);
 
 		$where = array('_id' => $this->group['_id']);
 
