@@ -91,11 +91,12 @@ require([
 	{
 		var $sidebar = $('#apps-nav');
 		var _options = {
-			classPane: 'track',
-			contentSelector: 'div.pane-content'
+			paneClass: 'track',
+			contentClass: '.pane-content'
 		};
 
-		$sidebar.nanoScroller(_options);
+		//$sidebar.nanoScroller(_options);
+		$('#main').find('div.nano').nanoScroller(_options);
 
 		// Sidebar
 		var $navApps      = $sidebar.find('div.app-nav');

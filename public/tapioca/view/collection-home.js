@@ -22,14 +22,9 @@ define([
 
 			var _html = Mustache.render(tContent, this.model.toJSON());
 
-			var _options = {
-				classPane: 'track',
-				contentSelector: 'div.pane-content'
-			};
-
 			this.$el
 				.html(_html)
-				.nanoScroller(_options);
+				.nanoScroller();
 
 			return this;
 		},
