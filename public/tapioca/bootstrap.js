@@ -26,6 +26,21 @@ require([
 		
 		initialize: function()
 		{
+			var total  = tapioca.config.user.groups.length;
+			var loaded = 0;
+			var loader = null;
+			var self   = this;
+			var check  = function()
+						{
+							if(loaded == total)
+							{
+								window.clearInterval(loader);
+								self.instance = true;
+								if(self.requestedFnc)
+									self.onRequest(self.requestedFnc, self.requestedArgs);
+							}
+						};
+
 			// Load Collections per Groups
 			for(var i in tapioca.config.user.groups)
 			{
@@ -33,6 +48,8 @@ require([
 
 				// Create an instance for the group
 				tapioca.apps[slug] = {};
+
+				tapioca.apps[slug].name = tapioca.config.user.groups[i].name;
 
 				tapioca.apps[slug].models = new Collections.Collection(slug);
 				tapioca.apps[slug].models.model = Collections.Model;
@@ -43,8 +60,20 @@ require([
 					appSlug: slug
 				});
 
-				tapioca.apps[slug].models.fetch();
+				tapioca.apps[slug].models.fetch({
+					success: function()
+					{
+						++loaded;
+					},
+					error: function()
+					{
+						++loaded;
+					}
+				});
 			}
+
+			loader = window.setInterval(check,100);
+
 		},
 
 		routes: {
@@ -66,20 +95,44 @@ require([
 
 		collectionHome: function(appslug, namespace)
 		{
-			mediator.publish('callCollectionHome', appslug, namespace);
+			if(this.instance)
+			{
+				mediator.publish('callCollectionHome', appslug, namespace);
+			}
+			else
+			{
+				this.requestedFnc  = 'collectionHome';
+				this.requestedArgs = [appslug, namespace];
+			}
 		},
 
 		collectionEdit: function(appslug, namespace)
 		{
-			var model = tapioca.apps[appslug].models.get(namespace);
-			model.fetch();
-		
-			mediator.publish('callCollectionEdit', appslug, namespace);
+			if(this.instance)
+			{
+				var model = tapioca.apps[appslug].models.get(namespace);
+				model.fetch();
+			
+				mediator.publish('callCollectionEdit', appslug, namespace);
+			}
+			else
+			{
+				this.requestedFnc  = 'collectionEdit';
+				this.requestedArgs = [appslug, namespace];
+			}
 		},
 
 		collectionAdd: function(appslug)
 		{
-			mediator.publish('callCollectionAdd', appslug);
+			if(this.instance)
+			{
+				mediator.publish('callCollectionAdd', appslug);
+			}
+			else
+			{
+				this.requestedFnc  = 'collectionAdd';
+				this.requestedArgs = [appslug];
+			}
 		}
 
 	});
