@@ -159,17 +159,9 @@ require([
 		$('#main').find('div.nano').nanoScroller(_options);
 
 		// Sidebar
+		var $navPane      = $sidebar.find('pane-content');
 		var $navApps      = $sidebar.find('div.app-nav');
 		var $navAppActive = $sidebar.find('div.app-nav.app-nav-active');
-		var $navLinks     = $sidebar.find('div.app-nav-lists a');
-
-		$navLinks.click(function(event)
-		{
-			event.preventDefault();
-
-			$navLinks.removeClass('active');
-			$(this).addClass('active');
-		})
 
 		$sidebar.find('a.app-nav-header').click(function(event)
 		{
@@ -189,7 +181,16 @@ require([
 
 				$parent.find('div.app-nav-lists').slideDown(200, function()
 				{
-					$parent.addClass('app-nav-active');
+					$parent
+						.addClass('app-nav-active');
+						/*
+						.bind(tapioca.transitionEnd, function()
+						{
+							console.log($parent.offset().top)
+							$navPane.scrollTop($parent.offset().top);
+							$(this).unbind(tapioca.transitionEnd);
+						});
+						*/
 				});
 			}
 		});
@@ -197,11 +198,7 @@ require([
 		// Define master router on the application namespace and trigger all
 		// navigation from this instance.		
 		app.router = new Router();
-		app.router.bind('all',function(route, router)
-		{
-			console.log("Different Page: " + route + ' '+router +' '+Backbone.history.fragment);
-		});
-	
+
 		// Trigger the initial route and enable HTML5 History API support
 		Backbone.history.start({ pushState: true });
 	});

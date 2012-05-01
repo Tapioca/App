@@ -1,8 +1,9 @@
 define([
+	'order!jquery',
 	'config',
 	'underscore',
 	'backbone'
-], function(config, _, Backbone)
+], function($, config, _, Backbone)
 {
 	Backbone.emulateJSON = true;
 
@@ -16,12 +17,32 @@ define([
 		}
 	}
 
+	var vP = '',
+		transitionEnd = 'transitionEnd';
+
+	if ($.browser.webkit) {
+		vP = "-webkit-";
+		transitionEnd = "webkitTransitionEnd";
+	} else if ($.browser.msie) {
+		vP = "-ms-";
+		transitionEnd = "msTransitionEnd";	
+	} else if ($.browser.mozilla) {
+		vP = "-moz-";
+		transitionEnd = "transitionend";
+	} else if ($.browser.opera) {
+		vP = "-o-";
+		transitionEnd = "oTransitionEnd";
+	}
 
 	var tapioca = {
 		
 		// User config
 		config:{},
 
+		vendor: vP,
+
+		transitionEnd: transitionEnd,
+		
 		// Apps state
 		apps: {},
 

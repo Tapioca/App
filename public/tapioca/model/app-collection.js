@@ -4,6 +4,7 @@ define([
 {
 	var model = Backbone.Model.extend(
 	{
+		idAttribute: 'namespace',
 		urlRoot: '/api',
 		url: function()
 		{
@@ -17,8 +18,7 @@ define([
 			'status': 1,
 			'structure': '',
 			'summary': ''
-		},
-		idAttribute: 'namespace'
+		}
 	});
 
 	return model;

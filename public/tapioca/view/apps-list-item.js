@@ -21,7 +21,7 @@ define([
 		{
 			var _html = Mustache.render(tAppsListItem, this.model.toJSON());
 			
-			this.$el.html(_html);
+			this.$el.html(_html).attr('data-namespace', this.model.get('namespace'));
 			
 			return this;
 		},

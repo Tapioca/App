@@ -4,24 +4,61 @@ define([
 	'underscore',
 	'subrouter',
 	'aura/mediator',
-	'collection/app-collections',
-	'model/app-collection',
 	'view/collection-home',
 	'view/collection-edit'
-], function(tapioca, Backbone, _, subrouter, mediator, cCollection, mCollection, vCollectionHome, vCollectionEdit) 
+], function(tapioca, Backbone, _, subrouter, mediator, vCollectionHome, vCollectionEdit) 
 {
 	// Create a new module
-	var Collections        = tapioca.module();
+	var Collections         = tapioca.module();
+	Collections.Collection  = Backbone.Collection.extend(
+	{
+		idAttribute: 'namespace',
+		initialize: function(appSlug)
+		{
+			this.appSlug = appSlug;
+			//this.model = new AppDetails();
+		},
+		//model: mCollection,
+		urlRoot: '/api',
+		url: function()
+		{
+			return this.urlRoot + '/' + this.appSlug + '/collection';
+		}
+	});
 
-	Collections.Collection  = cCollection;	
-	Collections.Model       = mCollection;
+	Collections.Model       = Backbone.Model.extend(
+	{
+		idAttribute: 'namespace',
+		urlRoot: '/api',
+		url: function()
+		{
+			return this.urlRoot + '/' + this.get('app_id') + '/collection' + '/' + this.get('namespace');
+		},
+		defaults:{
+			'name': '',
+			'namespace': null,
+			'app_id': null,
+			'desc': '',
+			'status': 1,
+			'structure': '',
+			'summary': ''
+		}
+	});
 
 	var model = null;
+
+	var highlight = function(appslug, namespace)
+	{
+		$('#app-nav-collections-'+appslug).trigger('collection:highlight', namespace);
+		$('#apps-nav').find('a.app-nav-header[data-app-slug="'+appslug+'"]').trigger('click');
+	}
 
 	mediator.subscribe('callCollectionHome', function(appslug, namespace)
 	{
 		model = tapioca.apps[appslug].models.get(namespace);
-		
+
+		highlight(appslug, namespace);
+
 		if(tapioca.view != null) tapioca.view.close();
 		tapioca.view  = new vCollectionHome({
 						model: model,
@@ -33,6 +70,8 @@ define([
 	{
 		model = tapioca.apps[appslug].models.get(namespace);
 
+		highlight(appslug, namespace);
+
 		if(tapioca.view != null) tapioca.view.close();
 		tapioca.view  = new vCollectionEdit({
 						model: model
@@ -41,9 +80,6 @@ define([
 
 	mediator.subscribe('callCollectionAdd', function(appslug)
 	{
-		console.log('callCollectionAdd')
-		console.log(tapioca.apps[appslug].models);
-
 		if(tapioca.view != null) tapioca.view.close();
 		tapioca.view  = new vCollectionEdit({
 						model: new Collections.Model({

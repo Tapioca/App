@@ -13,8 +13,26 @@ define([
 			this.appSlug = options.appSlug;
 			this.baseUri = 'app/'+this.appSlug;
 
-			this.model.bind('reset', this.render, this); 	
+			this.currentHighlight = null;
+
+			this.model.bind('reset', this.render, this);
 			this.model.bind('add', this.renderItem, this);
+		},
+
+		events:
+		{
+			'collection:highlight': 'highlight'
+		},
+
+		highlight: function(event, collection)
+		{
+			if(this.currentHighlight != collection)
+			{
+				this.currentHighlight = collection;
+				
+				this.$el.find('li').removeClass('active');
+				this.$el.find('li[data-namespace="' + collection + '"]').addClass('active');
+			}
 		},
  
 		render: function()

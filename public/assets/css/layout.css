@@ -258,6 +258,7 @@ header#tapp {
 }
 
 #app-container {
+	background: url(../img/ajax-loader.gif) no-repeat center;
 	border-left: 1px solid #222;
 	left: 20%;
 	right: 0;
@@ -385,12 +386,12 @@ header#tapp {
 	font-size:10px;
 }
 
-#apps-nav a.admin-action.active,
+#apps-nav .active a.admin-action,
 #apps-nav a.admin-action:hover {
 	color: #fff;
 }
 
-.app-nav-lists a.active,
+.app-nav-lists .active a,
 .app-nav-lists a:hover {
     background-color: #3C8DDE;
     background-image: -moz-linear-gradient(#599BDC, #3072B3);
@@ -524,6 +525,7 @@ header#tapp {
 -------------------------------------------------- */
 
 #app-content {
+	background: #fff;
 	left: 0;
 	right: 0;
 	top: 36px;
