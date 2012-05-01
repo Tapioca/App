@@ -19,9 +19,6 @@ define([
  
 		render: function()
 		{
-			// remove default message
-			this.$el.find('li.app-nav-collections-empty').remove();
-
 			_.each(this.model.models, this.renderItem, this);
 
 			return this;
@@ -29,6 +26,9 @@ define([
 
 		renderItem: function(collection)
 		{
+			// remove default message
+			this.$el.find('li.app-nav-collections-empty').remove();
+
 			collection.set('base_uri', this.baseUri);
 			this.$el.prepend(new vAppsListItem({model: collection}).render().el);
 		},
