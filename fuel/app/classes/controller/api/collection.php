@@ -74,8 +74,15 @@ class Controller_Api_Collection extends Controller_Api
 		{
 			$model = json_decode(Input::post('model', false), true);
 
-			// init tapioca first to get config & translation
-			$collection = Tapioca::collection(static::$group); 
+			try
+			{
+				// init tapioca first to get config & translation
+				$collection = Tapioca::collection(static::$group); 
+			}
+			catch (TapiocaException $e)
+			{
+				self::error($e->getMessage());
+			}
 			
 			if(!$model)
 			{
@@ -118,9 +125,16 @@ class Controller_Api_Collection extends Controller_Api
 		{
 			$model = json_decode(Input::put('model', false), true);
 
-			// init tapioca first to get config & translation
-			$collection = Tapioca::collection(static::$group, static::$namespace); 
-
+			try
+			{
+				// init tapioca first to get config & translation
+				$collection = Tapioca::collection(static::$group, static::$namespace); 
+			}
+			catch (TapiocaException $e)
+			{
+				self::error($e->getMessage());
+			}
+				
 			if(!$model)
 			{
 				self::$data   = array('error' => __('tapioca.missing_required_params'));

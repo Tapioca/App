@@ -113,9 +113,8 @@ class Collection
 				$this->namespace = $summary[0]['namespace'];
 				$this->name      = $summary[0]['name'];
 
-				static::$summary_where = array( 'app_id'    => static::$group->get('slug'),
-												'namespace' => $this->namespace,
-												'type'      => 'summary');
+				$this->set_summary_where();
+
 			}
 			// collection doesn't exist
 			else
@@ -125,6 +124,18 @@ class Collection
 				);
 			}
 		}
+	}
+
+	/**
+	 * Format "where" query for the current collection.
+	 *
+	 * @return  void
+	 */
+	private function set_summary_where()
+	{
+		static::$summary_where = array( 'app_id'    => static::$group->get('slug'),
+										'namespace' => $this->namespace,
+										'type'      => 'summary');		
 	}
 
 	/**
@@ -313,6 +324,8 @@ class Collection
 		$this->namespace = $new_summary['namespace'];
 		$this->name      = $new_summary['name'];
 		$this->data      = array();
+
+		$this->set_summary_where();
 
 		return static::$db->insert(static::$collection, $new_summary);
 	}

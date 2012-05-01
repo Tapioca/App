@@ -385,6 +385,7 @@ header#tapp {
 	font-size:10px;
 }
 
+#apps-nav a.admin-action.active,
 #apps-nav a.admin-action:hover {
 	color: #fff;
 }
