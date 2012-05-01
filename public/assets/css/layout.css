@@ -258,7 +258,6 @@ header#tapp {
 }
 
 #app-container {
-	background: url(../img/ajax-loader.gif) no-repeat center;
 	border-left: 1px solid #222;
 	left: 20%;
 	right: 0;
@@ -525,13 +524,14 @@ header#tapp {
 -------------------------------------------------- */
 
 #app-content {
-	background: #fff;
+	background: url(../img/ajax-loader.gif) no-repeat center;
 	left: 0;
 	right: 0;
 	top: 36px;
 }
 
 #app-content .pane-content {
+	background: #fff;
 	padding: 20px;
 }
 

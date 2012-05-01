@@ -7,6 +7,9 @@ define([
 {
 	Backbone.emulateJSON = true;
 
+	// Zombies! RUN!
+	// Managing Page Transitions In Backbone Apps
+	// http://lostechies.com/derickbailey/2011/09/15/zombies-run-managing-page-transitions-in-backbone-apps/
 	Backbone.View.prototype.close = function()
 	{
 		this.$el.empty();
@@ -15,6 +18,20 @@ define([
 		{
 			this.onClose();
 		}
+	}
+
+	// FuelPhp like reversed route,
+	// give method and it return the associated route
+	Backbone.Router.prototype.reverse = function(_method)
+	{
+		for(var path in this.routes)
+		{
+			if(this.routes[path] == _method)
+			{
+				return path;
+			}
+		}
+		return false;
 	}
 
 	var vP = '',
