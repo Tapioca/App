@@ -34,6 +34,20 @@ define([
 		return false;
 	}
 
+	Backbone.Router.prototype.createUri = function(_route, _hash)
+	{
+		var regexp  = new RegExp( /:\w+/g );
+		var replace = _route.match( regexp );
+
+		for(var i = -1; ++i< _hash.length;)
+		{  
+			_route = _route.replace(replace[i], _hash[i]);
+		}
+
+		return _route;
+	}
+
+
 	var vP = '',
 		transitionEnd = 'transitionEnd';
 
