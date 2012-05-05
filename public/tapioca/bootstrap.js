@@ -16,9 +16,9 @@ require([
 	'tapioca',
 	'aura/mediator',
 	'view/apps-list',
-	'module/subnav',
+	'module/breadcrumb',
 	'module/collection'
-], function($, nanoScroller, tapioca, mediator, vAppCollections, Subnav, Collections)
+], function($, nanoScroller, tapioca, mediator, vAppCollections, Breadcrumb, Collections)
 {
 	// Defining the application router.
 	var Router = Backbone.Router.extend(
