@@ -141,6 +141,24 @@ class Document
 	}
 
 	/**
+	 * Clean model properties
+	 *
+	 * @return  void
+	 */
+	public function reset()
+	{
+		static::$collection = null;
+		static::$group = null;
+		static::$namespace = null;
+		static::$ref = null;
+		static::$active = null;
+		static::$last_revision = null;
+		$this->document = null;
+		$this->summary = null;
+		$this->errors = array();
+	}
+
+	/**
 	 * Gets the summaries of all documents's collection
 	 *
 	 * @return  array
