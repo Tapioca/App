@@ -136,9 +136,9 @@
 					</p>
 				</form><!-- /#search-form -->
 			</div><!-- /#app-subnav -->
-			<div id="app-content" class="pane nano">
+			<!-- <div id="app-content" class="pane nano">
 
-			</div><!-- #app-content -->
+			</div>#app-content -->
 
 		</div><!-- #app-container -->
 	</div><!-- /#main -->

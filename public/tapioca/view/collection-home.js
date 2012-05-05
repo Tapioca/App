@@ -1,15 +1,11 @@
 define([
-	'order!jquery',
-	'order!nanoScroller', 
-	'backbone',
+	'view/content',
 	'Mustache',
 	'text!template/content/collection-home.html'
-], function($, nanoScroller, Backbone, Mustache, tContent)
+], function(vContent, Mustache, tContent)
 {
-	var view = Backbone.View.extend(
+	var view = vContent.extend(
 	{
-		el: $('#app-content'),
-
 		initialize: function(options)
 		{
 			this.render();
@@ -22,10 +18,8 @@ define([
 
 			var _html = Mustache.render(tContent, this.model.toJSON());
 
-			this.$el
-				.html(_html)
-				.nanoScroller();
-
+			this.html(_html);
+				
 			return this;
 		},
 
