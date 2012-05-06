@@ -577,9 +577,14 @@ header#tapp {
 	left:0; /*20.1%;*/
 	padding: 10px 15px 30px 10px;
 	position: absolute;
+	pointer-events:none;
 	right:0;
 	top:0; /*84px;*/
 	z-index:1000;
+}
+
+.app-content-header .btn-group {
+	pointer-events:auto;
 }
 
 .page-name {

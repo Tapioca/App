@@ -1,31 +1,40 @@
 define([
 	'view/content',
-	'Mustache',
-	'text!template/content/collection-home.html'
-], function(vContent, Mustache, tContent)
+	'hbs!template/content/collection-home'
+], function(vContent, tContent)
 {
 	var view = vContent.extend(
 	{
 		initialize: function(options)
 		{
-			this.render();
-			this.model.bind('fetch', this.render, this);
+			this.header = options.header;
+			this.collection.bind('reset', this.render, this);
 		},
 
 		render: function()
 		{
-			this.$el.html('');
+			this.header.thead = [];
 
-			var _html = Mustache.render(tContent, this.model.toJSON());
+			for(var i in this.header.summary)
+			{
+				this.header.thead.push(this.header.summary[i]);
+			}
+
+			var data = {
+				header: this.header,
+				documents: this.collection.toJSON()
+			};
+
+			var _html = tContent(data)
 
 			this.html(_html);
-				
+			
 			return this;
 		},
 
 		onClose: function()
 		{
-			this.model.unbind('fetch', this.render);
+			this.collection.unbind('fetch', this.render);
 			//this.model.unbind('reset', this.render);
 		}
 	});

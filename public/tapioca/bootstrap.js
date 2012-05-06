@@ -2,11 +2,20 @@ require.config({
 	'paths': {
 		'text': '../assets/library/require/text',
 		'order': '../assets/library/require/order',
+		'hbs': '../assets/library/require/hbs',
 		'jquery': '../assets/library/jquery/jquery-1.7.2',
 		'underscore': '../assets/library/underscore/underscore',
 		'backbone': '../assets/library/backbone/backbone',
 		'Mustache': '../assets/library/mustache/mustache-wrap',
-		'nanoScroller': '../assets/library/nanoscroller/jquery.nanoscroller'
+		'nanoScroller': '../assets/library/nanoscroller/jquery.nanoscroller',
+		'Handlebars': '../assets/library/handlebar/Handlebars'
+	},
+	// default plugin settings, listing here just as a reference
+	hbs : {
+		templateExtension : 'html',
+		// if disableI18n is `true` it won't load locales and the i18n helper
+		// won't work as well.
+		disableI18n : false
 	}
 });
  
@@ -17,8 +26,10 @@ require([
 	'aura/mediator',
 	'view/apps-list',
 	'module/breadcrumb',
-	'module/collection'
-], function($, nanoScroller, tapioca, mediator, vAppCollections, Breadcrumb, Collections)
+	'module/collection',
+	'module/document',
+	'module/list'
+], function($, nanoScroller, tapioca, mediator, vAppCollections, Breadcrumb, Collections, Document, List)
 {
 	// Defining the application router.
 	var Router = Backbone.Router.extend(
@@ -50,9 +61,9 @@ require([
 				// Create an instance for the group
 				tapioca.apps[slug] = {};
 
-				tapioca.apps[slug].name = tapioca.config.user.groups[i].name;
-
-				tapioca.apps[slug].models = new Collections.Collection(slug);
+				tapioca.apps[slug].name         = tapioca.config.user.groups[i].name;
+				tapioca.apps[slug].documents    = {};
+				tapioca.apps[slug].models       = new Collections.Collection(slug);
 				tapioca.apps[slug].models.model = Collections.Model;
 
 				new vAppCollections({

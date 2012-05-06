@@ -51,7 +51,7 @@ define([
 		$('#app-nav-collections-'+appslug).trigger('collection:highlight', namespace);
 		$('#apps-nav').find('a.app-nav-header[data-app-slug="'+appslug+'"]').trigger('click');
 	}
-
+/*
 	mediator.subscribe('callCollectionHome', function(appslug, namespace)
 	{
 		model = tapioca.apps[appslug].models.get(namespace);
@@ -61,10 +61,12 @@ define([
 		if(tapioca.view != null) tapioca.view.close();
 		tapioca.view  = new vCollectionHome({
 						model: model,
-						forceRender:  true
+						forceRender:  true,
+						appslug: appslug, 
+						namespace: namespace
 					});
 	});
-
+*/
 	mediator.subscribe('callCollectionEdit', function(appslug, namespace)
 	{
 		model = tapioca.apps[appslug].models.get(namespace);
