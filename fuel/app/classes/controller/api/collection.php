@@ -144,16 +144,22 @@ class Controller_Api_Collection extends Controller_Api
 			{
 				$summary    = array();
 				$data       = array();
-				$values     = $this->dispatch($summary, $data, $model);
+				
+				$this->dispatch($summary, $data, $model);
+
+				// format previous revision as new to compare
+				// goals is to know if we have a new revision or just the same data
+				// QUESTION: this migth be in the Collection Class ?
+				$foo      = array();
+				$previous = array();
+				$this->dispatch($foo, $previous, $collection->data());
 
 				try
 				{
-					if(count($summary) > 0)
-					{
-						$summary = $collection->update_summary($summary);
-					}
+					$summary = $collection->update_summary($summary);
 
-					if(count($data) > 0)
+					// TODO: find a better way to make a diff
+					if(json_encode($previous) != json_encode($data))
 					{
 						$data = $collection->update_data($data, self::$user);
 					}

@@ -37,7 +37,8 @@ return array(
 			'summary' => array(
 				'namespace',
 				'name',
-				'status'
+				'status', 
+				'summary'
 			),
 			'data' => array(
 				'structure', 
@@ -53,7 +54,8 @@ return array(
 				'name',
 				'desc',
 				'status',
-				'preview'
+				'preview', 
+				'summary'
 			),
 			'data' => array(
 				'structure', 
