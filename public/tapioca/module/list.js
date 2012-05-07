@@ -44,7 +44,9 @@ define([
 		if(tapioca.view != null) tapioca.view.close();
 		tapioca.view  = new vCollectionHome({
 						collection: documents,
-						header: model.toJSON()
+						header: model.toJSON(),
+						appslug: appslug,
+						namespace: namespace
 					});
 
 		documents.fetch({ data: $.param({ mode: 'list'}) })

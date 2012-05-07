@@ -3,16 +3,16 @@
 					<h2 class="page-name">{{name}}</h2>
 
 					<div class="btn-group">
-						<a class="btn" href="#">
+						<a class="btn" href="/app/{{app_id}}/document/{{namespace}}/add">
 							<i class="icon-plus"></i>
 							Ajouter
 						</a>
 						{{#editable}}
-						<a class="btn" href="app/{{app_id}}/collections/{{namespace}}/edit">
+						<a class="btn" href="/app/{{app_id}}/collections/{{namespace}}/edit">
 							<i class="icon-edit"></i>
 							Editer
 						</a>
-						<a class="btn btn-danger" href="app/{{app_id}}/collections/{{namespace}}/empty">
+						<a class="btn btn-danger" href="/app/{{app_id}}/collections/{{namespace}}/empty">
 							<i class="icon-trash"></i>
 							Vider
 						</a>
@@ -32,12 +32,11 @@
 							</tr>
 						</thead>
 						<tbody>
-						{{#documents}}
+						{{#each documents}}
 							<tr>
-								{{{docSummary data}}}
-								<td>
-									{{date.created.sec}} 
-									<span class="label label-info">Admin</span>
+								{{{docSummary data _ref ../header.app_id ../namespace}}}
+								<td> 
+									{{{displayStatus revisions}}}
 								</td>
 								<td>
 									<div class="btn-group float-right">
@@ -45,6 +44,7 @@
 											<i class="icon-pencil"></i>
 											Edit
 										</a>
+										{{#header.editable}}
 										<a href="#" data-toggle="dropdown" class="btn dropdown-toggle btn-mini">
 											<i class="icon-cogs"></i>
 											<span class="caret"></span>
@@ -53,10 +53,11 @@
 											<li><a href="#"><i class="icon-ban-circle"></i> Ban</a></li>
 											<li><a href="#"><i class="icon-key"></i> Make admin</a></li>
 										</ul>
+										{{/header.editable}}
 									</div>
 								</td>
 							</tr>
-						{{/documents}}
+						{{/each}}
 						</tbody>
 					</table
 				</div><!-- /.pane-content -->

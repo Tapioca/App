@@ -7,7 +7,10 @@ define([
 	{
 		initialize: function(options)
 		{
-			this.header = options.header;
+			this.header    = options.header;
+			this.appslug   = options.appslug;
+			this.namespace = options.namespace;
+
 			this.collection.bind('reset', this.render, this);
 		},
 
@@ -22,6 +25,9 @@ define([
 
 			var data = {
 				header: this.header,
+				appslug: this.appslug,
+				namespace: this.namespace,
+				editable: this.header.editable,
 				documents: this.collection.toJSON()
 			};
 

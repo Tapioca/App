@@ -89,12 +89,15 @@ require([
 		},
 
 		routes: {
-			''                                        : 'index',
-			'app'                                     : 'index',
-			'app/:appslug/collections/add'            : 'collectionAdd',
-			'app/:appslug/collections/:namespace/edit': 'collectionEdit',
-			'app/:appslug/collections/:namespace'     : 'collectionHome',
-			'*path'                                   : 'notFound'
+			''                                               : 'index',
+			'app'                                            : 'index',
+			'app/:appslug/collections/add'                   : 'collectionAdd',
+			'app/:appslug/collections/:namespace/edit'       : 'collectionEdit',
+			'app/:appslug/collections/:namespace'            : 'collectionHome',
+			'app/:appslug/document/:namespace/:ref/:revision': 'documentRef',
+			'app/:appslug/document/:namespace/:ref'          : 'documentRef',
+			'app/:appslug/document/:namespace/add'           : 'documentNew',
+			'*path'                                          : 'notFound'
 		},
 
 		notFound: function(path) {
@@ -152,6 +155,25 @@ require([
 				this.requestedFnc  = 'collectionAdd';
 				this.requestedArgs = [appslug];
 			}
+		},
+
+		documentRef: function(namespace, ref, revision)
+		{
+			if(this.instance)
+			{
+				console.log(namespace, ref, revision);
+				//mediator.publish('callDocumentRef', namespace, ref, revision);
+			}
+			else
+			{
+				this.requestedFnc  = 'callDocumentRef';
+				this.requestedArgs = [namespace, ref, revision];
+			}
+		},
+
+		documentAdd: function()
+		{
+
 		}
 
 	});
