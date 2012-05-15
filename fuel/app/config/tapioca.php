@@ -66,5 +66,60 @@ return array(
 				'templates'
 			)
 		)
+	),
+
+	/*
+	 * Upload
+	 */
+
+	'upload' => array(
+		'path'                => APPPATH.'tmp',
+		'field'               => 'tappfile',
+		'randomize'           => true,
+		'fileinfo_magic_path' => '',
+		'ext_whitelist'	      => array('jpg', 'jpeg', 'gif', 'png', 'flv', 'mp4', 'ogv', 'doc') //, 'pdf', 'zip')
+	),
+
+	/*
+	 * File by minetype
+	 */
+
+	'file_types' => array(
+		'image' => array(
+			'image/bmp', 
+			'image/x-windows-bmp',
+			'image/gif',
+			'image/jpeg',
+			'image/pjpeg',
+			'image/png',
+			'image/x-png',
+			'image/tiff',	
+		),
+		'video' => array(
+			'video/mpeg',
+			'video/mp4',
+			'application/ogg',
+			'video/x-flv',
+			'video/quicktime',
+			'video/x-msvideo',
+			'video/x-sgi-movie',
+			'video/vnd.rn-realvideo' // LOL
+		),
+		'document' => array(
+			'application/pdf',
+			'application/msword',
+			'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+			'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+			'application/msword',
+			'application/excel',
+			'application/vnd.ms-excel',
+			'application/msexcel',
+			'application/powerpoint',
+			'application/vnd.ms-powerpoint',
+			'text/richtext',
+			'text/rtf'
+		)
+
 	)
+
 );

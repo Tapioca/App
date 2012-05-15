@@ -84,6 +84,24 @@ class Tapioca
 		//
 	}
 
+	/**
+	 * @param   string app slug
+	 * @param   string document reference.
+	 * @throws  TapiocaException
+	 * @return  Document
+	 */
+	public static function file($app_slug, $filename = null)
+	{
+		try
+		{
+			return new \File($app_slug, $filename);
+		}
+		catch (TapiocaFileException $e)
+		{
+			throw new \TapiocaException($e->getMessage());
+		}
+	}
+
 	public static function set_status($status = array())
 	{
 		$defaults = Config::get('tapioca.status');

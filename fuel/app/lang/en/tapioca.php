@@ -17,6 +17,9 @@ return array(
 	'no_document_selected'         => 'No document is selected.',
 	'document_column_is_empty'     => ':column must not be empty.',
 
+	/** File Exception Messages **/
+	'file_already_exists'          => 'The file name ":name" already exists.',
+	
 	/** API Execption Messages **/
 	'missing_required_params'      => 'Some required params are missing',
 	'no_collections'               => 'No collections define yet',

@@ -15,6 +15,9 @@ Autoloader::add_core_namespace('Auth');
 Autoloader::add_classes(array(
 	// Add classes you want to override here
 	// Example: 'View' => APPPATH.'classes/view.php',
+	'Mongo_Db'			=> APPPATH.'classes/core/mongo/db.php',
+	'GridFs'			=> APPPATH.'classes/core/mongo/gridfs.php',	
+
 	'Debug'				=> APPPATH.'classes/core/debug.php',
 	'Phpredis'			=> APPPATH.'classes/core/phpredis.php',
 	'Set'			    => APPPATH.'classes/core/set.php',
@@ -36,11 +39,13 @@ Autoloader::add_classes(array(
 	'Tapioca\\Tapioca'                    => APPPATH.'classes/tapioca.php',
 	'Tapioca\\TapiocaException'           => APPPATH.'classes/tapioca.php',
 	'Tapioca\\TapiocaCollectionException' => APPPATH.'classes/tapioca/collection.php', 
-	'Tapioca\\TapiocaDocumentException'   => APPPATH.'classes/tapioca/document.php', 
+	'Tapioca\\TapiocaDocumentException'   => APPPATH.'classes/tapioca/document.php',  
+	'Tapioca\\TapiocaFileException'       => APPPATH.'classes/tapioca/file.php', 
 
 	'Tapioca\\Collection'                 => APPPATH.'classes/tapioca/collection.php',
 	'Tapioca\\Document'                   => APPPATH.'classes/tapioca/document.php',
 	'Tapioca\\Rules'                      => APPPATH.'classes/tapioca/rules.php',
+	'Tapioca\\File'                       => APPPATH.'classes/tapioca/file.php',
 
 	// Tapioca Resque jobs
 	'Tapioca\\Jobs\\PHP_Job' => APPPATH.'classes/tapioca/jobs/job.php',
