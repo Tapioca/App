@@ -38,7 +38,7 @@ class File
 	/**
 	 * @var  string  file's name
 	 */
-	protected static $filename = null;
+	protected $filename = null;
 
 	/**
 	 * @var  array Errors list
@@ -65,7 +65,7 @@ class File
 		// if a Name was passed
 		if ($filename)
 		{
-			static::$filename = $filename;
+			$this->filename = $filename;
 		}
 	}
 
@@ -80,6 +80,46 @@ class File
 		return $this->$property;
 	}
 
+	public function read()
+	{
+		if(is_null($this->filename))
+		{
+			throw new TapiocaFileException(__('tapioca.no_file_selected'));
+		}
+
+		$file =  static::$db->get_where(static::$collection, array(
+							'filename' => $this->filename
+						), 1);
+
+		$this->file = $file[0];
+
+		return $this->file;
+	}
+
+	public function getBytes($preview = false)
+	{
+		if(is_null($this->file))
+		{
+			$this->read();
+			//throw new TapiocaFileException(__('tapioca.no_file_selected'));
+		}
+		
+		$query = array( 'filename' => $this->filename,
+						'appid'    => static::$group->get('id'));
+
+		$query['preview'] = ($preview) ? true : array( '$exists' => false );
+
+		$cursor = static::$gfs
+					->find($query);
+
+		$result = array();
+
+		foreach($cursor as $c)
+		{
+			$result[] = $c;
+		}
+		return $result;
+	}
 
 	/**
 	 * List of files to create/update
@@ -126,14 +166,18 @@ class File
 			{
 				$ret = $this->create($file, $user);
 				
-				$file_url = '/api/'.static::$group->get('slug').'/file/'.$file['filename'];
+				$file_api    = '/api/'.static::$group->get('slug').'/file/'.$file['filename'];
+				$file_url    = '/file/'.static::$group->get('slug').'/'.$file['filename'];
+				// preview
+				$preview_url = (strpos($file['mimetype'], 'image') !== false) ?
+						'/file/'.static::$group->get('slug').'/preview/'.$file['filename'] : '';
 
 				$result[] = array(
 					'name'          => $file['filename'],
 					'size'          => $file['length'],
 					'url'           => $file_url,
-					'thumbnail_url' => "/example.org/thumbnails/picture1.jpg",
-					'delete_url'    => $file_url,
+					'thumbnail_url' => $preview_url,
+					'delete_url'    => $file_api,
 					'delete_type'   => 'DELETE'
 				);
 			}
@@ -153,8 +197,10 @@ class File
 	public function create(array $fields, \Auth\User $user)
 	{
 		$file_path = $fields['path'];
-		unset($fields['path']);
+		$saved_as  = $fields['saved_as'];
 
+		unset($fields['path']);
+		unset($fields['saved_as']);
 
 		$fields['uid'] = (string) static::$gfs
 									->storeFile($file_path, array(
@@ -173,9 +219,33 @@ class File
 
 		// do not work whem upload multiple files
 		$this->file      = $new_file;
-		$this->namespace = $new_file['filename'];
+		$this->filename  = $new_file['filename'];
 
-		return static::$db->insert(static::$collection, $new_file);
+		$ret = static::$db->insert(static::$collection, $new_file);
+
+		// preview
+		if($ret && strpos($fields['mimetype'], 'image') !== false)
+		{
+			\Image::load($file_path)
+				->config('bgcolor', null)
+				->config('quality', 60)
+				->config('filetype', 'png')
+				->crop_resize(100, 100)
+				->save_pa('preview-');
+
+			$saved_to     = Config::get('tapioca.upload.path');
+			$preview_path = $saved_to.'/preview-'.strtolower($saved_as);
+			
+			static::$gfs
+				->storeFile($preview_path, array(
+					'filename' => $fields['filename'],
+					'appid'    => static::$group->get('id'),
+					'preview'  => true
+				));
+			
+			unlink($file_path);
+			unlink($preview_path);
+		}
 	}
 
 	/**
@@ -292,6 +362,7 @@ class File
 				}
 
 				$new_file = array(
+								'saved_as'  => $file['saved_as'],
 								'path'      => $file_path,
 								'mimetype'  => $file['mimetype'],
 								'charset'   => str_replace('charset=', '', trim($minetype[1])),

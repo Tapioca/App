@@ -4,8 +4,12 @@ return array(
 	'_404_'   => 'welcome/404',    // The main 404 route
 	
 	//'log' => array(array('GET', new Route('log/index')), array('POST', new Route('log/in'))),
-	'app/(:any)' => 'app/index',
-	'app'        => 'app/index',
+	'file/:app_slug/preview/:ref'  => array('app/file/preview', 'name' => 'file_ref_preview'),
+	'file/:app_slug/download/:ref' => array('app/file/download', 'name' => 'file_ref_download'),
+	'file/:app_slug/:ref'          => array('app/file', 'name' => 'file_ref'),
+
+	'app/(:any)'                      => 'app/index',
+	'app'                             => 'app/index',
 
 	// API REST 
 	'api/:app_slug/collection/:namespace/drop'   => array('api/collection/drop', 'name' => 'api_collection_drop'),
