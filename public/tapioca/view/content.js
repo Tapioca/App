@@ -10,11 +10,16 @@ define([
 		className: 'pane nano',
 		tagName: 'div',
 
-		html: function(_html)
+		html: function(_html, _class)
 		{
-			this.$el
-				.appendTo('#app-container')
-				.html(_html);
+			this.$el.appendTo('#app-container')
+			
+			if(typeof _class != 'undefined')
+			{
+				this.$el.addClass(_class)
+			}
+
+			this.$el.html(_html);
 				
 			this.scroller();
 		},

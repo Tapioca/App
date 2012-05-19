@@ -2,8 +2,9 @@ define([
 	'tapioca',
 	'backbone',
 	'underscore',
-	'aura/mediator'
-], function(tapioca, Backbone, _, mediator) 
+	'aura/mediator',
+	'view/document-edit'
+], function(tapioca, Backbone, _, mediator, vDocumentEdit) 
 {
 	// Create a new module
 	var Documents         = tapioca.module();
@@ -25,14 +26,15 @@ define([
 	Documents.Model       = Backbone.Model.extend(
 	{
 		idAttribute: '_ref',
-		initialize: function(appSlug)
+		initialize: function(attrs, options)
 		{
-			this.appSlug = appSlug;
+			this.appSlug   = options.appSlug;
+			this.namespace = options.namespace;
 		},
 		urlRoot: '/api',
 		url: function()
 		{
-			return this.urlRoot + '/' + this.appSlug + '/document/' + this.namespace; // + '/' + this.get('_ref');
+			return this.urlRoot + '/' + this.appSlug + '/document/' + this.namespace + '/' + this.get('_ref');
 		},
 		defaults:{
 			'_ref': ''
@@ -47,27 +49,50 @@ define([
 		$('#apps-nav').find('a.app-nav-header[data-app-slug="'+appslug+'"]').trigger('click');
 	}
 
-	mediator.subscribe('_callDocumentsList', function(slug, namespace)
+	mediator.subscribe('callDocumentRef', function(slug, namespace, ref, revision)
 	{
-		if(!tapioca.apps[slug].documents[namespace])
+		highlight(slug, namespace);
+
+		var collectionDetails = tapioca.apps[slug].models.get(namespace);
+		var doc 			  = new Documents.Model({_ref: ref}, {appSlug: slug, namespace: namespace});
+		var fetchOptions      = { mode: 'edit'};
+
+		if(!_.isUndefined(revision))
 		{
-			tapioca.apps[slug].documents[namespace]       = new Documents.Collection(slug, namespace);
-			tapioca.apps[slug].documents[namespace].model = Documents.Model;
+			fetchOptions['revision'] = revision;
 		}
-		
 
-		var docs = tapioca.apps[slug].documents[namespace];
-		docs.fetch();
+		collectionDetails.fetch({
+			success: function(model, response)
+			{
+				if(tapioca.view != null) tapioca.view.close();
+				tapioca.view  = new vDocumentEdit({
+								model: doc,
+								schema: collectionDetails
+							});
 
+				doc.fetch({ data: $.param(fetchOptions) });
+			}
+		});
+	});
 
-/*
-		model = tapioca.apps[appslug].models.get(namespace);
-		if(tapioca.view != null) tapioca.view.close();
-		tapioca.view  = new vCollectionHome({
-						model: model,
-						forceRender:  true
-					});
-*/
+	mediator.subscribe('callDocumentNew', function(slug, namespace)
+	{
+		highlight(slug, namespace);
+
+		var collectionDetails = tapioca.apps[slug].models.get(namespace);
+
+		collectionDetails.fetch({
+			success: function(model, response)
+			{
+				if(tapioca.view != null) tapioca.view.close();
+				tapioca.view  = new vDocumentEdit({
+								model: new Documents.Model({}, {appSlug: slug, namespace: namespace}),
+								schema: collectionDetails,
+								forceRender: true
+							});
+			}
+		});
 	});
 
 	// Required, return the module for AMD compliance

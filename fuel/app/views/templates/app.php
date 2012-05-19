@@ -95,7 +95,7 @@
 ?>
  							<li class="divider"></li>
 							<li>
-								<a href="app/<?= $group['slug']; ?>/collections/add" class="admin-action">
+								<a href="app/<?= $group['slug']; ?>/collections/new" class="admin-action">
 									<i class="icon-plus"></i>
 									Ajouter une collection
 								</a>

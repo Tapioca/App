@@ -1,17 +1,23 @@
-require.config({
-	'paths': {
-		'text': '../assets/library/require/text',
-		'order': '../assets/library/require/order',
-		'hbs': '../assets/library/require/hbs',
-		'jquery': '../assets/library/jquery/jquery-1.7.2',
-		'underscore': '../assets/library/underscore/underscore',
-		'backbone': '../assets/library/backbone/backbone',
-		'Mustache': '../assets/library/mustache/mustache-wrap',
-		'nanoScroller': '../assets/library/nanoscroller/jquery.nanoscroller',
-		'Handlebars': '../assets/library/handlebar/Handlebars'
+require.config(
+{
+	'paths': 
+	{
+		'text'             : '../assets/library/require/text',
+		'order'            : '../assets/library/require/order',
+		'hbs'              : '../assets/library/require/hbs',
+		'jquery'           : '../assets/library/jquery/jquery-1.7.2',
+		'underscore'       : '../assets/library/underscore/underscore',
+		'underscore.string': '../assets/library/underscore/underscore.string',
+		'backbone'         : '../assets/library/backbone/backbone',
+		'Mustache'         : '../assets/library/mustache/mustache-wrap',
+		'nanoScroller'     : '../assets/library/nanoscroller/jquery.nanoscroller',
+		'Handlebars'       : '../assets/library/handlebar/Handlebars',
+		'moment'           : '../assets/library/moment/moment-wrap',
+		'form2js'          : '../assets/library/form2js/form2js-wrap'
 	},
 	// default plugin settings, listing here just as a reference
-	hbs : {
+	hbs : 
+	{
 		templateExtension : 'html',
 		// if disableI18n is `true` it won't load locales and the i18n helper
 		// won't work as well.
@@ -91,12 +97,12 @@ require([
 		routes: {
 			''                                               : 'index',
 			'app'                                            : 'index',
-			'app/:appslug/collections/add'                   : 'collectionAdd',
+			'app/:appslug/collections/new'                   : 'collectionNew',
 			'app/:appslug/collections/:namespace/edit'       : 'collectionEdit',
 			'app/:appslug/collections/:namespace'            : 'collectionHome',
+			'app/:appslug/document/:namespace/new'           : 'documentNew',
 			'app/:appslug/document/:namespace/:ref/:revision': 'documentRef',
 			'app/:appslug/document/:namespace/:ref'          : 'documentRef',
-			'app/:appslug/document/:namespace/add'           : 'documentNew',
 			'*path'                                          : 'notFound'
 		},
 
@@ -144,11 +150,11 @@ require([
 			}
 		},
 
-		collectionAdd: function(appslug)
+		collectionNew: function(appslug)
 		{
 			if(this.instance)
 			{
-				mediator.publish('callCollectionAdd', appslug);
+				mediator.publish('callCollectionNew', appslug);
 			}
 			else
 			{
@@ -157,23 +163,30 @@ require([
 			}
 		},
 
-		documentRef: function(namespace, ref, revision)
+		documentRef: function(appslug, namespace, ref, revision)
 		{
 			if(this.instance)
 			{
-				console.log(namespace, ref, revision);
-				//mediator.publish('callDocumentRef', namespace, ref, revision);
+				mediator.publish('callDocumentRef', appslug, namespace, ref, revision);
 			}
 			else
 			{
-				this.requestedFnc  = 'callDocumentRef';
-				this.requestedArgs = [namespace, ref, revision];
+				this.requestedFnc  = 'documentRef';
+				this.requestedArgs = [appslug, namespace, ref, revision];
 			}
 		},
 
-		documentAdd: function()
+		documentNew: function(appslug, namespace)
 		{
-
+			if(this.instance)
+			{
+				mediator.publish('callDocumentNew', appslug, namespace);
+			}
+			else
+			{
+				this.requestedFnc  = 'documentNew';
+				this.requestedArgs = [appslug, namespace];
+			}
 		}
 
 	});
