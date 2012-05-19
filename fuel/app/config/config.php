@@ -188,7 +188,8 @@ return array(
 			//'orm',
 			'casset',
 			'gravy',
-			'resque'
+			'resque',
+			'oauth2'
 		),
 
 		/**
