@@ -7,12 +7,13 @@ define([
 	'template/helpers/atLeastOnce',
 	'underscore.string',
 	'form2js'
-], function(tapioca, Handlebars, vContent, tContent, atLeastOnce, isSelected, _s, form2js)
+], function(tapioca, Handlebars, vContent, tContent, isSelected, atLeastOnce, _s, form2js)
 {
 	var view = vContent.extend(
 	{
 		template: tContent,
 		formStr: null,
+		inc:0,
 
 		initialize: function(options)
 		{
@@ -87,9 +88,18 @@ define([
 
 			this.walk(this.structure, '');
 
+			var self = this;
 			var template = Handlebars.compile(tContent);
 			Handlebars.registerPartial('formStr', this.formStr.get());
-			
+			Handlebars.registerHelper('_incCounter', function()
+			{
+				++self.inc;
+			});
+			Handlebars.registerHelper('_getCounter', function()
+			{
+				return self.inc;
+			});
+
 			var html     = template(this.model.toJSON());
 			
 			this.html(html, 'app-form');
@@ -112,7 +122,7 @@ define([
 		{
 			if(_is_array && _prefix != '')
 			{
-				_prefix = _prefix + '['+inc+']';
+				_prefix = _prefix + '[{{_getCounter}}]';
 			}
 			
 			else if(_prefix != '')
@@ -156,19 +166,21 @@ define([
 				formHtml += firstFieldset;
 			}
 
-			var str = '<fieldset class="subgroup">{{#atLeastOnce ' + item.id + '}}';
+			var str = '<fieldset class="subgroup">';
 
 			if(!_s.isBlank(item.label))
 			{
 				str += '<legend>'+ item.label +'</legend>';
 			}
 
+			str += '{{#atLeastOnce ' + item.id + '}}{{_incCounter}}'
+
 			formHtml += str;
 		};
 
 		fields.close = function(item)
 		{
-			formHtml += '{{/atLeastOnce}}</fieldset>';
+			formHtml += '<hr>{{/atLeastOnce}}</fieldset>';
 
 		};
 

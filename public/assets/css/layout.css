@@ -655,6 +655,10 @@ header#tapp {
 	margin: 5px 0;
 }
 
+.subgroup hr:last-child {
+	display: none;
+}
+
 .repeat-group .repeat-group-controls {
 	bottom:10px;
 	position: absolute;
