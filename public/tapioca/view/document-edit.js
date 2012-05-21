@@ -14,6 +14,7 @@ define([
 		template: tContent,
 		formStr: null,
 		inc:0,
+		level: 0,
 
 		initialize: function(options)
 		{
@@ -34,6 +35,7 @@ define([
 		{
 //			'change input': 'change',
 			'click .save'  : 'save',
+			'click .array-adder': 'addNode'
 //			'click .delete': 'delete'
 		},
 
@@ -55,38 +57,53 @@ define([
 			return false;
 		},
 
-		walk: function(_structure, _prefix)
+		walk: function(_structure, _prefix, _previous_key)
 		{
 			_.each(_structure, function(item, key)
 			{
 				var prefix_tmp = '';
+				var _key = (!_s.isBlank(_previous_key)) ? _previous_key+'.'+key : key;
 
 				// Recurssion
 				if(!_.isUndefined(item.node))
 				{
 					// start new fieldset
-					this.formStr.define('open', item);
+					this.formStr.define('open', item, _prefix, _key);
 
 					var is_array = (item.type == 'array');
 					prefix_tmp   = this.formStr.prefix(prefix_tmp, _prefix, item.id, is_array);
 
-					this.walk(item.node, prefix_tmp);
+					this.walk(item.node, prefix_tmp, _key);
 
-					this.formStr.define('close', item);
+					this.formStr.define('close', item, _prefix, _key);
 				}
 				else
 				{
-					this.formStr.setItem(item, _prefix)
+					this.formStr.setItem(item, _prefix, _key)
 				}
 
 			}, this);
+		},
+
+		addNode: function(event)
+		{
+			var $target = $(event.target);
+			var prefix  = $target.attr('data-prefix');
+			var key     = $target.attr('data-key');
+
+			console.log(this.structure[key].node);
+
+			this.walk(this.structure[key].node, prefix, key);
+
+			console.log(this.formStr.get())
+
 		},
 
 		render: function(eventName)
 		{
 			this.formStr = new fieldsFactory();
 
-			this.walk(this.structure, '');
+			this.walk(this.structure, '', '');
 
 			var self = this;
 			var template = Handlebars.compile(tContent);
@@ -178,9 +195,21 @@ define([
 			formHtml += str;
 		};
 
-		fields.close = function(item)
+		fields.close = function(item, prefix, key)
 		{
-			formHtml += '<hr>{{/atLeastOnce}}</fieldset>';
+			formHtml += '<hr>{{/atLeastOnce}}';
+
+			if(item.type == 'array')
+			{
+				formHtml += '<p class="align-right">\
+					<a class="btn btn-mini array-adder" data-prefix="' + getName(item, prefix) + '" data-key="'+key+'" href="javascript:void(0);">\
+						<i class="icon-plus"></i>\
+						Ajouter\
+					</a>\
+				</p>';
+			}
+
+			formHtml += '</fieldset>';
 
 		};
 
@@ -249,7 +278,7 @@ define([
 		// Getter//Setter
 
 		return {
-			'setItem': function(item, prefix)
+			'setItem': function(item, prefix, key)
 			{
 				// Find the right item's type
 				// will be usefull for template
@@ -278,14 +307,14 @@ define([
 					formHtml += '<label class="control-label">'+item.label+'</label>';
 
 				formHtml += '<div class="controls">';
-				fields[type](item, prefix);
+				fields[type](item, prefix, key);
 				formHtml += '</div></div>';
 
 				return;
 			},
-			'define': function(type, item, prefix)
+			'define': function(type, item, prefix, key)
 			{
-				fields[type](item, prefix);
+				fields[type](item, prefix, key);
 			},
 			'prefix': function(_prefix_tmp, _prefix, _id, _is_array)
 			{
@@ -300,7 +329,10 @@ define([
 					formHtml += firstFieldset;
 				}
 
-				return formHtml;
+				var result = formHtml;
+				formHtml = '';
+
+				return result;
 			}
 		}
 	}

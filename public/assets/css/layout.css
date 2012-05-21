@@ -624,7 +624,7 @@ header#tapp {
 }
 
 #app-content .form-horizontal .control-group {
-    border-bottom: 1px solid #F9F9F9;
+/*    border-bottom: 1px solid #F9F9F9;*/
 	margin-bottom: 9px;
 	padding: 9px 0;
 }
