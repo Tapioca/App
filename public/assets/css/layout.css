@@ -181,7 +181,8 @@ header#tapp {
 
 #header-logo {
 	float : left;
-	padding-top : 3px;
+	padding-top : 5px;
+	margin-left: 10px;
 }
 
 #header-logo,
@@ -196,8 +197,9 @@ header#tapp {
 
 #user-shortcuts {
 	float: right;
+	margin-right: 10px;
 	text-align:right;
-	width:20%;
+	width:155px;
 }
 
 #user-shortcuts .avatar {
@@ -248,7 +250,7 @@ header#tapp {
 	min-width : 980px;
 	overflow : hidden;
 	position : fixed;
-	top:47px;
+	top:0; /*47px;*/
 	width:100%;
 }
 
@@ -270,12 +272,14 @@ header#tapp {
 #apps-nav {
     background: #33393D;
 	left: 0;
+	padding-top: 10px;
 	width: 20%;
 	text-shadow : #000 1px 1px 1px;
 }
 
 #apps-nav .pane-content {
 	background:rgba(37,40,42,.8);
+	top:55px;
 }
 
 #apps-nav a,

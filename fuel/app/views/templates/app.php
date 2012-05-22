@@ -28,32 +28,25 @@
 </head>
 <body>
 
-
-	<header id="tapp">
-
-		<a id="header-logo" href="<?= Uri::create('app'); ?>">
-			<img alt="tapioca logo" src="/assets/img/header-logo.png">
-		</a><!-- /#header-logo -->
-
-		<div id="user-shortcuts">
-			<a href="#" class="avatar">
-				<img src="<?= Gravy::from_email(Auth::user()->get('email'), 37, 'g', null, true); ?>" alt="" height="37" width="37">
-			</a>
-			<h5>Hello <strong><?= Auth::user()->get('name'); ?></strong></h5>
-			<nav>
-
-				<?= Html::anchor(Uri::create('#'), __('tapioca.ui.user_account')); ?>
-
-				<?= Html::anchor(Uri::create('log/out'), __('tapioca.ui.user_logout')); ?>
-
-			</nav>
-		</div><!-- /#user-shortcuts -->
-	</header><!-- /#tapp -->
-
-
 	<div id="main">
-
 		<div id="apps-nav" class="pane nano">
+			<a id="header-logo" href="<?= Uri::create('app'); ?>">
+				<img alt="tapioca logo" src="/assets/img/header-logo.png">
+			</a><!-- /#header-logo -->
+
+			<div id="user-shortcuts">
+				<a href="#" class="avatar">
+					<img src="<?= Gravy::from_email(Auth::user()->get('email'), 37, 'g', null, true); ?>" alt="" height="37" width="37">
+				</a>
+				<h5>Hello <strong><?= Auth::user()->get('name'); ?></strong></h5>
+				<nav>
+
+					<?= Html::anchor(Uri::create('#'), __('tapioca.ui.user_account')); ?>
+
+					<?= Html::anchor(Uri::create('log/out'), __('tapioca.ui.user_logout')); ?>
+
+				</nav>
+			</div><!-- /#user-shortcuts -->
 			<div class="pane-content">
 <?php
 	
