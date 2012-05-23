@@ -22,12 +22,12 @@ echo $auth_error;
 		<p>
 			<label>Email</label>
 			<?= Form::input('email', $email, array('type' => 'email')); ?>
-			<?= $validation->errors('email'); ?>
+			<?= $validation->error('email'); ?>
 		</p>
 		<p>
 			<label>Password</label>
 			<?= Form::password('password'); ?>
-			<?= $validation->errors('password'); ?>
+			<?= $validation->error('password'); ?>
 		</p>
 		<p>
 			<label>

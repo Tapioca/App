@@ -44,7 +44,7 @@ class Files
 	/**
 	 * @var  array Errors list
 	 */
-	protected $errors = null;
+	protected $errors = array();
 
 	/**
 	 * Loads in the File object
@@ -164,17 +164,11 @@ class Files
 		if(count($files) > 0)
 		{
 			$result = array();
-\Debug::show(\Fuel::$VERSION);
-exit;
-\Debug::show($this->errors);
-\Debug::show($files);
 
 			foreach($files as $file)
 			{
-				if(\Arr::in_array_recursive($file['filename'], $this->errors))
+				if(!\Arr::in_array_recursive($file['filename'], $this->errors))
 				{
-\Debug::show('fail');
-exit;
 					$ret = $this->create($file, $user);
 					
 					$file_api    = '/api/'.static::$group->get('slug').'/file/'.$file['filename'];

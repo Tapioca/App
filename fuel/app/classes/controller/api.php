@@ -81,5 +81,7 @@ class Controller_Api extends Controller_Rest
 	public function after($response)
 	{
 		$this->response(self::$data, self::$status);
+
+		return $this->response;
 	}
 }
