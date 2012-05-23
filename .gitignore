@@ -9,4 +9,5 @@ fuel/app/tmp/*
 public/client_test
 public/temp
 public/dynamic
+public/files/*/*/*
 !.gitkeep

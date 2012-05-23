@@ -74,6 +74,7 @@ return array(
 
 	'upload' => array(
 		'path'                => APPPATH.'tmp',
+		'storage'             => DOCROOT.'files'.DIRECTORY_SEPARATOR,
 		'field'               => 'tappfile',
 		'randomize'           => true,
 		'fileinfo_magic_path' => '',

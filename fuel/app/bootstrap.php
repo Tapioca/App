@@ -45,7 +45,7 @@ Autoloader::add_classes(array(
 	'Tapioca\\Collection'                 => APPPATH.'classes/tapioca/collection.php',
 	'Tapioca\\Document'                   => APPPATH.'classes/tapioca/document.php',
 	'Tapioca\\Rules'                      => APPPATH.'classes/tapioca/rules.php',
-	'Tapioca\\File'                       => APPPATH.'classes/tapioca/file.php',
+	'Tapioca\\Files'                      => APPPATH.'classes/tapioca/file.php',
 
 	// Tapioca Resque jobs
 	'Tapioca\\Jobs\\PHP_Job' => APPPATH.'classes/tapioca/jobs/job.php',

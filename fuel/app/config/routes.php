@@ -4,10 +4,11 @@ return array(
 	'_404_'   => 'welcome/404',    // The main 404 route
 	
 	//'log' => array(array('GET', new Route('log/index')), array('POST', new Route('log/in'))),
+/*
 	'file/:app_slug/preview/:ref'  => array('app/file/preview', 'name' => 'file_ref_preview'),
 	'file/:app_slug/download/:ref' => array('app/file/download', 'name' => 'file_ref_download'),
 	'file/:app_slug/:ref'          => array('app/file', 'name' => 'file_ref'),
-
+*/
 	'app/(:any)'                      => 'app/index',
 	'app'                             => 'app/index',
 

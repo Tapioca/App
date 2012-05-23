@@ -5,10 +5,11 @@ namespace Tapioca;
 use FuelException;
 use Config;
 use Upload;
+use File;
 
 class TapiocaFileException extends FuelException {}
 
-class File
+class Files
 {
 	/**
 	 * @var  string  Database instance
@@ -136,7 +137,9 @@ class File
 		{
 			try
 			{
-				if($this->exists($file['filename'], $file['md5']))
+				$duplicate_name = $this->exists($file['filename'], $file['md5']);
+			
+				if($duplicate_name)
 				{
 					$file['basename'] = $file['basename'].'_'.time(); 
 					$file['filename'] = strtolower($file['basename'].'.'.$file['extension']);
@@ -161,25 +164,34 @@ class File
 		if(count($files) > 0)
 		{
 			$result = array();
+\Debug::show(\Fuel::$VERSION);
+exit;
+\Debug::show($this->errors);
+\Debug::show($files);
 
 			foreach($files as $file)
 			{
-				$ret = $this->create($file, $user);
-				
-				$file_api    = '/api/'.static::$group->get('slug').'/file/'.$file['filename'];
-				$file_url    = '/file/'.static::$group->get('slug').'/'.$file['filename'];
-				// preview
-				$preview_url = (strpos($file['mimetype'], 'image') !== false) ?
-						'/file/'.static::$group->get('slug').'/preview/'.$file['filename'] : '';
+				if(\Arr::in_array_recursive($file['filename'], $this->errors))
+				{
+\Debug::show('fail');
+exit;
+					$ret = $this->create($file, $user);
+					
+					$file_api    = '/api/'.static::$group->get('slug').'/file/'.$file['filename'];
+					$file_url    = '/file/'.static::$group->get('slug').'/'.$file['filename'];
+					// preview
+					$preview_url = (strpos($file['mimetype'], 'image') !== false) ?
+							'/file/'.static::$group->get('slug').'/preview/'.$file['filename'] : '';
 
-				$result[] = array(
-					'name'          => $file['filename'],
-					'size'          => $file['length'],
-					'url'           => $file_url,
-					'thumbnail_url' => $preview_url,
-					'delete_url'    => $file_api,
-					'delete_type'   => 'DELETE'
-				);
+					$result[] = array(
+						'name'          => $file['filename'],
+						'size'          => $file['length'],
+						'url'           => $file_url,
+						'thumbnail_url' => $preview_url,
+						'delete_url'    => $file_api,
+						'delete_type'   => 'DELETE'
+					);
+				}
 			}
 
 			return $result;
@@ -233,19 +245,17 @@ class File
 				->crop_resize(100, 100)
 				->save_pa('preview-');
 
-			$saved_to     = Config::get('tapioca.upload.path');
-			$preview_path = $saved_to.'/preview-'.strtolower($saved_as);
-			
-			static::$gfs
-				->storeFile($preview_path, array(
-					'filename' => $fields['filename'],
-					'appid'    => static::$group->get('id'),
-					'preview'  => true
-				));
-			
-			unlink($file_path);
+			$saved_to        = Config::get('tapioca.upload.path');
+			$preview_tmpname = 'preview-'.$saved_as;
+			$preview_name    = 'preview-'.$fields['filename'];
+			$preview_path    = $saved_to.DIRECTORY_SEPARATOR.$preview_tmpname;
+
+			$this->store($preview_name, $preview_path, $fields['category']);	
 			unlink($preview_path);
 		}
+
+		$this->store($fields['filename'], $file_path, $fields['category']);	
+		unlink($file_path);
 	}
 
 	/**
@@ -259,10 +269,12 @@ class File
 	private function exists($filename, $md5)
 	{
 		// query db to check for filename
-		$result = static::$db->get_where(static::$collection, array(
-											'filename' => $filename,
-											'md5'      => $md5
-										));
+		$result = static::$db
+						->or_where(array(
+							'filename' => $filename,
+							'md5'      => $md5
+						))
+						->get(static::$collection);
 
 		if (count($result) > 0)
 		{
@@ -283,6 +295,27 @@ class File
 		}
 
 		return false;
+	}
+
+	private function store($filename, $path, $category)
+	{
+		$storage_path = Config::get('tapioca.upload.storage');
+		$app_slug     = static::$group->get('slug');
+
+		$app_path     = $storage_path.$app_slug;
+		$cat_path     = $app_path.DIRECTORY_SEPARATOR.$category;
+
+		if(!is_dir($app_path))
+		{
+			\File::create_dir($storage_path, $app_slug, 0755);			
+		}
+
+		if(!is_dir($cat_path))
+		{
+			\File::create_dir($app_path, $category, 0755);			
+		}
+
+		\File::copy($path, $cat_path.DIRECTORY_SEPARATOR.$filename);
 	}
 
 
@@ -340,19 +373,19 @@ class File
 			// save them according to the config
 			Upload::save();
 
-			$finfo = new \finfo(FILEINFO_MIME);
+			//$finfo = new \finfo(FILEINFO_MIME);
 
 			foreach( Upload::get_files() as $file )
 			{
 				$file_path  = $file['saved_to'].$file['saved_as'];
 
-				$minetype	= explode(';', $finfo->file($file_path));
+				//$minetype	= explode(';', $finfo->file($file_path));
 				$basename	= \Inflector::friendly_title(trim(strtolower($file['filename'])));
 				$filename   = $basename.'.'.$file['extension'];
 
-				$finfo->file($file_path);
+//				$finfo->file($file_path);
 
-				$category   = '_other_';
+				$category   = 'other';
 				foreach ($file_types as $key => $values)
 				{
 					if(in_array($file['mimetype'], $values))
@@ -365,7 +398,7 @@ class File
 								'saved_as'  => $file['saved_as'],
 								'path'      => $file_path,
 								'mimetype'  => $file['mimetype'],
-								'charset'   => str_replace('charset=', '', trim($minetype[1])),
+//								'charset'   => str_replace('charset=', '', trim($minetype[1])),
 								'extension' => $file['extension'],
 								'basename'  => $basename,
 								'filename'  => $filename,
@@ -376,7 +409,7 @@ class File
 							);
 
 				// if file is an image, we get width/height
-				if(strpos($minetype[0], 'image') !== false)
+				if(strpos($file['mimetype'], 'image') !== false)
 				{
 					$new_file['size'] = array();
 					list($new_file['size']['width'], $new_file['size']['height']) = getimagesize($file_path);

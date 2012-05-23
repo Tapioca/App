@@ -94,7 +94,7 @@ class Tapioca
 	{
 		try
 		{
-			return new \File($app_slug, $filename);
+			return new \Files($app_slug, $filename);
 		}
 		catch (TapiocaFileException $e)
 		{
