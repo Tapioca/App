@@ -673,6 +673,31 @@ header#tapp {
 .repeat-group:hover .repeat-group-controls {
 	visibility: visible;
 }
+
+.input-repeat-list {
+	list-style:none
+}
+
+.input-repeat-list li {
+	margin-bottom: 10px;
+}
+
+.input-repeat-list li:last-child {
+	margin-bottom: 0;
+}
+
+.input-repeat-trigger {
+	margin-left: 10px;
+}
+
+.input-repeat-list li .icon-repeat-trigger:before {
+  content: "\f068";
+}
+
+.input-repeat-list li:last-child .icon-repeat-trigger:before {
+  content: "\f067";
+}
+
 /*
 #app-content .form-footer p {
 	margin-bottom: 0;

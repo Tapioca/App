@@ -45,7 +45,7 @@ define([
 			_route = _route.replace(replace[i], _hash[i]);
 		}
 
-		return _route;
+		return _route.replace(regexp, '').replace(/\/$/, '');
 	}
 
 
@@ -79,6 +79,8 @@ define([
 		apps: {},
 
 		view: null,
+
+		beforeunload: false,
 		
 		// Create a custom object with a nested Views object
 		module: function(additionalProps)

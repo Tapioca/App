@@ -6,7 +6,7 @@ define('template/helpers/atLeastOnce', ['Handlebars', 'underscore'], function ( 
 		
 		if(_.isEmpty(context))
 		{
-			context = {};
+			context = (options.hash.type == 'array') ? [''] : {};
 		}
 
 		if(_.isArray(context))

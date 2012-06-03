@@ -34,10 +34,17 @@ define([
 		urlRoot: '/api',
 		url: function()
 		{
-			return this.urlRoot + '/' + this.appSlug + '/document/' + this.namespace + '/' + this.get('_ref');
+			var url = this.urlRoot + '/' + this.appSlug + '/document/' + this.namespace;
+
+			if(this.get('_ref') != null)
+			{
+				url += '/' + this.get('_ref');
+			}
+
+			return url; //this.urlRoot + '/' + this.appSlug + '/document/' + this.namespace + '/' + this.get('_ref');
 		},
 		defaults:{
-			'_ref': ''
+			'_ref': null
 		}
 	});
 
@@ -89,6 +96,8 @@ define([
 				tapioca.view  = new vDocumentEdit({
 								model: new Documents.Model({}, {appSlug: slug, namespace: namespace}),
 								schema: collectionDetails,
+								appSlug: slug, 
+								namespace: namespace,
 								forceRender: true
 							});
 			}

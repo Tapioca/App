@@ -13,7 +13,8 @@ require.config(
 		'nanoScroller'     : '../assets/library/nanoscroller/jquery.nanoscroller',
 		'Handlebars'       : '../assets/library/handlebar/Handlebars',
 		'moment'           : '../assets/library/moment/moment-wrap',
-		'form2js'          : '../assets/library/form2js/form2js-wrap'
+		'form2js'          : '../assets/library/form2js/form2js-wrap',
+		'bootbox'          : '../assets/library/bootstrap/bootbox.amd'
 	},
 	// default plugin settings, listing here just as a reference
 	hbs : 
@@ -27,7 +28,8 @@ require.config(
  
 require([
 	'order!jquery',
-	'order!nanoScroller', 
+	'order!nanoScroller',
+	'bootbox', 
 	'tapioca',
 	'aura/mediator',
 	'view/apps-list',
@@ -35,7 +37,7 @@ require([
 	'module/collection',
 	'module/document',
 	'module/list'
-], function($, nanoScroller, tapioca, mediator, vAppCollections, Breadcrumb, Collections, Document, List)
+], function($, nanoScroller, bootbox, tapioca, mediator, vAppCollections, Breadcrumb, Collections, Document, List)
 {
 	// Defining the application router.
 	var Router = Backbone.Router.extend(
@@ -266,10 +268,24 @@ require([
 			// refresh.
 			event.preventDefault();
 
-			// `Backbone.history.navigate` is sufficient for all Routers and will
-			// trigger the correct events.  The Router's internal `navigate` method
-			// calls this anyways.
-			Backbone.history.navigate(href, true);
+			if(!tapioca.beforeunload)
+			{
+				// `Backbone.history.navigate` is sufficient for all Routers and will
+				// trigger the correct events.  The Router's internal `navigate` method
+				// calls this anyways.
+				Backbone.history.navigate(href, true);
+			}
+			else
+			{
+				bootbox.confirm(tapioca.beforeunload.message, function(result)
+				{
+					tapioca.beforeunload = false;
+					if (result)
+					{
+						Backbone.history.navigate(href, true);
+					}
+				});
+			}
 		}
 	});
 });
