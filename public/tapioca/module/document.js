@@ -75,7 +75,8 @@ define([
 				if(tapioca.view != null) tapioca.view.close();
 				tapioca.view  = new vDocumentEdit({
 								model: doc,
-								schema: collectionDetails
+								schema: collectionDetails,
+								appSlug: slug
 							});
 
 				doc.fetch({ data: $.param(fetchOptions) });

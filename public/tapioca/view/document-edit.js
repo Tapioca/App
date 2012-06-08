@@ -1,13 +1,14 @@
 define([
 	'tapioca',
 	'Handlebars',
+	'aura/mediator',
 	'view/content',
 	'text!template/content/document-edit.html',
 	'template/helpers/isSelected',
 	'template/helpers/atLeastOnce',
 	'underscore.string',
 	'form2js'
-], function(tapioca, Handlebars, vContent, tContent, isSelected, atLeastOnce, _s, form2js)
+], function(tapioca, Handlebars, mediator, vContent, tContent, isSelected, atLeastOnce, _s, form2js)
 {
 	var view = vContent.extend(
 	{
@@ -43,6 +44,10 @@ define([
 			{
 				return self.counters[options.hash.counter];
 			});
+			Handlebars.registerHelper('_embedData', function(context, options)
+			{
+				return self.embedData(context, '', options.hash.prefix);
+			});
 
 			if(options.forceRender)
 			{
@@ -56,7 +61,9 @@ define([
 			'click #tapioca-document-form-save'                                  : 'save',
 			'click .array-repeat-trigger'                                        : 'addNode',
 			'click .input-repeat-list li:last-child .input-repeat-trigger'       : 'addInput',
-			'click .input-repeat-list li:not(:last-child) .input-repeat-trigger' : 'removeInput'
+			'click .input-repeat-list li:not(:last-child) .input-repeat-trigger' : 'removeInput',
+			'click .file-list-trigger'                                           : 'fileList',
+			'document:addFile'                                                   : 'addFile'
 //			'click .delete': 'delete'
 		},
 
@@ -64,7 +71,8 @@ define([
 		{
 			tapioca.beforeunload = {
 				type: 'confirm',
-				message: 'Etes vous sur de voiloir quiter cette page ? Vos modifications ne seront pas sauvegarder'
+				title: 'Etes vous sur de voiloir quiter cette page ? ',
+				message: 'Vos modifications ne seront pas sauvegarder'
 			};
 
 			$('#tapioca-document-form-save').removeClass('disabled').removeAttr('disabled');
@@ -72,6 +80,8 @@ define([
 
 		save: function()
 		{
+			tapioca.beforeunload = false;
+
 			var formData = form2js('tapioca-document-form', '.'),
 				self     = this;
 				
@@ -201,6 +211,70 @@ define([
 				html     = template({});
 			
 			target.$.parents('p.align-right').before(html);
+		},
+
+		fileList: function(event)
+		{
+			this.target = event;
+			mediator.publish('callFileList', this.appSlug);
+		},
+
+		addFile: function(event, file)
+		{
+			var target = this.targetData(this.target),
+				_html  = '';
+//console.log(target)
+//console.log(file)
+			_html = this.embedData(file, _html, target.prefix);
+//console.log(_html);
+			target.$.after(_html);
+		},
+
+		embedData: function(hash, str, prefix)
+		{
+			var iterator = 0;
+
+			for(var i in hash)
+			{
+				var prefixTmp = prefix + '.' + i;
+
+				if(_.isString(hash[i]))
+				{
+					str += '<input type="text" name="' + prefixTmp + '" value="' + hash[i] + '">';
+				}
+				else
+				{
+					if(_.isArray(hash[i]))
+					{
+						if(!_.isString(hash[i][0]))
+						{
+							for(var j = -1, total = hash[i].length; ++j < total;)
+							{
+								var p = prefixTmp + '[' + j + ']';
+
+								str += this.embedData(hash[i][j], '', p);
+							}
+						}
+						else
+						{
+							var p = prefixTmp + '[' + j + '][]';
+							
+							for(var j = -1, total = hash[i].length; ++j < total;)
+							{
+								str += '<input type="text" name="' + p + '" value="' + hash[i][j] + '">';
+							}
+						}
+					}
+					else
+					{
+						str += this.embedData(hash[i], '', prefixTmp);
+					}
+				}
+
+				++iterator;
+			}
+
+			return str;
 		},
 
 		getDescendantProp: function(key)
@@ -357,7 +431,7 @@ define([
 
 			var str = '<fieldset class="subgroup">';
 
-			if(!_s.isBlank(item.label))
+			if(!_.isUndefined(item.label) && !_s.isBlank(item.label))
 			{
 				str += '<legend>'+ item.label +'</legend>';
 			}
@@ -467,9 +541,12 @@ define([
 			formHtml += str;
 		};
 
-		fields.media = function(item, prefix)
+		fields.media = function(item, prefix, key)
 		{
-			formHtml += '';
+			formHtml += '<a class="btn file-list-trigger" href="javascript:void(0)" data-prefix="' + getName(item, prefix) + '" data-key="'+key+'">\
+					<i class="icon-plus"></i>\
+					Link\
+				</a>{{{_embedData ' + item.id + ' prefix="' + getName(item, prefix) + '"}}}';
 		};
 
 		fields.row = function(item, prefix, key)
@@ -487,6 +564,11 @@ define([
 			formHtml += '<div class="controls">';
 			fields[type](item, prefix, key);
 			formHtml += '</div></div>';
+		};
+
+		fields.bool = function(item, prefix, key)
+		{
+			formHtml += '<input type="checkbox" value="1" name="' + getName(item, prefix) + '"{{isSelected '+ item.id + ' default="1" checked="checked"}}>';
 		};
 
 		// Getter//Setter

@@ -1,0 +1,11 @@
+
+				<div class="pane-content">
+					<form class="well form-inline">
+						<input id="fileupload" type="file" name="files[]" data-url="/api/happyend/file/" multiple>
+						<button type="submit" class="btn">Sign in</button>
+					</form>
+
+					<div id="files-list">
+						{{> template_content_file-list}}
+					</div><!-- /#files-list -->
+				</div><!-- /.pane-content -->

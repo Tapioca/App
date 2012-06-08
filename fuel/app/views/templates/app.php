@@ -86,7 +86,7 @@
 	if($group['is_admin'])
 	{
 ?>
- 							<li class="divider"></li>
+							<li class="divider"></li>
 							<li>
 								<a href="app/<?= $group['slug']; ?>/collections/new" class="admin-action">
 									<i class="icon-plus"></i>
@@ -108,6 +108,13 @@
 							</li>
 							<li>
 								<a href="#">Autres</a>
+							</li>
+							<li class="divider"></li>
+							<li>
+								<a href="app/<?= $group['slug']; ?>/file" class="admin-action">
+									<i class="icon-plus"></i>
+									Ajouter un fichier
+								</a>
 							</li>
 						</ul>
 					</div><!-- /.app-nav-lists -->

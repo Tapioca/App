@@ -1,0 +1,27 @@
+
+									<td>
+										<a href="/app/file/{{file.filename}}">{{file.filename}}</a>
+									</td>
+									<td>
+										{{file.category}}
+									</td>
+									<td>
+										<div class="btn-group float-right">
+											{{#if home}}
+											<a href="#" class="btn btn-mini">
+												<i class="icon-pencil"></i>
+												Edit
+											</a>
+											<a href="javascript:void(0)" class="btn btn-mini btn-danger delete-file-trigger" data-filename="{{filename}}">
+												<i class="icon-trash"></i>
+												delete
+											</a>
+											{{/if}}
+											{{#if select}}
+											<a href="javascript:void(0)" class="btn btn-mini select-file-trigger">
+												<i class="icon-pencil"></i>
+												select
+											</a>
+											{{/if}}
+										</div>
+									</td>

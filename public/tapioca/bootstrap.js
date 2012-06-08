@@ -14,8 +14,19 @@ require.config(
 		'Handlebars'       : '../assets/library/handlebar/Handlebars',
 		'moment'           : '../assets/library/moment/moment-wrap',
 		'form2js'          : '../assets/library/form2js/form2js-wrap',
-		'bootbox'          : '../assets/library/bootstrap/bootbox.amd'
+//		'bootbox'          : '../assets/library/bootstrap/bootbox.amd',
+		'bootbox'          : '../assets/library/bootstrap/bootbox.amd',
+		'fileupload'       : '../assets/library/fileupload/jquery.fileupload',
+		'jquery.ui.widget' : '../assets/library/fileupload/jquery.ui.widget'
 	},
+	packages: 
+	[
+		{
+			name: 'wtwui',
+			location: '../assets/library/wtwui'
+		}
+	],
+
 	// default plugin settings, listing here just as a reference
 	hbs : 
 	{
@@ -29,15 +40,16 @@ require.config(
 require([
 	'order!jquery',
 	'order!nanoScroller',
-	'bootbox', 
+	'wtwui/Confirmation',
 	'tapioca',
 	'aura/mediator',
 	'view/apps-list',
 	'module/breadcrumb',
 	'module/collection',
 	'module/document',
-	'module/list'
-], function($, nanoScroller, bootbox, tapioca, mediator, vAppCollections, Breadcrumb, Collections, Document, List)
+	'module/list',
+	'module/file'
+], function($, nanoScroller, Confirmation, tapioca, mediator, vAppCollections, Breadcrumb, Collections, Document, List, File)
 {
 	// Defining the application router.
 	var Router = Backbone.Router.extend(
@@ -105,6 +117,8 @@ require([
 			'app/:appslug/document/:namespace/new'           : 'documentNew',
 			'app/:appslug/document/:namespace/:ref/:revision': 'documentRef',
 			'app/:appslug/document/:namespace/:ref'          : 'documentRef',
+			'app/:appslug/file/:ref'                         : 'fileRef',
+			'app/:appslug/file'                              : 'fileHome',
 			'*path'                                          : 'notFound'
 		},
 
@@ -188,6 +202,32 @@ require([
 			{
 				this.requestedFnc  = 'documentNew';
 				this.requestedArgs = [appslug, namespace];
+			}
+		},
+
+		fileHome: function(appslug)
+		{
+			if(this.instance)
+			{
+				mediator.publish('callFileHome', appslug);
+			}
+			else
+			{
+				this.requestedFnc  = 'fileHome';
+				this.requestedArgs = [appslug];
+			}
+		},
+
+		fileRef: function(appslug, ref)
+		{
+			if(this.instance)
+			{
+				mediator.publish('callFileNew', appslug, ref);
+			}
+			else
+			{
+				this.requestedFnc  = 'fileNew';
+				this.requestedArgs = [appslug, ref];
 			}
 		}
 
@@ -277,14 +317,30 @@ require([
 			}
 			else
 			{
-				bootbox.confirm(tapioca.beforeunload.message, function(result)
+				new Confirmation(
 				{
-					tapioca.beforeunload = false;
-					if (result)
+					title: tapioca.beforeunload.title,
+					message: tapioca.beforeunload.message,
+					ok: function()
 					{
+						tapioca.beforeunload = false;
 						Backbone.history.navigate(href, true);
+					},
+					cancel: function()
+					{
+						if( !_.isUndefined(tapioca.beforeunload.cancel) 
+							&& _.isFunction(tapioca.beforeunload.cancel))
+						{
+							tapioca.beforeunload.cancel();
+						}
+					},
+					overlay: {
+						css: {
+							background: 'black'
+						}
 					}
-				});
+				})
+				.show();
 			}
 		}
 	});

@@ -24,6 +24,8 @@ class Controller_App_File extends Controller_App
 		{
 			$this->gateway($bytes[0]);
 		}
+
+		return $this->response;
 	}
 
 	public function action_preview()

@@ -24,7 +24,8 @@ return array(
 	'api/:app_slug/group/team'         => array('api/group/team', 'name' => 'api_group_team'),
 	'api/:app_slug/group'              => array('api/group/', 'name' => 'api_group'),
 
-	'api/:app_slug/file/:ref'         => array('api/file', 'name' => 'api_file_ref'),
-	'api/:app_slug/file'              => array('api/file', 'name' => 'api_file'),
+	'api/:app_slug/file/summary'       => array('api/file/summary', 'name' => 'api_file_summary'),
+	'api/:app_slug/file/:filename'     => array('api/file/name', 'name' => 'api_file_name'),
+	'api/:app_slug/file'               => array('api/file', 'name' => 'api_file'),
 
 );
