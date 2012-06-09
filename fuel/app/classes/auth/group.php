@@ -105,6 +105,29 @@ class Group
 		}
 	}
 
+
+	/**
+	 * Return group's info.
+	 *
+	 * @param   string|array  Group ID, can be an array of ID 
+	 * @return  int|bool
+	 */
+	public function read($id)
+	{
+		static::$db->select(array(), array('_id', 'admins', 'name', 'slug'));
+
+		if(is_array($id))
+		{
+			static::$db->where_in('id', $id);
+		}
+		else
+		{
+			static::$db->where(array('id' => $id));
+		}
+
+		return static::$db->get(static::$collection);
+	}
+
 	/**
 	 * Creates the given group.
 	 *
