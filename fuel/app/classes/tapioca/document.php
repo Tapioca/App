@@ -36,6 +36,11 @@ class Document
 	protected static $ref = null;
 
 	/**
+	 * @var  string  Document locale
+	 */
+	protected static $locale = null;
+
+	/**
 	 * @var  int  active Document version
 	 */
 	protected static $active = null;
@@ -76,9 +81,10 @@ class Document
 	 * @param   string  Group id
 	 * @param   string  Collection namespace
 	 * @param   string  Document ref
+	 * @param   string  locale
 	 * @return  void
 	 */
-	public function __construct(\Auth\Group $group, $namespace, $ref = null, $check_exists = false)
+	public function __construct(\Auth\Group $group, $namespace, $ref = null, $locale = null, $check_exists = false)
 	{
 		// load and set config
 		static::$group      = $group;
@@ -86,6 +92,17 @@ class Document
 		static::$namespace  = $namespace;
 		
 		static::$db = \Mongo_Db::instance();
+
+		// Set Locale
+		if(!is_null($locale)  
+			&& in_array($locale, static::$group->get('locales_keys')))
+		{
+			static::$locale = $locale;
+		}
+		else
+		{
+			static::$locale = static::$group->get('locale_default');
+		}
 
 		// if a Ref was passed
 		if ($ref)
@@ -104,14 +121,23 @@ class Document
 			if (count($summary) == 1)
 			{
 				$this->summary = $summary[0];
-				$this->set('where', array(
-					'_ref' => self::$ref,
-					'_summary' => array( '$exists' => false )
-				));
 
 				// cache data
 				self::$active        = $this->summary['revisions']['active'];
 				self::$last_revision = $this->summary['revisions']['total'];
+
+				if(!isset($this->summary['revisions']['active'][static::$locale]))
+				{
+					$this->summary['revisions']['active'][static::$locale] = null;
+				}
+
+				self::$active = $this->summary['revisions']['active'][static::$locale];
+
+				$this->set('where', array(
+						'_ref'          => self::$ref,
+						'_summary'      => array( '$exists' => false ),
+						'_about.locale' => static::$locale
+					));
 
 				// if just a document exists check - return true, no need for additional queries
 				if ($check_exists)
@@ -151,6 +177,7 @@ class Document
 		static::$group = null;
 		static::$namespace = null;
 		static::$ref = null;
+		static::$locale = null;
 		static::$active = null;
 		static::$last_revision = null;
 		$this->document = null;
@@ -250,8 +277,9 @@ class Document
 		}
 
 		$this->set('where', array(
-			'_summary' => array( '$exists' => false ),
-			'_about.active' => true
+			'_summary'      => array( '$exists' => false ),
+			'_about.active' => true,
+			'_about.locale' => static::$locale
 		));
 
 		// get a specific revison
@@ -259,6 +287,8 @@ class Document
 		{
 			$this->_unset('where', '_about.active');
 			$this->_unset('where', '_about.status');
+			$this->_unset('where', '_about.locale');
+
 			$this->set('where', array('_about.revision' => $revision));
 		}
 		else if(!is_null(self::$active))
@@ -384,33 +414,35 @@ class Document
 		$ref = uniqid();
 
 		$data = array(
-			'_ref' => $ref,
+			'_ref'   => $ref,
 			'_about' => array(
-				'date' => $date,
+				'date'     => $date,
 				'revision' => (int) 1,
-				'status' => (int) 1,
-				'active' => (bool) true,
-				'user' => $user,
+				'status'   => (int) 1,
+				'active'   => (bool) true,
+				'locale'   => static::$locale,
+				'user'     => $user,
 			)
 		) + $document;
 
 		$summary = array(
-			'_ref' => $ref,
-			'_summary' => (bool) true,
-			'date' => array(
+			'_ref'      => $ref,
+			'_summary'  => (bool) true,
+			'date'      => array(
 				'created' => $date
 			),
 			'revisions' => array(
-				'total' => (int) 1,
-				'active' => (int) 1,
-				'list' => array(
-					array(
-						'revision' => 1,
-						'date' => $date,
-						'status' => (int) 1,
-						'user' => $user,
-					)
-				)
+				'total'   => (int) 1,
+				'active'  => array(static::$locale => (int) 1),
+				'list'    => array(
+								array(
+									'revision' => (int) 1,
+									'date'     => $date,
+									'status'   => (int) 1,
+									'locale'   => static::$locale,
+									'user'     => $user,
+								)
+							)
 			)
 		) + $summary;
 
@@ -439,15 +471,17 @@ class Document
 		$is_active = $this->set_active();
 
 		$data = array(
-			'_ref' => self::$ref,
+			'_ref'   => self::$ref,
 			'_about' => array(
-				'date' => $this->summary['date']['created'],
+				'date'     => $this->summary['date']['created'],
 				'revision' => (int) self::$last_revision,
-				'status' => (int) 1,
-				'active' => (bool) $is_active,
-				'user' => $user,
+				'status'   => (int) 1,
+				'active'   => (bool) $is_active,
+				'locale'   => static::$locale,
+				'user'     => $user,
 			)
 		) + $document;
+
 
 		++$this->summary['revisions']['total'];
 
@@ -455,18 +489,23 @@ class Document
 		$this->summary['date']['updated']     = $date;
 		$this->summary['revisions']['list'][] = array(
 													'revision' => (int) self::$last_revision,
-													'date' => $date,
-													'status' => (int) 1,
-													'user' => $user,
+													'date'     => $date,
+													'status'   => (int) 1,
+													'locale'   => static::$locale,
+													'user'     => $user,
 												);
+
 		// update active revision
 		if($is_active)
 		{
 			$update_active = static::$db
-								->where(array('_ref' => self::$ref))
+								->where(array(
+									'_ref'          => self::$ref,
+									'_about.locale' => static::$locale
+								))
 								->update_all(static::$collection, array('_about.active' => (bool) false));
 
-			$this->summary['revisions']['active'] = (int) self::$last_revision;
+			$this->summary['revisions']['active'][static::$locale] = (int) self::$last_revision;
 		}
 
 		$new_data = static::$db->insert(static::$collection, $data);
@@ -704,11 +743,14 @@ class Document
 		
 		foreach ($this->summary['revisions']['list'] as $revision)
 		{
-			$higher = ($revision['status'] > $higher) ? $revision['status'] : $higher;
-
-			if($revision['status'] == 100)
+			if($revision['locale'] == static::$locale)
 			{
-				return false;
+				$higher = ($revision['status'] > $higher) ? $revision['status'] : $higher;
+
+				if($revision['status'] == 100)
+				{
+					return false;
+				}
 			}
 		}
 

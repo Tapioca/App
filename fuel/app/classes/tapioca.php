@@ -66,14 +66,15 @@ class Tapioca
 	 * @param   string app slug
 	 * @param   string collection namespace.
 	 * @param   string document reference.
+	 * @param   string document locale.
 	 * @throws  TapiocaException
 	 * @return  Document
 	 */
-	public static function document($app_slug, $namespace, $ref = null)
+	public static function document($app_slug, $namespace, $ref = null, $locale = null)
 	{
 		try
 		{
-			return new \Document($app_slug, $namespace, $ref);
+			return new \Document($app_slug, $namespace, $ref, $locale);
 		}
 		catch (TapiocaDocumentException $e)
 		{

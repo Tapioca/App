@@ -12,6 +12,17 @@ return array(
 	),
 
 	/*
+	 * Locales
+	 */
+	'locales' => array(
+		'default' => array(
+			'key'     => 'fr_FR',
+			'label'   => 'français / France',
+			'default' => true
+		)
+    ),
+
+	/*
 	 * Default documents/collections status
 	 */
 	'status' => array(

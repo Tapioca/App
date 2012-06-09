@@ -5,6 +5,7 @@ class Controller_Api_Document extends Controller_Api
 	private static $collection;
 	private static $ref;
 	private static $revision;
+	private static $locale;
 	private static $doc_status;
 	private static $query;
 	private static $mode;
@@ -16,6 +17,7 @@ class Controller_Api_Document extends Controller_Api
 		// to define with api key and query string
 		static::$collection = $this->param('collection', false);
 		static::$ref        = $this->param('ref', null);
+		static::$locale     = Input::get('locale', null);;
 		static::$revision   = Input::get('revision', null);
 		static::$doc_status = Input::get('status', null);
 		static::$query      = Input::get('q', null);
@@ -44,7 +46,7 @@ class Controller_Api_Document extends Controller_Api
 		{
 			try
 			{
-				$document = Tapioca::document(self::$group, static::$collection, static::$ref);
+				$document = Tapioca::document(self::$group, static::$collection, static::$ref, static::$locale);
 
 				if(static::$query)
 				{
@@ -87,7 +89,7 @@ class Controller_Api_Document extends Controller_Api
 		if(self::$granted)
 		{
 			$model    = json_decode(Input::post('model', false), true);
-			$document = Tapioca::document(self::$group, static::$collection);
+			$document = Tapioca::document(self::$group, static::$collection, null, static::$locale);
 
 			if(!$model)
 			{
@@ -110,7 +112,7 @@ class Controller_Api_Document extends Controller_Api
 		if(self::$granted)
 		{
 			$model    = json_decode(Input::put('model', false), true);
-			$document = Tapioca::document(self::$group, static::$collection, static::$ref);
+			$document = Tapioca::document(self::$group, static::$collection, static::$ref, static::$locale);
 
 			if(!$model)
 			{

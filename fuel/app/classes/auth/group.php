@@ -37,6 +37,17 @@ class Group
 	protected $admins = array();
 
 	/**
+	 * @var  array  Group's locales list
+	 */
+	protected $locales = null;
+
+	/**
+	 * @var  array  Group's default locale
+	 */
+	protected $locale_default = null;
+
+
+	/**
 	 * Gets the collection names
 	 */
 	public static function _init()
@@ -95,6 +106,18 @@ class Group
 			$this->group  = $group[0];
 			$this->team   = $group[0]['team'];
 			$this->admins = $group[0]['admins'];
+
+			$this->group['locales_keys'] = array();
+
+			foreach ($group[0]['locales'] as $locale)
+			{
+				$this->group['locales_keys'][] = $locale['key'];
+
+				if(isset($locale['default']) && $locale['default'] == true)
+				{
+					$this->group['locale_default'] = $locale['key'];
+				}
+			}
 		}
 		// group doesn't exist
 		else
@@ -168,6 +191,12 @@ class Group
 		if ( ! array_key_exists('admins', $group))
 		{
 			$group['admins'] = array();
+		}
+
+		if ( ! array_key_exists('locales', $group))
+		{
+			$group['locales']   = array();
+			$group['locales'][] = \Config::get('tapioca.locales.default');
 		}
 
 		$group_id = uniqid();
