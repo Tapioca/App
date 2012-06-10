@@ -31,7 +31,7 @@ class Controller_App_Index extends Controller_App
 		}
 
 		$app_settings = array(
-							'base_uri' => Uri::current().'/',
+							'base_uri' => str_replace(Uri::base(), '/', Uri::create('app/')), //Uri::current().'/',
 							'user'     => array(
 								'id'     => static::$user->get('id'),
 								'groups' => $user_groups

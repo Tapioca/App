@@ -8,6 +8,7 @@ define([
 {
 	// Create a new module
 	var Documents         = tapioca.module();
+	/*
 	Documents.Collection  = Backbone.Collection.extend(
 	{
 		idAttribute: '_ref',
@@ -22,7 +23,7 @@ define([
 			return this.urlRoot + '/' + this.appSlug + '/document/' + this.namespace;
 		}
 	});
-
+	*/
 	Documents.Model       = Backbone.Model.extend(
 	{
 		idAttribute: '_ref',
@@ -41,6 +42,8 @@ define([
 				url += '/' + this.get('_ref');
 			}
 
+			url += '?locale='+locale;
+
 			return url; //this.urlRoot + '/' + this.appSlug + '/document/' + this.namespace + '/' + this.get('_ref');
 		},
 		defaults:{
@@ -48,7 +51,8 @@ define([
 		}
 	});
 
-	var model = null;
+	var model = null,
+		locale;
 
 	var highlight = function(appslug, namespace)
 	{
@@ -56,18 +60,22 @@ define([
 		$('#apps-nav').find('a.app-nav-header[data-app-slug="'+appslug+'"]').trigger('click');
 	}
 
-	mediator.subscribe('callDocumentRef', function(slug, namespace, ref, revision)
+	mediator.subscribe('callDocumentRef', function(slug, namespace, ref, params)
 	{
 		highlight(slug, namespace);
 
-		var collectionDetails = tapioca.apps[slug].models.get(namespace);
-		var doc 			  = new Documents.Model({_ref: ref}, {appSlug: slug, namespace: namespace});
-		var fetchOptions      = { mode: 'edit'};
-
-		if(!_.isUndefined(revision))
+		if(!_.isUndefined(params.locale))
 		{
-			fetchOptions['revision'] = revision;
+			tapioca.apps[slug].locale_working = locale = params.locale;
 		}
+		else
+		{
+			locale = tapioca.apps[slug].locale_working;
+		}
+
+		var collectionDetails = tapioca.apps[slug].models.get(namespace),
+			doc 			  = new Documents.Model({_ref: ref}, {appSlug: slug, namespace: namespace}),
+			fetchOptions      = $.extend({ mode: 'edit'}, params);
 
 		collectionDetails.fetch({
 			success: function(model, response)
@@ -76,7 +84,10 @@ define([
 				tapioca.view  = new vDocumentEdit({
 								model: doc,
 								schema: collectionDetails,
-								appSlug: slug
+								appSlug: slug,
+								namespace: namespace,
+								locale: tapioca.apps[slug].locale_working,
+								locales: tapioca.apps[slug].locales
 							});
 
 				doc.fetch({ data: $.param(fetchOptions) });
@@ -84,11 +95,20 @@ define([
 		});
 	});
 
-	mediator.subscribe('callDocumentNew', function(slug, namespace)
+	mediator.subscribe('callDocumentNew', function(slug, namespace, params)
 	{
 		highlight(slug, namespace);
 
 		var collectionDetails = tapioca.apps[slug].models.get(namespace);
+
+		if(!_.isUndefined(params.locale))
+		{
+			tapioca.apps[slug].locale_working = locale = params.locale;
+		}
+		else
+		{
+			locale = tapioca.apps[slug].locale_working;
+		}
 
 		collectionDetails.fetch({
 			success: function(model, response)
@@ -99,7 +119,9 @@ define([
 								schema: collectionDetails,
 								appSlug: slug, 
 								namespace: namespace,
-								forceRender: true
+								forceRender: true,
+								locale: tapioca.apps[slug].locale_working,
+								locales: tapioca.apps[slug].locales
 							});
 			}
 		});

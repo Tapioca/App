@@ -1,7 +1,17 @@
 				{{#header}}
 				<div class="app-content-header">
-					<h2 class="page-name">{{name}}</h2>
-
+					<h2 class="page-name">{{name}} </h2>
+					<div class="dropdown btn-group" id="locale-switcher">
+						<a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+							{{locale}}
+							<b class="caret"></b>
+						</a>
+						<ul class="dropdown-menu">
+						{{#each locales}}
+							<li><a href="{{../../baseUri}}?locale={{key}}">{{label}}</a></li>
+						{{/each}}
+						</ul>
+					</div>
 					<div class="btn-group">
 						<a class="btn" href="/app/{{app_id}}/document/{{namespace}}/new">
 							<i class="icon-plus"></i>
@@ -36,7 +46,7 @@
 							<tr>
 								{{{docSummary data _ref ../header.app_id ../namespace}}}
 								<td> 
-									{{{displayStatus revisions}}}
+									{{{displayStatus revisions ../appslug}}}
 								</td>
 								<td>
 									<div class="btn-group float-right">

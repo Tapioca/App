@@ -34,19 +34,26 @@ define([
 		$('#apps-nav').find('a.app-nav-header[data-app-slug="'+appslug+'"]').trigger('click');
 	}
 
-	mediator.subscribe('callCollectionHome', function(appslug, namespace)
+	mediator.subscribe('callCollectionHome', function(appslug, namespace, params)
 	{
-		var model = tapioca.apps[appslug].models.get(namespace);
-		var documents = new List.Collection(appslug, namespace);
+		var model     = tapioca.apps[appslug].models.get(namespace),
+			documents = new List.Collection(appslug, namespace);
 
 		highlight(appslug, namespace);
+
+		if(!_.isUndefined(params.locale))
+		{
+			tapioca.apps[appslug].locale_working = params.locale;
+		}
 
 		if(tapioca.view != null) tapioca.view.close();
 		tapioca.view  = new vCollectionHome({
 						collection: documents,
 						header: model.toJSON(),
 						appslug: appslug,
-						namespace: namespace
+						namespace: namespace,
+						locale: tapioca.apps[appslug].locale_working,
+						locales: tapioca.apps[appslug].locales
 					});
 
 		documents.fetch({ data: $.param({ mode: 'list'}) })

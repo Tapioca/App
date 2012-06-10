@@ -1,7 +1,26 @@
 				<div class="pane-content">
 					<form id="tapioca-document-form" class="form-horizontal">
 						<div id="file-popin"></div>
-						{{> formStr}}
+						<div class="row-fluid">
+							<div class="span8">
+								<fieldset>
+									<legend>New document</legend>
+									<div class="dropdown btn-group" id="locale-switch">
+										<a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
+											{{locale}}
+											<b class="caret"></b>
+										</a>
+										<ul class="dropdown-menu pull-right">
+										{{#each locales}}
+											<li><a href="{{../baseUri}}?locale={{key}}" data-locale="{{key}}">{{label}}</a></li>
+										{{/each}}
+										</ul>
+									</div>
+
+								{{> formStr}}
+							</div>
+							<div class="span4">Level 2</div>
+						</div>
 					</form>
 				</div><!-- /.pane-content -->
 				<div class="form-actions form-footer">

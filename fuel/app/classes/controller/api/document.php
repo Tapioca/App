@@ -70,16 +70,18 @@ class Controller_Api_Document extends Controller_Api
 				}
 
 				self::$status = 200;
-
-				if(static::$debug)
-				{
-					self::$data['debug'] = $document->last_query();
-				}
 			}
 			catch (TapiocaException $e)
 			{
 				self::error($e->getMessage());
 			}
+				if(static::$debug)
+				{
+					self::$data['debug'] = $document->last_query();
+				}
+//\Debug::show(self::$data);
+//exit;
+
 		} // if granted
 	}
 

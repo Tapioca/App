@@ -1,14 +1,24 @@
-define('template/helpers/displayStatus', ['Handlebars'], function ( Handlebars )
+define('template/helpers/displayStatus', ['Handlebars', 'tapioca'], function ( Handlebars, tapioca )
 {
-	function displayStatus ( revisions, options )
+	function displayStatus ( revisions, slug )
 	{
-		var value    = '';
-		var label    = '';
-		var active   = (revisions.active - 1);
-		var revision = revisions.list[active];
+		var value = '',
+			label,
+			status = -1,
+			workingLocale = tapioca.apps[slug].locale_working;
+			
+			if(!_.isUndefined(revisions.active[workingLocale]))
+			{
+				var active = (revisions.active[workingLocale] - 1);
+		
+				status = revisions.list[active].status;
+			}
 
-		switch(revision.status)
+		switch(status)
 		{
+			case -1: 
+					label = 'pas rédigé';
+					break;
 			case 0: 
 					value = 'label-inverse';
 					label = 'supprimé';

@@ -121,7 +121,7 @@ class Document
 			if (count($summary) == 1)
 			{
 				$this->summary = $summary[0];
-
+				
 				// cache data
 				self::$active        = $this->summary['revisions']['active'];
 				self::$last_revision = $this->summary['revisions']['total'];
@@ -274,6 +274,20 @@ class Document
 		if(is_null(static::$collection))
 		{
 			throw new \TapiocaException(__('tapioca.no_collection_selected'));
+		}
+
+		// check if locale exists for this document
+		if(!isset($this->summary['revisions']['active'][static::$locale]))
+		{
+			// try default locale first
+			static::$locale = static::$group->get('locale_default');
+
+			// if default locale doesn't exists, use first locale found
+			if(!isset($this->summary['revisions']['active'][static::$locale]))
+			{
+				reset($this->summary['revisions']['active']);
+				static::$locale = key($this->summary['revisions']['active']);
+			}
 		}
 
 		$this->set('where', array(
@@ -665,6 +679,13 @@ class Document
 	 */
 	private function set_summary($structure, $document)
 	{
+		$locale_default = static::$group->get('locale_default');
+
+		if(static::$locale != $locale_default && isset($this->summary['revisions']['active'][$locale_default]))
+		{
+			return array('data' => $this->summary['data']);
+		}
+
 		$summary = array('data' => array());
 
 		foreach($structure as $key => $v)

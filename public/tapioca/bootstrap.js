@@ -2,22 +2,23 @@ require.config(
 {
 	'paths': 
 	{
-		'text'             : '../assets/library/require/text',
-		'order'            : '../assets/library/require/order',
-		'hbs'              : '../assets/library/require/hbs',
-		'jquery'           : '../assets/library/jquery/jquery-1.7.2',
-		'underscore'       : '../assets/library/underscore/underscore',
-		'underscore.string': '../assets/library/underscore/underscore.string',
-		'backbone'         : '../assets/library/backbone/backbone',
-		'Mustache'         : '../assets/library/mustache/mustache-wrap',
-		'nanoScroller'     : '../assets/library/nanoscroller/jquery.nanoscroller',
-		'Handlebars'       : '../assets/library/handlebar/Handlebars',
-		'moment'           : '../assets/library/moment/moment-wrap',
-		'form2js'          : '../assets/library/form2js/form2js-wrap',
-//		'bootbox'          : '../assets/library/bootstrap/bootbox.amd',
-		'bootbox'          : '../assets/library/bootstrap/bootbox.amd',
-		'fileupload'       : '../assets/library/fileupload/jquery.fileupload',
-		'jquery.ui.widget' : '../assets/library/fileupload/jquery.ui.widget'
+		'text'                 : '../assets/library/require/text',
+		'order'                : '../assets/library/require/order',
+		'hbs'                  : '../assets/library/require/hbs',
+		'jquery'               : '../assets/library/jquery/jquery-1.7.2',
+		'underscore'           : '../assets/library/underscore/underscore',
+		'underscore.string'    : '../assets/library/underscore/underscore.string',
+		'backbone'             : '../assets/library/backbone/backbone-wrap',
+		'Mustache'             : '../assets/library/mustache/mustache-wrap',
+		'nanoScroller'         : '../assets/library/nanoscroller/jquery.nanoscroller',
+		'Handlebars'           : '../assets/library/handlebar/Handlebars',
+		'moment'               : '../assets/library/moment/moment-wrap',
+		'form2js'              : '../assets/library/form2js/form2js-wrap',
+//		'bootbox'              : '../assets/library/bootstrap/bootbox.amd',
+		'bootbox'              : '../assets/library/bootstrap/bootbox.amd',
+		'fileupload'           : '../assets/library/fileupload/jquery.fileupload',
+		'jquery.ui.widget'     : '../assets/library/fileupload/jquery.ui.widget',
+		'dropdown'             : '../assets/library/bootstrap/dropdown'
 	},
 	packages: 
 	[
@@ -85,6 +86,19 @@ require([
 				tapioca.apps[slug].documents    = {};
 				tapioca.apps[slug].models       = new Collections.Collection(slug);
 				tapioca.apps[slug].models.model = Collections.Model;
+				tapioca.apps[slug].locales      = tapioca.config.user.groups[i].locales;
+
+				for(var j = -1, nbLocales = tapioca.config.user.groups[i].locales.length; ++j < nbLocales;)
+				{
+					var locale = tapioca.config.user.groups[i].locales[j];
+
+					if(!_.isUndefined(locale.default) && locale.default == true)
+					{
+						tapioca.apps[slug].locale_working = locale.key;
+						tapioca.apps[slug].locale_default = locale.key;
+						break;
+					}
+				}
 
 				new vAppCollections({
 					el: $('#app-nav-collections-'+slug),
@@ -109,17 +123,16 @@ require([
 		},
 
 		routes: {
-			''                                               : 'index',
-			'app'                                            : 'index',
-			'app/:appslug/collections/new'                   : 'collectionNew',
-			'app/:appslug/collections/:namespace/edit'       : 'collectionEdit',
-			'app/:appslug/collections/:namespace'            : 'collectionHome',
-			'app/:appslug/document/:namespace/new'           : 'documentNew',
-			'app/:appslug/document/:namespace/:ref/:revision': 'documentRef',
-			'app/:appslug/document/:namespace/:ref'          : 'documentRef',
-			'app/:appslug/file/:ref'                         : 'fileRef',
-			'app/:appslug/file'                              : 'fileHome',
-			'*path'                                          : 'notFound'
+			''                                                : 'index',
+			'app'                                             : 'index',
+			'app/:appslug/collections/new'                    : 'collectionNew',
+			'app/:appslug/collections/:namespace/edit'        : 'collectionEdit',
+			'app/:appslug/collections/:namespace'             : 'collectionHome',
+			'app/:appslug/document/:namespace/new'            : 'documentNew',
+			'app/:appslug/document/:namespace/:ref'           : 'documentRef',
+			'app/:appslug/file/:ref'                          : 'fileRef',
+			'app/:appslug/file'                               : 'fileHome',
+			'*path'                                           : 'notFound'
 		},
 
 		notFound: function(path) {
@@ -141,7 +154,9 @@ require([
 		{
 			if(this.instance)
 			{
-				mediator.publish('callCollectionHome', appslug, namespace);
+				var params = Backbone.history.getQueryParameters();
+
+				mediator.publish('callCollectionHome', appslug, namespace, params);
 			}
 			else
 			{
@@ -179,16 +194,18 @@ require([
 			}
 		},
 
-		documentRef: function(appslug, namespace, ref, revision)
+		documentRef: function(appslug, namespace, ref)
 		{
 			if(this.instance)
 			{
-				mediator.publish('callDocumentRef', appslug, namespace, ref, revision);
+				var params = Backbone.history.getQueryParameters();
+
+				mediator.publish('callDocumentRef', appslug, namespace, ref, params);
 			}
 			else
 			{
 				this.requestedFnc  = 'documentRef';
-				this.requestedArgs = [appslug, namespace, ref, revision];
+				this.requestedArgs = [appslug, namespace, ref];
 			}
 		},
 
@@ -196,7 +213,9 @@ require([
 		{
 			if(this.instance)
 			{
-				mediator.publish('callDocumentNew', appslug, namespace);
+				var params = Backbone.history.getQueryParameters();
+
+				mediator.publish('callDocumentNew', appslug, namespace, params);
 			}
 			else
 			{

@@ -592,6 +592,20 @@ header#tapp {
 	pointer-events:auto;
 }
 
+.app-content-header .btn-group.dropdown {
+	float: left;
+	margin-left: 15px;
+	padding-top: 6px;
+}
+
+#locale-switch.btn-group .dropdown-toggle,
+#locale-switch.dropdown.open .dropdown-toggle {
+	background: none;
+	border-radius:0;
+	box-shadow:none;
+	color: #0088CC;
+}
+
 .page-name {
     color: #333;
 	float:left;
@@ -614,6 +628,17 @@ header#tapp {
 
 /* Content Form
 ------------------------- */
+
+#tapioca-document-form .span8 {
+	position: relative;
+}
+
+#locale-switch {
+	position: absolute;
+	right:0;
+	top:10px;
+}
+
 
 #app-content.app-form {
 	bottom: 64px;

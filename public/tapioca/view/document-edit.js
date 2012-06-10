@@ -7,8 +7,9 @@ define([
 	'template/helpers/isSelected',
 	'template/helpers/atLeastOnce',
 	'underscore.string',
-	'form2js'
-], function(tapioca, Handlebars, mediator, vContent, tContent, isSelected, atLeastOnce, _s, form2js)
+	'form2js',
+	'dropdown'
+], function(tapioca, Handlebars, mediator, vContent, tContent, isSelected, atLeastOnce, _s, form2js, dropdown)
 {
 	var view = vContent.extend(
 	{
@@ -22,6 +23,10 @@ define([
 			this.structure  = this.schema.structure;
 			this.appSlug    = options.appSlug;
 			this.namespace  = options.namespace;
+			this.locales    = options.locales;
+			this.locale     = options.locale;
+
+			this.baseUri    = tapioca.config.base_uri+this.appSlug+'/document/'+this.namespace;
 
 			_.bindAll(this, 'render');
 			this.model.on('change', this.render);
@@ -58,6 +63,7 @@ define([
 		events:
 		{
 			'change :input'                                                      : 'change',
+//			'click .dropdown-menu a'                                             : 'setLocal',
 			'click #tapioca-document-form-save'                                  : 'save',
 			'click .array-repeat-trigger'                                        : 'addNode',
 			'click .input-repeat-list li:last-child .input-repeat-trigger'       : 'addInput',
@@ -84,7 +90,7 @@ define([
 
 			var formData = form2js('tapioca-document-form', '.'),
 				self     = this;
-				
+
 			this.model.save(formData, {
 				success:function (model, response)
 				{
@@ -96,6 +102,14 @@ define([
 			});
 
 			return false;
+		},
+
+		setLocal: function(event)
+		{
+			var $target = $(event.target),
+				locale  = $target.attr('data-locale');
+
+
 		},
 
 		walk: function(_structure, _prefix, _previous_key)
@@ -312,11 +326,30 @@ define([
 
 			var formStr  = this.formStr.get(),
 				template = Handlebars.compile(tContent);
+	
+				formStr += '{{/model}}';				
+	
 				Handlebars.registerPartial('formStr', formStr);
 
-			var html     = template(this.model.toJSON());
+			if(!_.isNull(this.model.get('_ref')))
+			{
+				this.baseUri = this.baseUri+'/'+this.model.get('_ref')
+			}
+			else
+			{
+				this.baseUri = this.baseUri+'/new'
+			}
+
+			var html     = template({
+								model: this.model.toJSON(),
+								baseUri: this.baseUri,
+								locale: this.locale,
+								locales: this.locales
+							});
 			
 			this.html(html, 'app-form');
+			
+			this.$el.find('.dropdown-toggle').dropdown();
 
 			return this;
 		},
@@ -333,7 +366,7 @@ define([
 
 	var fieldsFactory = function()
 	{
-		var formHtml =  '<fieldset><legend>New document</legend>',
+		var formHtml =  '{{#model}}',
 			firstFieldset =  '</fieldset>',
 			firstFieldsetClose = false,
 			inc = 0;
