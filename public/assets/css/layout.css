@@ -633,12 +633,20 @@ header#tapp {
 	position: relative;
 }
 
+#tapioca-document-form .span4 {
+	padding-top: 36px;
+}
+
 #locale-switch {
 	position: absolute;
 	right:0;
 	top:10px;
 }
 
+.app-content-header #locale-switch {
+	position: relative;
+	top:0;
+}
 
 #app-content.app-form {
 	bottom: 64px;
@@ -721,6 +729,65 @@ header#tapp {
 
 .input-repeat-list li:last-child .icon-repeat-trigger:before {
   content: "\f067";
+}
+
+
+	/* revisons
+	------------------------- */
+
+#revisions {
+	list-style:none;
+}
+
+#revisions li {
+	border-bottom:1px solid #ddd;
+	line-height:auto;
+	margin-bottom: 10px;
+	overflow: hidden;
+	padding-bottom: 10px;
+}
+
+#revisions li:last-child {
+	border-bottom:none;
+	margin-bottom: 0;
+	padding-bottom: 0;
+}
+
+#revisions a {
+	opacity: 0.5;
+	-moz-opacity: 0.5;
+	filter:alpha(opacity=5);
+}
+
+#revisions a.active,
+#revisions a:hover {
+	opacity: 1;
+	-moz-opacity: 1;
+	filter:alpha(opacity=1);
+}
+
+
+#revisions a:hover {
+	color: #005580;
+}
+
+#revisions .label {
+	float: right
+}
+
+.revision-id {
+	color: #ccc;
+	float: left;
+	font-size:38px;
+	font-weight:bold;
+	line-height:39px;
+	margin-right: 10px;
+}
+
+.revision-details {
+	float: left;
+	line-height:15px;
+	margin-right: 10px;
 }
 
 /*

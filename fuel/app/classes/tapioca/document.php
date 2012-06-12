@@ -597,7 +597,10 @@ class Document
 			}
 			else if($set_out_of_date) // set other revision "Out of date"
 			{
-				$value['status'] = -1;
+				if($value['locale'] == static::$locale)
+				{
+					$value['status'] = -1;
+				}
 			}
 		}
 
@@ -609,12 +612,13 @@ class Document
 		// and define the revision as "Active"
 		if($set_out_of_date)
 		{
-			$this->summary['revisions']['active'] = $revision;
+			$this->summary['revisions']['active'][static::$locale] = $revision;
 
 			$update_no_active = static::$db
 									->where(array(
 										'_ref'            => self::$ref,
 										'_about.revision' => array('$ne' => $revision),
+										'_about.locale'   => static::$locale,
 										'_summary'        => array( '$exists' => false )
 									))
 									->update_all(static::$collection, array(

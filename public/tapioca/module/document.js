@@ -64,15 +64,20 @@ define([
 	{
 		highlight(slug, namespace);
 
+		var params = Backbone.history.getQueryParameters();
+
 		if(!_.isUndefined(params.locale))
 		{
-			tapioca.apps[slug].locale_working = locale = params.locale;
+			tapioca.apps[slug].locale.working = locale = {
+				key : params.locale,
+				label: tapioca.apps[slug].locale.list[params.locale]
+			};
 		}
 		else
 		{
-			locale = tapioca.apps[slug].locale_working;
+			locale = tapioca.apps[slug].locale.working;
 		}
-
+		
 		var collectionDetails = tapioca.apps[slug].models.get(namespace),
 			doc 			  = new Documents.Model({_ref: ref}, {appSlug: slug, namespace: namespace}),
 			fetchOptions      = $.extend({ mode: 'edit'}, params);
@@ -85,9 +90,7 @@ define([
 								model: doc,
 								schema: collectionDetails,
 								appSlug: slug,
-								namespace: namespace,
-								locale: tapioca.apps[slug].locale_working,
-								locales: tapioca.apps[slug].locales
+								namespace: namespace
 							});
 
 				doc.fetch({ data: $.param(fetchOptions) });
@@ -95,19 +98,23 @@ define([
 		});
 	});
 
-	mediator.subscribe('callDocumentNew', function(slug, namespace, params)
+	mediator.subscribe('callDocumentNew', function(slug, namespace)
 	{
 		highlight(slug, namespace);
 
-		var collectionDetails = tapioca.apps[slug].models.get(namespace);
+		var collectionDetails = tapioca.apps[slug].models.get(namespace),
+			params            = Backbone.history.getQueryParameters();
 
 		if(!_.isUndefined(params.locale))
 		{
-			tapioca.apps[slug].locale_working = locale = params.locale;
+			tapioca.apps[slug].locale.working = locale = {
+				key : params.locale,
+				label: tapioca.apps[slug].locale.list[params.locale]
+			};
 		}
 		else
 		{
-			locale = tapioca.apps[slug].locale_working;
+			locale = tapioca.apps[slug].locale.working;
 		}
 
 		collectionDetails.fetch({
@@ -119,9 +126,7 @@ define([
 								schema: collectionDetails,
 								appSlug: slug, 
 								namespace: namespace,
-								forceRender: true,
-								locale: tapioca.apps[slug].locale_working,
-								locales: tapioca.apps[slug].locales
+								forceRender: true
 							});
 			}
 		});

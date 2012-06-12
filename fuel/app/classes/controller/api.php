@@ -8,12 +8,15 @@ class Controller_Api extends Controller_Rest
 	protected static $user    = null;
 	protected static $group   = null;
 	protected static $debug   = null;
+	protected static $apiKey  = false;
 
 	public function before()
 	{
 		parent::before();
 
-		if (!Auth::check())
+		static::$apiKey = Input::get('apikey', false);
+
+		if (!Auth::check() && !static::$apiKey)
 		{
 			self::restricted();
 		}
@@ -43,7 +46,7 @@ class Controller_Api extends Controller_Rest
 				static::error($e->getMessage());
 			}
 
-			if($valid)
+			if($valid && !static::$apiKey)
 			{
 				// Check if user is a member of the group
 				$user_email = self::$user->get('email');
@@ -80,6 +83,7 @@ class Controller_Api extends Controller_Rest
 
 	public function after($response)
 	{
+		$this->response->set_header('Content-Type', 'application/json; charset=UTF-8');
 		$this->response(self::$data, self::$status);
 
 		return $this->response;

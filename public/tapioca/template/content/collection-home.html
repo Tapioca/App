@@ -1,15 +1,14 @@
 				{{#header}}
 				<div class="app-content-header">
 					<h2 class="page-name">{{name}} </h2>
-					<div class="dropdown btn-group" id="locale-switcher">
+					<!--div class="dropdown btn-group" id="locale-switcher"-->
+					<div class="dropdown btn-group" id="locale-switch">
 						<a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
-							{{locale}}
+							{{../locale.working.label}}
 							<b class="caret"></b>
 						</a>
 						<ul class="dropdown-menu">
-						{{#each locales}}
-							<li><a href="{{../../baseUri}}?locale={{key}}">{{label}}</a></li>
-						{{/each}}
+							{{{localeSwitcher ../locale.list ../baseUri}}}
 						</ul>
 					</div>
 					<div class="btn-group">

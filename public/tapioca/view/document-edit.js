@@ -6,10 +6,11 @@ define([
 	'text!template/content/document-edit.html',
 	'template/helpers/isSelected',
 	'template/helpers/atLeastOnce',
+	'template/helpers/localeSwitcher',
 	'underscore.string',
 	'form2js',
 	'dropdown'
-], function(tapioca, Handlebars, mediator, vContent, tContent, isSelected, atLeastOnce, _s, form2js, dropdown)
+], function(tapioca, Handlebars, mediator, vContent, tContent, isSelected, atLeastOnce, localeSwitcher, _s, form2js, dropdown)
 {
 	var view = vContent.extend(
 	{
@@ -23,9 +24,8 @@ define([
 			this.structure  = this.schema.structure;
 			this.appSlug    = options.appSlug;
 			this.namespace  = options.namespace;
-			this.locales    = options.locales;
-			this.locale     = options.locale;
 
+			this.locale     = tapioca.apps[this.appSlug].locale;
 			this.baseUri    = tapioca.config.base_uri+this.appSlug+'/document/'+this.namespace;
 
 			_.bindAll(this, 'render');
@@ -333,25 +333,34 @@ define([
 
 			if(!_.isNull(this.model.get('_ref')))
 			{
+				var docTitle = 'Edit document';
 				this.baseUri = this.baseUri+'/'+this.model.get('_ref')
 			}
 			else
 			{
+				var docTitle = 'Compose new document';
 				this.baseUri = this.baseUri+'/new'
 			}
 
 			var html     = template({
+								docTitle: docTitle,
 								model: this.model.toJSON(),
 								baseUri: this.baseUri,
-								locale: this.locale,
-								locales: this.locales
+								locale: this.locale
 							});
-			
+
 			this.html(html, 'app-form');
 			
 			this.$el.find('.dropdown-toggle').dropdown();
 
+//			this.$el.find('input[name="title"]').keyup(this.slugiffy);
+
 			return this;
+		},
+
+		slugiffy: function(event)
+		{
+console.log(event)
 		},
 
 		onClose: function()
@@ -509,7 +518,7 @@ define([
 				str += '<li>';
 			}
 
-			str += '<input type="'+item.type+'" name="' + getName(item, prefix) + '" value="{{' + id + '}}">';
+			str += '<input type="'+item.type+'" name="' + getName(item, prefix) + '" value="{{' + id + '}}" class="span7">';
 
 			if(item.repeat)
 			{
@@ -531,7 +540,7 @@ define([
 
 		fields.textarea = function(item, prefix)
 		{
-			formHtml += '<textarea class="input-xlarge" name="' + getName(item, prefix) + '" rows="3">{{' + item.id + '}}</textarea>';
+			formHtml += '<textarea class="span7" name="' + getName(item, prefix) + '" rows="3">{{' + item.id + '}}</textarea>';
 		};
 
 		fields.select = function(item, prefix)

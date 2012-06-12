@@ -5,8 +5,8 @@ define('template/helpers/displayStatus', ['Handlebars', 'tapioca'], function ( H
 		var value = '',
 			label,
 			status = -1,
-			workingLocale = tapioca.apps[slug].locale_working;
-			
+			workingLocale = tapioca.apps[slug].locale.working.key;
+
 			if(!_.isUndefined(revisions.active[workingLocale]))
 			{
 				var active = (revisions.active[workingLocale] - 1);

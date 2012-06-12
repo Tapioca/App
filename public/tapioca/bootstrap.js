@@ -86,7 +86,29 @@ require([
 				tapioca.apps[slug].documents    = {};
 				tapioca.apps[slug].models       = new Collections.Collection(slug);
 				tapioca.apps[slug].models.model = Collections.Model;
-				tapioca.apps[slug].locales      = tapioca.config.user.groups[i].locales;
+				tapioca.apps[slug].locale       = {
+					list: {}
+				};
+
+				for(var j = -1, nbLocales = tapioca.config.user.groups[i].locales.length; ++j < nbLocales;)
+				{
+					var locale = tapioca.config.user.groups[i].locales[j];
+					tapioca.apps[slug].locale.list[locale.key] = locale.label;
+
+					if(!_.isUndefined(locale.default) && locale.default == true)
+					{
+						var obj = {
+							key: locale.key,
+							label: locale.label
+						};
+
+						tapioca.apps[slug].locale.working = obj;
+						tapioca.apps[slug].locale.default = obj;
+					}
+				}
+
+/*
+//				tapioca.apps[slug].locale.list  = tapioca.config.user.groups[i].locales;
 
 				for(var j = -1, nbLocales = tapioca.config.user.groups[i].locales.length; ++j < nbLocales;)
 				{
@@ -94,12 +116,15 @@ require([
 
 					if(!_.isUndefined(locale.default) && locale.default == true)
 					{
-						tapioca.apps[slug].locale_working = locale.key;
-						tapioca.apps[slug].locale_default = locale.key;
+						tapioca.apps[slug].locale.working = locale.key;
+						tapioca.apps[slug].locale.default = {
+							key: locale.key,
+							label: locale.label
+						};
 						break;
 					}
 				}
-
+*/
 				new vAppCollections({
 					el: $('#app-nav-collections-'+slug),
 					model: tapioca.apps[slug].models, 
@@ -154,9 +179,7 @@ require([
 		{
 			if(this.instance)
 			{
-				var params = Backbone.history.getQueryParameters();
-
-				mediator.publish('callCollectionHome', appslug, namespace, params);
+				mediator.publish('callCollectionHome', appslug, namespace);
 			}
 			else
 			{
@@ -198,9 +221,7 @@ require([
 		{
 			if(this.instance)
 			{
-				var params = Backbone.history.getQueryParameters();
-
-				mediator.publish('callDocumentRef', appslug, namespace, ref, params);
+				mediator.publish('callDocumentRef', appslug, namespace, ref);
 			}
 			else
 			{
@@ -213,9 +234,7 @@ require([
 		{
 			if(this.instance)
 			{
-				var params = Backbone.history.getQueryParameters();
-
-				mediator.publish('callDocumentNew', appslug, namespace, params);
+				mediator.publish('callDocumentNew', appslug, namespace);
 			}
 			else
 			{

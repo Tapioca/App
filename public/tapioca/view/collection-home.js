@@ -14,9 +14,8 @@ define([
 			this.namespace = options.namespace;
 
 			//
-			this.header.locales  = options.locales;
-			this.header.locale   = options.locale;
-			this.baseUri         = tapioca.config.base_uri+this.appslug+'/collections/'+this.namespace;
+			this.locale     = tapioca.apps[this.appslug].locale;
+			this.baseUri    = tapioca.config.base_uri+this.appslug+'/collections/'+this.namespace;
 
 			this.collection.bind('reset', this.render, this);
 		},
@@ -29,13 +28,14 @@ define([
 			{
 				this.header.thead.push(this.header.summary[i]);
 			}
-
+			
 			var data = {
 				header: this.header,
 				appslug: this.appslug,
 				namespace: this.namespace,
 				editable: this.header.editable,
 				baseUri: this.baseUri,
+				locale: this.locale,
 				documents: this.collection.toJSON()
 			};
 

@@ -4,22 +4,53 @@
 						<div class="row-fluid">
 							<div class="span8">
 								<fieldset>
-									<legend>New document</legend>
+									<legend>{{docTitle}}</legend>
 									<div class="dropdown btn-group" id="locale-switch">
 										<a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
-											{{locale}}
+											{{locale.working.label}}
 											<b class="caret"></b>
 										</a>
 										<ul class="dropdown-menu pull-right">
-										{{#each locales}}
-											<li><a href="{{../baseUri}}?locale={{key}}" data-locale="{{key}}">{{label}}</a></li>
-										{{/each}}
+										{{{localeSwitcher locale.list baseUri}}}
 										</ul>
 									</div>
 
 								{{> formStr}}
 							</div>
-							<div class="span4">Level 2</div>
+							<div class="span4">
+								<ul class="well" id="revisions">
+									<li>
+										<a href="#" class="active">
+											<span class="revision-id">#8</span>
+											<span class="revision-details">
+												Monday 11th june 2012<br>
+												by Michael Lefebvre
+											</span>
+											<span class="label label-success">Plublished</span>
+										</a>
+									</li>
+									<li>
+										<a href="#">
+											<span class="revision-id">#7</span>
+											<span class="revision-details">
+												Monday 11th june 2012<br>
+												by Michael Lefebvre
+											</span>
+											<span class="label label-inverse">out of date</span>
+										</a>
+									</li>
+									<li>
+										<a href="#">
+											<span class="revision-id">#6</span>
+											<span class="revision-details">
+												Monday 11th june 2012<br>
+												by Michael Lefebvre
+											</span>
+											<span class="label label-inverse">out of date</span>
+										</a>
+									</li>
+								</ul><!-- /#revisions -->
+							</div><!-- /.span4 -->
 						</div>
 					</form>
 				</div><!-- /.pane-content -->

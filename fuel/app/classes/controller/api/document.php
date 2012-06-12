@@ -146,7 +146,7 @@ class Controller_Api_Document extends Controller_Api
 	{
 		if(self::$granted)
 		{
-			$document     = Tapioca::document(self::$group, static::$collection, static::$ref);
+			$document     = Tapioca::document(self::$group, static::$collection, static::$ref, static::$locale);
 
 			if(is_null(static::$doc_status))
 			{

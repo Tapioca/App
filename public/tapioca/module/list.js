@@ -34,16 +34,20 @@ define([
 		$('#apps-nav').find('a.app-nav-header[data-app-slug="'+appslug+'"]').trigger('click');
 	}
 
-	mediator.subscribe('callCollectionHome', function(appslug, namespace, params)
+	mediator.subscribe('callCollectionHome', function(appslug, namespace)
 	{
 		var model     = tapioca.apps[appslug].models.get(namespace),
-			documents = new List.Collection(appslug, namespace);
+			documents = new List.Collection(appslug, namespace),
+			params    = Backbone.history.getQueryParameters();
 
 		highlight(appslug, namespace);
 
 		if(!_.isUndefined(params.locale))
 		{
-			tapioca.apps[appslug].locale_working = params.locale;
+			tapioca.apps[appslug].locale.working = locale = {
+				key : params.locale,
+				label: tapioca.apps[appslug].locale.list[params.locale]
+			};
 		}
 
 		if(tapioca.view != null) tapioca.view.close();
@@ -51,9 +55,7 @@ define([
 						collection: documents,
 						header: model.toJSON(),
 						appslug: appslug,
-						namespace: namespace,
-						locale: tapioca.apps[appslug].locale_working,
-						locales: tapioca.apps[appslug].locales
+						namespace: namespace
 					});
 
 		documents.fetch({ data: $.param({ mode: 'list'}) })
