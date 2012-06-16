@@ -737,6 +737,7 @@ header#tapp {
 
 #revisions {
 	list-style:none;
+	margin: 0 5px 9px;
 }
 
 #revisions li {
@@ -754,16 +755,10 @@ header#tapp {
 }
 
 #revisions a {
-	opacity: 0.5;
-	-moz-opacity: 0.5;
-	filter:alpha(opacity=5);
 }
 
 #revisions a.active,
 #revisions a:hover {
-	opacity: 1;
-	-moz-opacity: 1;
-	filter:alpha(opacity=1);
 }
 
 
@@ -778,9 +773,9 @@ header#tapp {
 .revision-id {
 	color: #ccc;
 	float: left;
-	font-size:38px;
+	font-size:18px;
 	font-weight:bold;
-	line-height:39px;
+	line-height:19px;
 	margin-right: 10px;
 }
 
@@ -790,6 +785,15 @@ header#tapp {
 	margin-right: 10px;
 }
 
+#revision-active.well {
+	min-height:35px;
+	padding: 10px 5px;
+}
+
+#revision-active .revision-id {
+	font-size:38px;
+	line-height:32px;
+}
 /*
 #app-content .form-footer p {
 	margin-bottom: 0;

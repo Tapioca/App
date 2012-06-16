@@ -68,14 +68,15 @@ define([
 
 		if(!_.isUndefined(params.locale))
 		{
-			tapioca.apps[slug].locale.working = locale = {
+			locale = params.locale;
+			tapioca.apps[slug].locale.working = {
 				key : params.locale,
 				label: tapioca.apps[slug].locale.list[params.locale]
 			};
 		}
 		else
 		{
-			locale = tapioca.apps[slug].locale.working;
+			locale = tapioca.apps[slug].locale.working.key;
 		}
 		
 		var collectionDetails = tapioca.apps[slug].models.get(namespace),

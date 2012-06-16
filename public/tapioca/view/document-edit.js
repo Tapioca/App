@@ -288,6 +288,9 @@ define([
 				++iterator;
 			}
 
+			// set unload warming
+			this.change();
+
 			return str;
 		},
 
