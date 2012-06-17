@@ -4,13 +4,15 @@ define([
 	'aura/mediator',
 	'view/content',
 	'text!template/content/document-edit.html',
+	'hbs!template/content/document-revision',
 	'template/helpers/isSelected',
 	'template/helpers/atLeastOnce',
 	'template/helpers/localeSwitcher',
 	'underscore.string',
 	'form2js',
-	'dropdown'
-], function(tapioca, Handlebars, mediator, vContent, tContent, isSelected, atLeastOnce, localeSwitcher, _s, form2js, dropdown)
+	'dropdown',
+	'template/helpers/setStatus'
+], function(tapioca, Handlebars, mediator, vContent, tContent, tRevisions, isSelected, atLeastOnce, localeSwitcher, _s, form2js, dropdown, setStatus)
 {
 	var view = vContent.extend(
 	{
@@ -20,19 +22,21 @@ define([
 
 		initialize: function(options)
 		{
+			var self     = this;
+
 			this.schema     = options.schema.toJSON();
 			this.structure  = this.schema.structure;
 			this.appSlug    = options.appSlug;
 			this.namespace  = options.namespace;
+			this.ref        = options.ref;
 
 			this.locale     = tapioca.apps[this.appSlug].locale;
-			this.baseUri    = tapioca.config.base_uri+this.appSlug+'/document/'+this.namespace;
+			this.rootUri    = tapioca.config.base_uri+this.appSlug+'/document/'+this.namespace;
+			this.baseUri    = (!_.isNull(this.ref)) ? this.rootUri+'/'+options.ref : this.rootUri+'/new';
 
-			_.bindAll(this, 'render');
-			this.model.on('change', this.render);
+			_.bindAll(this, 'preRender');
+			this.model.on('change', this.preRender);
 			//this.model.bind('reset', this.render, this);
-
-			var self     = this;
 
 			Handlebars.registerHelper('_incCounter', function(options)
 			{
@@ -56,21 +60,19 @@ define([
 
 			if(options.forceRender)
 			{
-				this.render();
+				this.preRender();
 			}
 		},
 
 		events:
 		{
 			'change :input'                                                      : 'change',
-//			'click .dropdown-menu a'                                             : 'setLocal',
 			'click #tapioca-document-form-save'                                  : 'save',
 			'click .array-repeat-trigger'                                        : 'addNode',
 			'click .input-repeat-list li:last-child .input-repeat-trigger'       : 'addInput',
 			'click .input-repeat-list li:not(:last-child) .input-repeat-trigger' : 'removeInput',
 			'click .file-list-trigger'                                           : 'fileList',
 			'document:addFile'                                                   : 'addFile'
-//			'click .delete': 'delete'
 		},
 
 		change: function()
@@ -89,27 +91,24 @@ define([
 			tapioca.beforeunload = false;
 
 			var formData = form2js('tapioca-document-form', '.'),
-				self     = this;
+				self     = this,
+				isNew    = this.model.isNew();
 
 			this.model.save(formData, {
 				success:function (model, response)
 				{
-					var route = tapioca.app.router.reverse('documentRef'),
-						href  = tapioca.app.router.createUri(route, [self.appSlug, self.namespace, self.model.get('_ref')]);
+					if(isNew)
+					{
+						var ref   = self.model.get('_ref');
+							route = tapioca.app.router.reverse('documentRef'),
+							href  = tapioca.app.router.createUri(route, [self.appSlug, self.namespace, ref]);
 
-					Backbone.history.navigate(href, true);
+						Backbone.history.navigate(href, true);
+					}
 				}
 			});
 
 			return false;
-		},
-
-		setLocal: function(event)
-		{
-			var $target = $(event.target),
-				locale  = $target.attr('data-locale');
-
-
 		},
 
 		walk: function(_structure, _prefix, _previous_key)
@@ -321,39 +320,63 @@ define([
  			return ret;
 		},
 
-		render: function(eventName)
+		preRender: function()
+		{
+			if(!_.isNull(this.ref))
+			{
+				var model     = this.model.toJSON();
+				var revisions = model._about.revisions			
+			}
+			else
+			{
+				var revisions = {};
+			}
+
+			this.html(tContent, 'app-form');
+			this.revisionsRender(revisions);
+			this.formRender();
+		},
+
+		revisionsRender: function(revisions)
+		{
+			var html  = tRevisions({
+								baseUri: this.baseUri,
+								revisions: revisions,
+								ref: this.ref,
+								appslug: this.appSlug,
+								namespace: this.namespace
+							});
+			
+			$('#revisions').html(html);
+
+			var self = this;
+			
+			this.$el.find('ul[data-type="set-status"] a').setStatus(function(data)
+			{
+				self.revisionsRender(data.revisions);
+			});
+		},
+
+		formRender: function(eventName)
 		{
 			this.formStr = new fieldsFactory();
 
 			this.walk(this.structure, '', '');
 
-			var formStr  = this.formStr.get(),
-				template = Handlebars.compile(tContent);
-	
+			var formStr  = this.formStr.get();
 				formStr += '{{/model}}';				
-	
-				Handlebars.registerPartial('formStr', formStr);
 
-			if(!_.isNull(this.model.get('_ref')))
-			{
-				var docTitle = 'Edit document';
-				this.baseUri = this.baseUri+'/'+this.model.get('_ref')
-			}
-			else
-			{
-				var docTitle = 'Compose new document';
-				this.baseUri = this.baseUri+'/new'
-			}
-
+			var template = Handlebars.compile(formStr);
+			var docTitle = (!_.isNull(this.model.get('_ref'))) ? 'Edit document' : 'Compose new document';
 			var html     = template({
 								docTitle: docTitle,
 								model: this.model.toJSON(),
 								baseUri: this.baseUri,
 								locale: this.locale
 							});
+			$('#form-holder').html(html);
+			//this.html(html, 'app-form');
 
-			this.html(html, 'app-form');
-			
 			this.$el.find('.dropdown-toggle').dropdown();
 
 //			this.$el.find('input[name="title"]').keyup(this.slugiffy);
@@ -368,9 +391,9 @@ console.log(event)
 
 		onClose: function()
 		{
-			//tapioca.beforeunload = false;
+			tapioca.beforeunload = false;
 			//_.bindAll(this, 'render');
-			//this.model.unbind('change', this.render);
+			this.model.unbind('change', this.render);
 			//this.model.unbind('reset', this.render);
 		}
 	});
@@ -378,7 +401,17 @@ console.log(event)
 
 	var fieldsFactory = function()
 	{
-		var formHtml =  '{{#model}}',
+		var formHtml =  '<fieldset>\
+							<legend>{{docTitle}}</legend>\
+							<div class="dropdown btn-group" id="locale-switch">\
+								<a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">\
+									{{locale.working.label}}\
+									<b class="caret"></b>\
+								</a>\
+								<ul class="dropdown-menu pull-right">\
+								{{{localeSwitcher locale.list baseUri}}}\
+								</ul>\
+							</div>{{#model}}',
 			firstFieldset =  '</fieldset>',
 			firstFieldsetClose = false,
 			inc = 0;

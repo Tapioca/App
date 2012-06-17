@@ -2,53 +2,11 @@
 					<form id="tapioca-document-form" class="form-horizontal">
 						<div id="file-popin"></div>
 						<div class="row-fluid">
-							<div class="span8">
-								<fieldset>
-									<legend>{{docTitle}}</legend>
-									<div class="dropdown btn-group" id="locale-switch">
-										<a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
-											{{locale.working.label}}
-											<b class="caret"></b>
-										</a>
-										<ul class="dropdown-menu pull-right">
-										{{{localeSwitcher locale.list baseUri}}}
-										</ul>
-									</div>
-
-								{{> formStr}}
+							<div class="span8" id="form-holder">
+								
 							</div>
 							<div class="span4">
-								<ul class="well" id="revisions">
-									<li>
-										<a href="#" class="active">
-											<span class="revision-id">#8</span>
-											<span class="revision-details">
-												Monday 11th june 2012<br>
-												by Michael Lefebvre
-											</span>
-											<span class="label label-success">Plublished</span>
-										</a>
-									</li>
-									<li>
-										<a href="#">
-											<span class="revision-id">#7</span>
-											<span class="revision-details">
-												Monday 11th june 2012<br>
-												by Michael Lefebvre
-											</span>
-											<span class="label label-inverse">out of date</span>
-										</a>
-									</li>
-									<li>
-										<a href="#">
-											<span class="revision-id">#6</span>
-											<span class="revision-details">
-												Monday 11th june 2012<br>
-												by Michael Lefebvre
-											</span>
-											<span class="label label-inverse">out of date</span>
-										</a>
-									</li>
+								<ul id="revisions">
 								</ul><!-- /#revisions -->
 							</div><!-- /.span4 -->
 						</div>

@@ -42,7 +42,7 @@ define([
 				url += '/' + this.get('_ref');
 			}
 
-			url += '?locale='+locale;
+			url += '?locale='+locale+'&mode=edit';
 
 			return url; //this.urlRoot + '/' + this.appSlug + '/document/' + this.namespace + '/' + this.get('_ref');
 		},
@@ -81,7 +81,7 @@ define([
 		
 		var collectionDetails = tapioca.apps[slug].models.get(namespace),
 			doc 			  = new Documents.Model({_ref: ref}, {appSlug: slug, namespace: namespace}),
-			fetchOptions      = $.extend({ mode: 'edit'}, params);
+			fetchOptions      = $.extend({}, params);
 
 		collectionDetails.fetch({
 			success: function(model, response)
@@ -91,7 +91,8 @@ define([
 								model: doc,
 								schema: collectionDetails,
 								appSlug: slug,
-								namespace: namespace
+								namespace: namespace,
+								ref: ref
 							});
 
 				doc.fetch({ data: $.param(fetchOptions) });
@@ -115,7 +116,7 @@ define([
 		}
 		else
 		{
-			locale = tapioca.apps[slug].locale.working;
+			locale = tapioca.apps[slug].locale.working.key;
 		}
 
 		collectionDetails.fetch({
@@ -127,7 +128,8 @@ define([
 								schema: collectionDetails,
 								appSlug: slug, 
 								namespace: namespace,
-								forceRender: true
+								forceRender: true,
+								ref: null
 							});
 			}
 		});

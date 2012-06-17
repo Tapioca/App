@@ -320,7 +320,7 @@ class Document
 		{
 			if($mode == 'edit')
 			{
-				$result[0]['_about']['revisions'] = $this->summary['revisions'];
+				$result[0]['_about']['revisions'] = $this->set_locale_revision($revision);
 			}
 
 			// return individual document
@@ -418,7 +418,7 @@ class Document
 			$this->update($document, $summary, $user_data);
 		}
 
-		return $this->get(static::$last_revision);
+		return $this->get(static::$last_revision, 'edit');
 	}
 
 	private function create($document, $summary, $user)
@@ -645,7 +645,7 @@ class Document
 							))
 							->update(static::$collection, $this->summary);
 
-		return true;
+		return $this->set_locale_revision($revision);
 	}
 
 	/**
@@ -709,6 +709,30 @@ class Document
 		}
 
 		return $summary;
+	}
+
+	private function set_locale_revision($revision = null)
+	{
+		$localeRevision = array();
+		$revisionActive = (!is_null($revision)) ? $revision : self::$active;
+		$totalRevision  = (count($this->summary['revisions']['list']) - 1);
+		$revisions      = $this->summary['revisions']['list'];
+
+		for($r = $totalRevision; $r >= 0; --$r)
+		{
+			if($revisions[$r]['locale'] == static::$locale)
+			{
+				if($revisions[$r]['revision'] == $revisionActive)
+				{
+					$revisions[$r]['active'] = true;
+				}
+				$revisions[$r]['date'] = $revisions[$r]['date']->sec;
+
+				$localeRevision[]      = $revisions[$r];
+			}
+		}
+
+		return $localeRevision;
 	}
 
 	/**

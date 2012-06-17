@@ -737,23 +737,23 @@ header#tapp {
 
 #revisions {
 	list-style:none;
-	margin: 0 5px 9px;
+	margin: 0 0 9px;
 }
 
-#revisions li {
+#revisions li.revision {
 	border-bottom:1px solid #ddd;
 	line-height:auto;
-	margin-bottom: 10px;
-	overflow: hidden;
-	padding-bottom: 10px;
+	min-height:35px;
+	margin:0 5px 10px;
+	padding: 0 0 10px 5px;
 }
 
-#revisions li:last-child {
+#revisions li.revision:last-child {
 	border-bottom:none;
 	margin-bottom: 0;
 	padding-bottom: 0;
 }
-
+/*
 #revisions a {
 }
 
@@ -765,8 +765,9 @@ header#tapp {
 #revisions a:hover {
 	color: #005580;
 }
-
-#revisions .label {
+*/
+#revisions .label,
+#revisions .dropdown {
 	float: right
 }
 
@@ -786,6 +787,7 @@ header#tapp {
 }
 
 #revision-active.well {
+	margin: 0 0 10px;
 	min-height:35px;
 	padding: 10px 5px;
 }

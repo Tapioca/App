@@ -2,8 +2,9 @@ define([
 	'tapioca',
 	'view/content',
 	'hbs!template/content/collection-home',
-	'dropdown'
-], function(tapioca, vContent, tContent, dropdown)
+	'dropdown',
+	'template/helpers/setStatus'
+], function(tapioca, vContent, tContent, dropdown, setStatus)
 {
 	var view = vContent.extend(
 	{
@@ -44,6 +45,7 @@ define([
 			this.html(_html);
 
 			this.$el.find('.dropdown-toggle').dropdown();
+			this.$el.find('ul[data-type="set-status"] a').setStatus();
 
 			return this;
 		},

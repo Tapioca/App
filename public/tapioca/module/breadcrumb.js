@@ -47,6 +47,50 @@ define([
 			return breadcrumb;
 		};
 
+	mediator.subscribe('callDocumentNew', function(appslug, namespace)
+	{
+		var breadcrumb = makeObject(appslug);
+		var model      = app.models.get(namespace);
+		var routeHome  = tapioca.app.router.reverse('collectionHome');
+		var routeEdit  = tapioca.app.router.reverse('documentNew');
+		
+		breadcrumb.push({
+				url: tapioca.app.router.createUri(routeHome, [appslug, namespace]),
+				name: model.get('name'),
+				is_active: false
+			});
+
+		breadcrumb.push({
+				url: tapioca.app.router.createUri(routeEdit, [appslug, namespace]),
+				name: 'Compose new document',
+				is_active: true
+			});
+
+		build(breadcrumb);
+	});
+
+	mediator.subscribe('callDocumentRef', function(appslug, namespace, ref)
+	{
+		var breadcrumb = makeObject(appslug);
+		var model      = app.models.get(namespace);
+		var routeHome  = tapioca.app.router.reverse('collectionHome');
+		var routeEdit  = tapioca.app.router.reverse('documentRef');
+		
+		breadcrumb.push({
+				url: tapioca.app.router.createUri(routeHome, [appslug, namespace]),
+				name: model.get('name'),
+				is_active: false
+			});
+
+		breadcrumb.push({
+				url: tapioca.app.router.createUri(routeEdit, [appslug, namespace, ref]),
+				name: 'Edit document',
+				is_active: true
+			});
+
+		build(breadcrumb);
+	});
+
 	mediator.subscribe('callCollectionHome', function(appslug, namespace)
 	{
 		var breadcrumb = makeObject(appslug);

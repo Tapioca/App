@@ -2,7 +2,7 @@ define('template/helpers/displayDate', ['Handlebars', 'moment'], function ( Hand
 {
 	function displayDate ( date, options )
 	{
-		return moment((date*1000)).format("MMM Do 'YY");
+		return moment((date*1000)).format('D MMM YYYY, h:m');
 	}
 
 	Handlebars.registerHelper( 'displayDate', displayDate );

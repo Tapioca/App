@@ -29,4 +29,12 @@ return array(
 		'user_account' => 'Account',
 		'user_logout' => 'Logout'
 	),
+
+	'doc_status' => array(
+		'not_translated' => 'not translated',
+		'out_of_date'    => 'out of date',
+		'offline'        => 'offline',
+		'draft'          => 'draft',
+		'published'      => 'published'
+	)
 );

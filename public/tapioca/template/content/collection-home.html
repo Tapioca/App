@@ -17,14 +17,25 @@
 							Ajouter
 						</a>
 						{{#editable}}
-						<a class="btn" href="/app/{{app_id}}/collections/{{namespace}}/edit">
-							<i class="icon-edit"></i>
-							Editer
+						<a href="#" data-toggle="dropdown" class="btn dropdown-toggle">
+							<i class="icon-cogs"></i>
+							<span class="caret"></span>
 						</a>
-						<a class="btn btn-danger" href="/app/{{app_id}}/collections/{{namespace}}/empty">
-							<i class="icon-trash"></i>
-							Vider
-						</a>
+						<ul class="dropdown-menu pull-right">
+							<li>
+								<a href="/app/{{app_id}}/collections/{{namespace}}/edit">
+									<i class="icon-edit"></i>
+									Editer
+								</a>
+							</li>
+							<li class="divider"></li>
+							<li>
+								<a href="/app/{{app_id}}/collections/{{namespace}}/empty">
+									<i class="icon-trash"></i>
+									Vider
+								</a>
+							</li>
+						</ul>
 						{{/editable}}
 					</div>
 				</div><!-- /#app-content-header -->
@@ -45,24 +56,19 @@
 							<tr>
 								{{{docSummary data _ref ../header.app_id ../namespace}}}
 								<td> 
-									{{{displayStatus revisions ../appslug}}}
+									{{{displayStatus _ref revisions ../appslug ../namespace}}}
 								</td>
 								<td>
 									<div class="btn-group float-right">
-										<a href="#" class="btn btn-mini">
+										<a href="/app/{{../appslug}}/document/{{../namespace}}/{{_ref}}" class="btn btn-mini">
 											<i class="icon-pencil"></i>
 											Edit
 										</a>
-										{{#header.editable}}
-										<a href="#" data-toggle="dropdown" class="btn dropdown-toggle btn-mini">
-											<i class="icon-cogs"></i>
-											<span class="caret"></span>
+										{{#../header.editable}}
+										<a href="#" class="btn btn-mini btn-danger">
+											<i class="icon-trash"></i>
 										</a>
-										<ul class="dropdown-menu pull-right">
-											<li><a href="#"><i class="icon-ban-circle"></i> Ban</a></li>
-											<li><a href="#"><i class="icon-key"></i> Make admin</a></li>
-										</ul>
-										{{/header.editable}}
+										{{/../header.editable}}
 									</div>
 								</td>
 							</tr>

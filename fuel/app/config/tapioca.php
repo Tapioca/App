@@ -27,16 +27,29 @@ return array(
 	 */
 	'status' => array(
 		array(
+			-2,
+			'not_translated',
+			'label-warning'
+		),
+		array(
 			-1,
-			'out_of_date'
+			'out_of_date',
+			''
+		),
+		array(
+			0,
+			'offline',
+			'label-important'
 		),
 		array(
 			1,
-			'draft'
+			'draft',
+			'label-info'
 		),
 		array(
 			100,
-			'published'
+			'published',
+			'label-success'
 		)
 	),
 

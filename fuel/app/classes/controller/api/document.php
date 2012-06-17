@@ -155,7 +155,7 @@ class Controller_Api_Document extends Controller_Api
 			}
 			else
 			{
-				self::$data   = array('status' => $document->update_status(static::$doc_status, static::$revision));
+				self::$data   = array('revisions' => $document->update_status(static::$doc_status, static::$revision));
 				self::$status = 200;
 			}
 		}

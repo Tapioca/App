@@ -30,17 +30,43 @@ class Controller_App_Index extends Controller_App
 			}
 		}
 
+		// status translation, to move somewhere else
+		$statusArray  = Config::get('tapioca.status');
+		$statusTech   = array();
+		$statusPublic = array();
+		foreach ($statusArray as $row)
+		{
+			$statusTech[$row[0]] = array(
+				'label' => __('tapioca.doc_status.'.$row[1]),
+				'class' => $row[2]
+			);
+
+			if($row[0] >= 0)
+			{
+				$statusPublic[] = array(
+					'value' => $row[0],
+					'label' => $row[1],
+					'class' => $row[2]
+				);
+			}
+		}
+
 		$app_settings = array(
 							'base_uri' => str_replace(Uri::base(), '/', Uri::create('app/')), //Uri::current().'/',
+							'api_uri'  => str_replace(Uri::base(), '/', Uri::create('api/')), //Uri::current().'/',
 							'user'     => array(
 								'id'     => static::$user->get('id'),
 								'groups' => $user_groups
 							),
 							'file'     => array(
 								'base_path' => Config::get('tapioca.upload.public')
+							),
+							'status'   => array(
+								'public' => $statusPublic,
+								'tech'   => $statusTech
 							)
 						);
-
+		
 		return View::forge('templates/app', array('app_settings' => $app_settings));
 	}
 }
