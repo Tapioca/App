@@ -335,10 +335,10 @@ class Files
 					$ret = $this->create($file, $user, $update);
 					
 					$file_api    = '/api/'.static::$group->get('slug').'/file/'.$file['filename'];
-					$file_url    = '/file/'.static::$group->get('slug').'/'.$file['category'].'/'.$file['filename'];
+					$file_url    = '/files/'.static::$group->get('slug').'/'.$file['category'].'/'.$file['filename'];
 					// preview
 					$preview_url = (strpos($file['mimetype'], 'image') !== false) ?
-							'/file/'.static::$group->get('slug').'/'.$file['category'].'/preview-'.$file['filename'] : '';
+							'/files/'.static::$group->get('slug').'/'.$file['category'].'/preview-'.$file['filename'] : '';
 
 					$result[] = array(
 						'name'          => $file['filename'],

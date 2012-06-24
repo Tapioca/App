@@ -753,19 +753,7 @@ header#tapp {
 	margin-bottom: 0;
 	padding-bottom: 0;
 }
-/*
-#revisions a {
-}
 
-#revisions a.active,
-#revisions a:hover {
-}
-
-
-#revisions a:hover {
-	color: #005580;
-}
-*/
 #revisions .label,
 #revisions .dropdown {
 	float: right
@@ -796,6 +784,44 @@ header#tapp {
 	font-size:38px;
 	line-height:32px;
 }
+
+
+.media-preview {
+	padding: 5px 0;
+	text-align: center;
+}
+
+.media-preview i {
+	font-size:80px;
+	margin: 0 auto;
+}
+
+	/* File/document ref pop-in
+	------------------------------ */
+
+#ref-popin {
+	background: #fff;
+	display: none;
+	width:auto;
+	z-index:9995;
+}
+
+#ref-popin.active {
+	display: block;
+	position: fixed;
+	top:5%;
+	left:5%;
+	right:5%;
+	bottom:5%;
+}
+
+#ref-popin-content {
+	top:20px;
+	left:10px;
+	right:10px;
+	bottom:10px;
+}
+
 /*
 #app-content .form-footer p {
 	margin-bottom: 0;

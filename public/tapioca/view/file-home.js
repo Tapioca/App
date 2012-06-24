@@ -1,10 +1,9 @@
 define([
-	'Handlebars',
+	'tapioca',
 	'view/content',
 	'view/file-list',
-	'hbs!template/content/file-home',
-	'fileupload'
-], function(Handlebars, vContent, vFileList, tContent, fileupload)
+	'hbs!template/content/file-home'
+], function(tapioca, vContent, vFileList, tContent)
 {
 	var view = vContent.extend(
 	{
@@ -14,6 +13,7 @@ define([
 		initialize: function(options)
 		{
 			this.basePath = options.publicStorage;
+			this.appSlug  = options.appSlug;
 
 			this.render();
 			
@@ -25,43 +25,14 @@ define([
 
 		render: function()
 		{
-			var _html = tContent({}),
+			var _html = tContent({
+					appSlug: this.appSlug,
+					rootUri: tapioca.config.root_uri
+				}),
 				self  = this;
 
 			this.html(_html);
 
-			$('#fileupload').fileupload({
-				dataType: 'json',
-/*
-				add: function (e, data) 
-				{
-					$.each(data.files, function (index, file)
-					{
-						console.log('Added file: ' + file.name);
-					});
-				},
-*/
-				done: function (e, data)
-				{
-					console.log(data.result)
-				},
-				progress: function (e, data)
-				{
-					var progress = parseInt(data.loaded / data.total * 100, 10);
-					console.log(progress)
-				},
-				always: function()
-				{
-					console.log('sync')
-					Backbone.sync('read', self.collection, {
-						success: function()
-						{
-							console.log('call render')
-							self.fileList.render();
-						}
-					});
-				}
-			});
 			
 			return this;
 		},

@@ -59,6 +59,7 @@ class Controller_Api extends Controller_Rest
 			}
 
 		}// if Auth
+
 	}
 
 	protected static function restricted()

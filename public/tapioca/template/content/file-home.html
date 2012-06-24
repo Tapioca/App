@@ -1,10 +1,14 @@
 
-				<div class="pane-content">
-					<form class="well form-inline">
-						<input id="fileupload" type="file" name="files[]" data-url="/api/happyend/file/" multiple>
-						<button type="submit" class="btn">Sign in</button>
-					</form>
-
+				<div class="app-content-header">
+					<h2 class="page-name">Library</h2>
+					<div class="btn-group">
+						<a class="btn" href="/app/{{appSlug}}/file/upload">
+							<i class="icon-plus"></i>
+							Ajouter
+						</a>
+					</div>
+				</div><!-- /#app-content-header -->
+				<div class="pane-content header-active">
 					<div id="files-list">
 						{{> template_content_file-list}}
 					</div><!-- /#files-list -->

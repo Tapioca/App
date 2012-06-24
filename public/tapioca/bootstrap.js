@@ -1,6 +1,6 @@
 require.config(
 {
-	'paths': 
+	paths: 
 	{
 		'text'                 : '../assets/library/require/text',
 		'order'                : '../assets/library/require/order',
@@ -14,10 +14,10 @@ require.config(
 		'Handlebars'           : '../assets/library/handlebar/Handlebars',
 		'moment'               : '../assets/library/moment/moment-wrap',
 		'form2js'              : '../assets/library/form2js/form2js-wrap',
-//		'bootbox'              : '../assets/library/bootstrap/bootbox.amd',
 		'bootbox'              : '../assets/library/bootstrap/bootbox.amd',
-		'fileupload'           : '../assets/library/fileupload/jquery.fileupload',
-		'jquery.ui.widget'     : '../assets/library/fileupload/jquery.ui.widget',
+		//'fileupload'           : '../assets/library/fileupload/jquery.fileupload',
+		//'fileupload-ui'        : '../assets/library/fileupload/jquery.fileupload-ui',
+		//'jquery.ui.widget'     : '../assets/library/fileupload/jquery.ui.widget',
 		'dropdown'             : '../assets/library/bootstrap/dropdown'
 	},
 	packages: 
@@ -25,6 +25,16 @@ require.config(
 		{
 			name: 'wtwui',
 			location: '../assets/library/wtwui'
+		},
+		{
+			name: 'fileupload',
+			location: '../assets/library/fileupload',
+			main: 'jquery.fileupload'
+		},
+		{
+			name: 'fileupload-ui',
+			location: '../assets/library/fileupload',
+			main: 'jquery.fileupload-ui'
 		}
 	],
 
@@ -155,6 +165,7 @@ require([
 			'app/:appslug/collections/:namespace'             : 'collectionHome',
 			'app/:appslug/document/:namespace/new'            : 'documentNew',
 			'app/:appslug/document/:namespace/:ref'           : 'documentRef',
+			'app/:appslug/file/upload'                        : 'fileNew',
 			'app/:appslug/file/:ref'                          : 'fileRef',
 			'app/:appslug/file'                               : 'fileHome',
 			'*path'                                           : 'notFound'
@@ -256,11 +267,24 @@ require([
 			}
 		},
 
+		fileNew: function(appslug)
+		{
+			if(this.instance)
+			{
+				mediator.publish('callFileNew', appslug);
+			}
+			else
+			{
+				this.requestedFnc  = 'fileNew';
+				this.requestedArgs = [appslug];
+			}
+		},
+
 		fileRef: function(appslug, ref)
 		{
 			if(this.instance)
 			{
-				mediator.publish('callFileNew', appslug, ref);
+				mediator.publish('callFileRef', appslug, ref);
 			}
 			else
 			{

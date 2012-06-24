@@ -17,7 +17,7 @@ class Controller_Api_Collection extends Controller_Api
 
 	// Only admins are allowed to edit Collections
 	private static function is_granted()
-	{		
+	{
 		if(!static::$is_allowed)
 		{
 			self::restricted();

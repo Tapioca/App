@@ -101,17 +101,11 @@
 						<h6>Fichiers</h6>
 						<ul id="app-nav-files-<?= $group['slug']; ?>">
 							<li>
-								<a href="#">Images</a>
-							</li>
-							<li>
-								<a href="#">Videos</a>
-							</li>
-							<li>
-								<a href="#">Autres</a>
+								<a href="app/<?= $group['slug']; ?>/file">Library</a>
 							</li>
 							<li class="divider"></li>
 							<li>
-								<a href="app/<?= $group['slug']; ?>/file" class="admin-action">
+								<a href="app/<?= $group['slug']; ?>/file/upload" class="admin-action">
 									<i class="icon-plus"></i>
 									Ajouter un fichier
 								</a>
@@ -142,6 +136,10 @@
 
 		</div><!-- #app-container -->
 	</div><!-- /#main -->
+	<div id="ref-popin" class="wtwui-dialog wtwui-element fade overlay" data-content="">
+		<div class="close">×</div>
+		<div id="ref-popin-content" class="pane"><div class="pane-content"></div></div>
+	</div>
 
 	<!-- Application source -->
 	<script data-main="/tapioca/bootstrap" src="/assets/library/require/require.js"></script>

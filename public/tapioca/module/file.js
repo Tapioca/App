@@ -5,7 +5,8 @@ define([
 	'aura/mediator',
 	'view/file-home',
 	'view/file-popin',
-], function(tapioca, Backbone, _, mediator, vFileHome, vFilePopin) 
+	'view/file-upload'
+], function(tapioca, Backbone, _, mediator, vFileHome, vFilePopin, vFileUpload) 
 {
 	// Create a new module
 	var Files         = tapioca.module();
@@ -69,7 +70,7 @@ define([
 
 		var popion = new vFilePopin({
 							collection: collection,
-							el: $('#file-popin')
+							el: $('#ref-popin-content')
 						});
 
 		collection.fetch();
@@ -88,10 +89,24 @@ define([
 
 		tapioca.view  = new vFileHome({
 							collection: collection,
-							publicStorage: publicStorage
+							publicStorage: publicStorage,
+							appSlug: appSlug
 						});
 
 		collection.fetch();
+	});
+
+	mediator.subscribe('callFileNew', function(appslug)
+	{
+		if(tapioca.view != null) tapioca.view.close();
+
+		publicStorage = tapioca.config.file.base_path+appslug;
+		appSlug = appslug;
+
+		tapioca.view  = new vFileUpload({
+							publicStorage: publicStorage,
+							appSlug: appSlug
+						});
 	});
 
 	// Required, return the module for AMD compliance

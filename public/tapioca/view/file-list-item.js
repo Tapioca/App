@@ -35,6 +35,7 @@ define([
 			}
 
 			$('#app-content').trigger('document:addFile', ret);
+			$('#ref-popin-content').trigger('popin:close');
 		},
 
 		destroy: function(event)

@@ -11,8 +11,9 @@ define([
 	'underscore.string',
 	'form2js',
 	'dropdown',
-	'template/helpers/setStatus'
-], function(tapioca, Handlebars, mediator, vContent, tContent, tRevisions, isSelected, atLeastOnce, localeSwitcher, _s, form2js, dropdown, setStatus)
+	'template/helpers/setStatus',
+	'hbs!template/content/document-thumb',
+], function(tapioca, Handlebars, mediator, vContent, tContent, tRevisions, isSelected, atLeastOnce, localeSwitcher, _s, form2js, dropdown, setStatus, tThumb)
 {
 	var view = vContent.extend(
 	{
@@ -72,6 +73,7 @@ define([
 			'click .input-repeat-list li:last-child .input-repeat-trigger'       : 'addInput',
 			'click .input-repeat-list li:not(:last-child) .input-repeat-trigger' : 'removeInput',
 			'click .file-list-trigger'                                           : 'fileList',
+			'click .file-remove-trigger'                                         : 'fileRemove',
 			'document:addFile'                                                   : 'addFile'
 		},
 
@@ -132,7 +134,14 @@ define([
 						this.formStr.define('incCounter', item);
 					}
 
-					this.walk(item.node, prefix_tmp, _key);
+					if(_.isUndefined(item.template))
+					{
+						this.walk(item.node, prefix_tmp, _key);
+					}
+					else
+					{
+						this.formStr.define('template', item.template, null, null);
+					}
 
 					this.formStr.define('close', item, _prefix, _key);
 				}
@@ -216,7 +225,16 @@ define([
 
 			this.formStr.define('loopStart', target.node);
 			this.formStr.define('incCounter', target.node);
-			this.walk(target.node.node, target.prefix, target.key);
+
+			if(_.isUndefined(target.node.template))
+			{
+				this.walk(target.node.node, target.prefix, target.key);
+			}
+			else
+			{
+				this.formStr.define('template', target.node.template, null, null);
+			}
+
 			this.formStr.define('loopEnd', null);
 
 			var htmlStr  = this.formStr.get(),
@@ -234,17 +252,30 @@ define([
 
 		addFile: function(event, file)
 		{
-			var target = this.targetData(this.target),
-				_html  = '';
-//console.log(target)
-//console.log(file)
+			var target   = this.targetData(this.target),
+				_html    = '',
+				hasThumb = target.$.parents('div.controls').eq(0).find('ul.thumbnails');
+
+			if(hasThumb.size() > 0)
+			{
+				hasThumb.remove();
+			}
+
 			_html = this.embedData(file, _html, target.prefix);
-//console.log(_html);
-			target.$.after(_html);
+
+			var $parent = target.$.parents('div.btn-group').eq(0);
+
+			$parent.before(_html);
+		},
+
+		fileRemove: function(event)
+		{
+			$(event.target).parents('ul.thumbnails').remove();
 		},
 
 		embedData: function(hash, str, prefix)
 		{
+
 			var iterator = 0;
 
 			for(var i in hash)
@@ -253,7 +284,7 @@ define([
 
 				if(_.isString(hash[i]))
 				{
-					str += '<input type="text" name="' + prefixTmp + '" value="' + hash[i] + '">';
+					str += '<input type="hidden" name="' + prefixTmp + '" value="' + hash[i] + '">';
 				}
 				else
 				{
@@ -274,7 +305,7 @@ define([
 							
 							for(var j = -1, total = hash[i].length; ++j < total;)
 							{
-								str += '<input type="text" name="' + p + '" value="' + hash[i][j] + '">';
+								str += '<input type="hidden" name="' + p + '" value="' + hash[i][j] + '">';
 							}
 						}
 					}
@@ -287,10 +318,35 @@ define([
 				++iterator;
 			}
 
-			// set unload warming
-			this.change();
+			if(!_.isUndefined(hash))
+			{
+				// set unload warming
+				this.change();
 
-			return str;
+				if(!_.isUndefined(hash.filename) && !_.isUndefined(hash.category))
+				{
+					return this.embedDataFile(hash, str, prefix);
+				}
+			}
+		},
+
+		embedDataFile: function(hash, str, prefix)
+		{
+			switch(hash.category)
+			{
+				case 'image': 
+								hash.url = tapioca.config.file.base_path + '/' + this.appSlug + '/image/preview-'+hash.filename;
+								break;
+				case 'video':
+								hash.icon = 'film'
+								break;
+				default:
+								hash.icon = 'file'
+			}
+
+			hash.str = str;
+
+			return tThumb(hash)
 		},
 
 		getDescendantProp: function(key)
@@ -365,7 +421,7 @@ define([
 
 			var formStr  = this.formStr.get();
 				formStr += '{{/model}}';				
-
+console.log(formStr)
 			var template = Handlebars.compile(formStr);
 			var docTitle = (!_.isNull(this.model.get('_ref'))) ? 'Edit document' : 'Compose new document';
 			var html     = template({
@@ -378,7 +434,17 @@ define([
 			//this.html(html, 'app-form');
 
 			this.$el.find('.dropdown-toggle').dropdown();
+			/*
+			this.$el.find('div.btn-group[data-embed]').each(function()
+			{
+				var $target = $this,
+					id = $this.attr('data-embed'),
+					prefix = $this.attr('data-prefix')
 
+				this.embedData(hash, str, prefix)
+				console.log($(this))
+			})
+			*/
 //			this.$el.find('input[name="title"]').keyup(this.slugiffy);
 
 			return this;
@@ -554,7 +620,9 @@ console.log(event)
 				str += '<li>';
 			}
 
-			str += '<input type="'+item.type+'" name="' + getName(item, prefix) + '" value="{{' + id + '}}" class="span7">';
+			str += '<input type="'+item.type+'" name="' + getName(item, prefix) + '" value="{{' + id + '}}" class="';
+			str += (_.isUndefined(item.class)) ? 'span7' : item.class; 
+			str += '">';
 
 			if(item.repeat)
 			{
@@ -621,10 +689,22 @@ console.log(event)
 
 		fields.media = function(item, prefix, key)
 		{
-			formHtml += '<a class="btn file-list-trigger" href="javascript:void(0)" data-prefix="' + getName(item, prefix) + '" data-key="'+key+'">\
-					<i class="icon-plus"></i>\
-					Link\
-				</a>{{{_embedData ' + item.id + ' prefix="' + getName(item, prefix) + '"}}}';
+			formHtml += '<!-- {{! _embedData ' + item.id + ' prefix="' + getName(item, prefix) + '" }} -->\
+						<div class="btn-group float-left">\
+							<a class="btn file-list-trigger" href="javascript:void(0)" data-prefix="' + getName(item, prefix) + '" data-key="'+key+'">\
+								<i class="icon-file"></i>\
+								library\
+							</a>';
+
+			if(!_.isUndefined(item.upload))
+			{
+				formHtml += '<a class="btn" href="javascript:void(0)">\
+								<i class="icon-upload"></i>\
+								upload\
+							</a>';
+			}
+
+			formHtml += '</div>';
 		};
 
 		fields.row = function(item, prefix, key)
@@ -647,6 +727,11 @@ console.log(event)
 		fields.bool = function(item, prefix, key)
 		{
 			formHtml += '<input type="checkbox" value="1" name="' + getName(item, prefix) + '"{{isSelected '+ item.id + ' default="1" checked="checked"}}>';
+		};
+
+		fields.template = function(str)
+		{
+			formHtml += str;
 		};
 
 		// Getter//Setter

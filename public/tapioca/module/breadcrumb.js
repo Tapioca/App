@@ -143,6 +143,43 @@ define([
 		build(breadcrumb);
 	});
 
+	mediator.subscribe('callFileHome', function(appslug)
+	{
+		var breadcrumb = makeObject(appslug);
+		var route      = tapioca.app.router.reverse('fileHome');
+		
+		breadcrumb.push({
+				url: tapioca.app.router.createUri(route, [appslug]),
+				name: 'Library', // TODO: i18n
+				is_active: true
+			});
+
+		build(breadcrumb);
+	});
+
+	mediator.subscribe('callFileNew', function(appslug)
+	{
+		var breadcrumb = makeObject(appslug);
+		var routeHome  = tapioca.app.router.reverse('fileHome');
+		var routeNew   = tapioca.app.router.reverse('fileNew');
+
+		breadcrumb.push({
+				url: tapioca.app.router.createUri(routeHome, [appslug]),
+				name: 'Library', // TODO: i18n
+				is_active: false
+			});
+
+		
+		breadcrumb.push({
+				url: tapioca.app.router.createUri(routeNew, [appslug]),
+				name: 'Upload', // TODO: i18n
+				is_active: true
+			});
+
+		build(breadcrumb);
+	});
+
+
 	// Required, return the module for AMD compliance
 	return true;
 
