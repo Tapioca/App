@@ -822,6 +822,34 @@ header#tapp {
 	bottom:10px;
 }
 
+	/* WYSIWYG toolbar
+	------------------------------ */
+
+.wysihtml5-toolbar {
+	height: 25px;
+    padding-top: 5px;
+}
+
+.wysihtml5-toolbar .separator {
+	background: #fff;
+	display: inline-block;
+	margin: 0 5px;
+	width:1px;
+}
+
+.wysihtml5-toolbar a {
+	color: #666;
+	text-decoration: none;
+}
+
+.wysihtml5-toolbar a:hover {
+	color: #333;
+}
+
+.wysihtml5-toolbar a.wysihtml5-command-active {
+	color: #0088CC;
+}
+
 /*
 #app-content .form-footer p {
 	margin-bottom: 0;

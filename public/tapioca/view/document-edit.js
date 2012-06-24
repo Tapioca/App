@@ -13,7 +13,8 @@ define([
 	'dropdown',
 	'template/helpers/setStatus',
 	'hbs!template/content/document-thumb',
-], function(tapioca, Handlebars, mediator, vContent, tContent, tRevisions, isSelected, atLeastOnce, localeSwitcher, _s, form2js, dropdown, setStatus, tThumb)
+	'wysiwyg'
+], function(tapioca, Handlebars, mediator, vContent, tContent, tRevisions, isSelected, atLeastOnce, localeSwitcher, _s, form2js, dropdown, setStatus, tThumb, wysiwyg)
 {
 	var view = vContent.extend(
 	{
@@ -56,7 +57,14 @@ define([
 			});
 			Handlebars.registerHelper('_embedData', function(context, options)
 			{
-				return self.embedData(context, '', options.hash.prefix);
+				// NESTED HELPERS NOT ALLOWED 
+				// https://github.com/wycats/handlebars.js/issues/222
+				var prefix = options.hash.prefix;
+					prefix =  prefix.replace(/_#/g, '[{{').replace(/#_/g, '}}]').replace(/II/g, '"');
+				var template = Handlebars.compile(prefix);
+				prefix = template({})
+
+				return self.embedData(context, '', prefix);
 			});
 
 			if(options.forceRender)
@@ -332,21 +340,26 @@ define([
 
 		embedDataFile: function(hash, str, prefix)
 		{
+			var thumb = {};
+
 			switch(hash.category)
 			{
 				case 'image': 
-								hash.url = tapioca.config.file.base_path + '/' + this.appSlug + '/image/preview-'+hash.filename;
+								thumb.url = tapioca.config.file.base_path + '/' + this.appSlug + '/image/preview-'+hash.filename;
 								break;
 				case 'video':
-								hash.icon = 'film'
+								thumb.icon = 'film'
 								break;
 				default:
-								hash.icon = 'file'
+								thumb.icon = 'file'
 			}
 
-			hash.str = str;
+			thumb.str = str;
 
-			return tThumb(hash)
+			return tThumb({
+				hash: hash,
+				thumb: thumb
+			});
 		},
 
 		getDescendantProp: function(key)
@@ -420,8 +433,8 @@ define([
 			this.walk(this.structure, '', '');
 
 			var formStr  = this.formStr.get();
-				formStr += '{{/model}}';				
-console.log(formStr)
+				formStr += '{{/model}}';
+//console.log(formStr)
 			var template = Handlebars.compile(formStr);
 			var docTitle = (!_.isNull(this.model.get('_ref'))) ? 'Edit document' : 'Compose new document';
 			var html     = template({
@@ -430,21 +443,21 @@ console.log(formStr)
 								baseUri: this.baseUri,
 								locale: this.locale
 							});
+
 			$('#form-holder').html(html);
-			//this.html(html, 'app-form');
+
+			var self = this;
 
 			this.$el.find('.dropdown-toggle').dropdown();
-			/*
-			this.$el.find('div.btn-group[data-embed]').each(function()
+			this.$el.find('textarea').each(function()
 			{
-				var $target = $this,
-					id = $this.attr('data-embed'),
-					prefix = $this.attr('data-prefix')
+				var $this  = $(this),
+					config = ($this.attr('data-wysiwyg')) ? { toolbar: $this.attr('data-toolbar') } : {},
+					editor = wysiwyg($this[0], config);
 
-				this.embedData(hash, str, prefix)
-				console.log($(this))
-			})
-			*/
+				editor.on('change', self.change);
+			});
+
 //			this.$el.find('input[name="title"]').keyup(this.slugiffy);
 
 			return this;
@@ -480,6 +493,7 @@ console.log(event)
 							</div>{{#model}}',
 			firstFieldset =  '</fieldset>',
 			firstFieldsetClose = false,
+			wysiwygInc = 0,
 			inc = 0;
 
 		// Field name Helpers
@@ -529,7 +543,7 @@ console.log(event)
 			{
 				case 'textarea':
 				case 'select':
-				case 'media':
+				case 'file':
 				case 'bool':
 				case 'dbref':
 								break;
@@ -644,7 +658,37 @@ console.log(event)
 
 		fields.textarea = function(item, prefix)
 		{
-			formHtml += '<textarea class="span7" name="' + getName(item, prefix) + '" rows="3">{{' + item.id + '}}</textarea>';
+			if(!_.isUndefined(item.wysiwyg))
+			{
+				++wysiwygInc;
+				formHtml += '<div id="wysihtml5-toolbar-'+wysiwygInc+'" class="wysihtml5-toolbar" style="display: none;">'+"\n"+
+'  <a data-wysihtml5-command="bold" title="bold"><i class="icon-bold"></i></a>'+"\n"+
+'  <a data-wysihtml5-command="italic" title="italic"><i class="icon-italic"></i></a>'+"\n"+
+'  <span class="separator">&nbsp;</span>'+"\n"+
+'  <a data-wysihtml5-command="createLink" title="insert link"><i class="icon-link"></i></a>'+"\n"+
+'  <span class="separator">&nbsp;</span>'+"\n"+
+'  <a data-wysihtml5-command="insertOrderedList" title="insert ordered list"><i class="icon-list-ol"></i></a>'+"\n"+
+'  <a data-wysihtml5-command="insertUnorderedList" title="insert unordered list"><i class="icon-list-ul"></i></a>'+"\n"+
+'  <span class="separator">&nbsp;</span>'+"\n"+
+'  <a data-wysihtml5-command="change_view" title="Show HTML"><i class="icon-list-ul"></i></a>'+"\n"+
+'  <div data-wysihtml5-dialog="createLink" style="display: none;">'+"\n"+
+'    <label>'+"\n"+
+'      Link:'+"\n"+
+'      <input data-wysihtml5-dialog-field="href" value="http://" class="text"> '+"\n"+
+'      <a data-wysihtml5-dialog-action="save" title="save"><i class="icon-ok"></i></a> <a data-wysihtml5-dialog-action="cancel" title="cancel"><i class="icon-remove"></i></a>'+"\n"+
+'    </label>'+"\n"+
+'  </div>'+"\n"+
+'</div>';
+			}
+
+			formHtml += '<textarea class="span7"';
+			
+			if(!_.isUndefined(item.wysiwyg))
+			{
+				formHtml += ' data-wysiwyg="true" data-toolbar="wysihtml5-toolbar-'+wysiwygInc+'" id="wysihtml5-textarea-'+wysiwygInc+'"'
+			}
+
+			formHtml += ' name="' + getName(item, prefix) + '" rows="3">{{' + item.id + '}}</textarea>';
 		};
 
 		fields.select = function(item, prefix)
@@ -687,9 +731,13 @@ console.log(event)
 			formHtml += str;
 		};
 
-		fields.media = function(item, prefix, key)
+		fields.file = function(item, prefix, key)
 		{
-			formHtml += '<!-- {{! _embedData ' + item.id + ' prefix="' + getName(item, prefix) + '" }} -->\
+			// NESTED HELPERS NOT ALLOWED 
+			// https://github.com/wycats/handlebars.js/issues/222
+			var _prefix =  getName(item, prefix).replace(/\[{{/g, '_#').replace(/}}\]/g, '#_').replace(/"/g, 'II')
+
+			formHtml += '{{{ _embedData ' + item.id + ' prefix="' + _prefix + '" }}}\
 						<div class="btn-group float-left">\
 							<a class="btn file-list-trigger" href="javascript:void(0)" data-prefix="' + getName(item, prefix) + '" data-key="'+key+'">\
 								<i class="icon-file"></i>\
@@ -726,7 +774,7 @@ console.log(event)
 
 		fields.bool = function(item, prefix, key)
 		{
-			formHtml += '<input type="checkbox" value="1" name="' + getName(item, prefix) + '"{{isSelected '+ item.id + ' default="1" checked="checked"}}>';
+			formHtml += '<input type="checkbox" value="1" name="' + getName(item, prefix) + '"{{isSelected '+ item.id + ' default="1" attribute="checked"}}>';
 		};
 
 		fields.template = function(str)
@@ -737,6 +785,7 @@ console.log(event)
 		// Getter//Setter
 
 		return {
+			'getName': getName,
 			'getType': getType,
 			'define': function(type, item, prefix, key)
 			{
