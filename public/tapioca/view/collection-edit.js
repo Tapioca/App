@@ -19,6 +19,8 @@ define([
 			var view           = this.model.toJSON();
 				view.structure = JSON.stringify(view.structure);
 				view.summary   = JSON.stringify(view.summary);
+				view.callback  = JSON.stringify(view.callback);
+				view.rules     = JSON.stringify(view.rules);
 
 			var _html = Mustache.render(tContent, view);
 
@@ -50,11 +52,13 @@ define([
 
 			this.model.set(
 			{
-				name     : $('#name').val(),
-				desc     : $('#desc').val(),
-				status   : $('#status').val(),
-				structure: jQuery.parseJSON($('#structure').val()),
-				summary  : jQuery.parseJSON($('#summary').val())
+				name      : $('#name').val(),
+				desc      : $('#desc').val(),
+				status    : $('#status').val(),
+				structure : jQuery.parseJSON($('#structure').val()),
+				summary   : jQuery.parseJSON($('#summary').val()),
+				callback  : jQuery.parseJSON($('#callback').val()),
+				rules     : jQuery.parseJSON($('#rules').val())
 			});
 
 			if (this.model.isNew())

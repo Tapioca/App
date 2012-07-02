@@ -6,6 +6,7 @@ require.config(
 		'order'                : '../assets/library/require/order',
 		'hbs'                  : '../assets/library/require/hbs',
 		'jquery'               : '../assets/library/jquery/jquery-1.7.2',
+		'jqueryui'             : '../assets/library/jquery.ui/jquery-ui-1.8.21.custom.min',
 		'underscore'           : '../assets/library/underscore/underscore',
 		'underscore.string'    : '../assets/library/underscore/underscore.string',
 		'backbone'             : '../assets/library/backbone/backbone-wrap',
@@ -365,7 +366,7 @@ require([
 		var protocol = this.protocol + "//";
 
 		// Ensure the protocol is not part of URL, meaning its relative.
-		if (href && href.slice(0, protocol.length) !== protocol && href.indexOf("javascript:") !== 0) 
+		if (href && href.slice(0, protocol.length) !== protocol && href.indexOf("javascript:") !== 0 && href !== '#') 
 		{
 			// Stop the default event to ensure the link will not cause a page
 			// refresh.

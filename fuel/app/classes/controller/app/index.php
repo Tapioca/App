@@ -51,6 +51,9 @@ class Controller_App_Index extends Controller_App
 			}
 		}
 
+		// TODO: define timezone per group
+		date_default_timezone_set('Europe/Paris');
+
 		$app_settings = array(
 							'base_uri' => str_replace(Uri::base(), '/', Uri::create('app/')), //Uri::current().'/',
 							'api_uri'  => str_replace(Uri::base(), '/', Uri::create('api/')), //Uri::current().'/',

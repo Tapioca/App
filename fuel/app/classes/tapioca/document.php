@@ -66,6 +66,11 @@ class Document
 	protected $errors = array();
 
 	/**
+	 * @var  array  Events list for callbacks
+	 */
+	protected $events = array();
+
+	/**
 	 * @var  string  Query arguments
 	 */
 	protected static $operators = array('select', 'where', 'sort', 'limit', 'skip');
@@ -120,6 +125,12 @@ class Document
 			// if there was a result
 			if (count($summary) == 1)
 			{
+				// if just a document exists check - return true, no need for additional queries
+				if ($check_exists)
+				{
+					return true;
+				}
+
 				$this->summary = $summary[0];
 				
 				// cache data
@@ -138,12 +149,6 @@ class Document
 						'_summary'      => array( '$exists' => false ),
 						'_about.locale' => static::$locale
 					));
-
-				// if just a document exists check - return true, no need for additional queries
-				if ($check_exists)
-				{
-					return true;
-				}
 			}
 			// collection doesn't exist
 			else
@@ -376,6 +381,8 @@ class Document
 			throw new \TapiocaException( $e->getMessage() );
 		}
 
+		Callback::register(self::$group, $collection_data);
+
 		// Test document rules
 		if(isset($collection_data['rules']))
 		{
@@ -403,20 +410,33 @@ class Document
 				'email' => $user->get('email'),
 			);
 
+		// Global before callback
+		Callback::trigger('before', $document);
+
 		// new document
 		if(is_null(static::$ref))
 		{
+			Callback::trigger('before::new', $document);
+
 			$ret = $this->create($document, $summary, $user_data);
 
 			if($ret)
 			{
 				$collection->inc_document();
 			}
+			
+			Callback::trigger('after::new', $document);
 		}
 		else // update Document
 		{
+			Callback::trigger('before::update', $document);
+			
 			$this->update($document, $summary, $user_data);
+
+			Callback::trigger('after::update', $document);
 		}
+
+		Callback::trigger('after', $document);
 
 		return $this->get(static::$last_revision, 'edit');
 	}

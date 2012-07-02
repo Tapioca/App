@@ -13,7 +13,8 @@ define([
 	'dropdown',
 	'template/helpers/setStatus',
 	'hbs!template/content/document-thumb',
-	'wysiwyg'
+	'wysiwyg',
+	'jqueryui'
 ], function(tapioca, Handlebars, mediator, vContent, tContent, tRevisions, isSelected, atLeastOnce, localeSwitcher, _s, form2js, dropdown, setStatus, tThumb, wysiwyg)
 {
 	var view = vContent.extend(
@@ -220,6 +221,8 @@ define([
 				html     = template({});
 			
 			target.$.parents('ul.input-repeat-list').append(html);
+
+			this.bindInput();
 		},
 
 		removeInput: function(event)
@@ -250,6 +253,8 @@ define([
 				html     = template({});
 			
 			target.$.parents('p.align-right').before(html);
+
+			this.bindInput();
 		},
 
 		fileList: function(event)
@@ -446,21 +451,47 @@ define([
 
 			$('#form-holder').html(html);
 
+			this.$el.find('.dropdown-toggle').dropdown();
+
+			this.bindInput();
+
+			return this;
+		},
+
+		bindInput: function()
+		{
+
 			var self = this;
 
-			this.$el.find('.dropdown-toggle').dropdown();
-			this.$el.find('textarea').each(function()
+			this.$el.find('textarea').not('[data-binded="true"]').each(function()
 			{
 				var $this  = $(this),
 					config = ($this.attr('data-wysiwyg')) ? { toolbar: $this.attr('data-toolbar') } : {},
 					editor = wysiwyg($this[0], config);
 
+				$this.attr('data-binded', 'true');
 				editor.on('change', self.change);
 			});
 
-//			this.$el.find('input[name="title"]').keyup(this.slugiffy);
+			this.$el.find('input[type="date"]').not('[data-binded="true"]').each(function()
+			{
+				var $this     = $(this),
+					$altField = $('input[name="'+$this.attr('data-name')+'"]');
+				
+				$this.attr('data-binded', 'true');
+				
+				$this.datepicker({
+					dateFormat: 'dd/mm/yy',
+					onSelect: function(dateText, inst)
+					{
+						var epoch = $.datepicker.formatDate('@', $this.datepicker('getDate')) / 1000;
 
-			return this;
+						$altField.val(epoch);
+						self.change();
+					}
+				});
+			});
+//			this.$el.find('input[name="title"]').keyup(this.slugiffy);
 		},
 
 		slugiffy: function(event)
@@ -634,9 +665,18 @@ console.log(event)
 				str += '<li>';
 			}
 
-			str += '<input type="'+item.type+'" name="' + getName(item, prefix) + '" value="{{' + id + '}}" class="';
+			str += '<input type="'+item.type+'" class="';
 			str += (_.isUndefined(item.class)) ? 'span7' : item.class; 
-			str += '">';
+			str += '"';
+			str += (item.type =='date') ? ' data-' : ' ';
+			str += 'name="' + getName(item, prefix) + '"';
+			str += (item.type =='date') ? ' value="{{displayDate ' + id + ' format="DD/MM/YYYY"}}"' : '  value="{{' + id + '}}"';
+			str += '>';
+
+			if(item.type =='date')
+			{
+				str += '<input type="hidden" name="' + getName(item, prefix) + '" value="{{' + id + '}}">';
+			}
 
 			if(item.repeat)
 			{

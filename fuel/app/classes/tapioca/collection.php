@@ -50,6 +50,11 @@ class Collection
 	protected static $summary_where = array();
 
 	/**
+	 * @var  array  Events list for callbacks
+	 */
+	protected $callback = array();
+
+	/**
 	 * Loads in the Collection object
 	 *
 	 * @param   object  Group instace
@@ -112,6 +117,12 @@ class Collection
 				$this->data      = $data;
 				$this->namespace = $summary[0]['namespace'];
 				$this->name      = $summary[0]['name'];
+
+
+				if(isset($summary[0]['callback']))
+				{
+					$this->callback = $summary[0]['callback'];
+				}
 
 				$this->set_summary_where();
 

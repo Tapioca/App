@@ -86,7 +86,7 @@ return array(
 				'summary',
 				'dependencies',
 				'indexes',
-				'callbacks',
+				'callback',
 				'templates'
 			)
 		)

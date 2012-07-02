@@ -41,11 +41,13 @@ Autoloader::add_classes(array(
 	'Tapioca\\TapiocaCollectionException' => APPPATH.'classes/tapioca/collection.php', 
 	'Tapioca\\TapiocaDocumentException'   => APPPATH.'classes/tapioca/document.php',  
 	'Tapioca\\TapiocaFileException'       => APPPATH.'classes/tapioca/file.php', 
+	'Tapioca\\TapiocaCallbackException'   => APPPATH.'classes/tapioca/callback.php', 
 
 	'Tapioca\\Collection'                 => APPPATH.'classes/tapioca/collection.php',
 	'Tapioca\\Document'                   => APPPATH.'classes/tapioca/document.php',
 	'Tapioca\\Rules'                      => APPPATH.'classes/tapioca/rules.php',
 	'Tapioca\\Files'                      => APPPATH.'classes/tapioca/file.php',
+	'Tapioca\\Callback'                   => APPPATH.'classes/tapioca/callback.php',
 
 	// Tapioca Resque jobs
 	'Tapioca\\Jobs\\PHP_Job' => APPPATH.'classes/tapioca/jobs/job.php',
