@@ -93,6 +93,16 @@ return array(
 	),
 
 	/*
+	 * Cast
+	 * fields type that needs to cast for mongodb
+	 */
+
+	'cast' => array(
+		'date',
+		'number'
+	),
+
+	/*
 	 * Upload
 	 */
 

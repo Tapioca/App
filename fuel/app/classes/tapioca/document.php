@@ -394,6 +394,10 @@ class Document
 			}
 		}
 
+		// Cast document's values
+
+		Cast::set(&$document, $collection_data['structure']);
+
 		// Set document summary
 		try
 		{
