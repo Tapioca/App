@@ -484,9 +484,14 @@ define([
 					dateFormat: 'dd/mm/yy',
 					onSelect: function(dateText, inst)
 					{
-						var epoch = $.datepicker.formatDate('@', $this.datepicker('getDate')) / 1000;
+						var _getDate    = $this.datepicker('getDate'),
+							epoch       = $.datepicker.formatDate('@', _getDate),
+							defaultDate = $.datepicker.formatDate('MM d, yy', _getDate);
 
-						$altField.val(epoch);
+						$.datepicker.setDefaults( {
+							defaultDate: new Date(defaultDate)
+						}) 
+						$altField.val(epoch / 1000);
 						self.change();
 					}
 				});
@@ -670,6 +675,7 @@ console.log(event)
 			str += '"';
 			str += (item.type =='date') ? ' data-' : ' ';
 			str += 'name="' + getName(item, prefix) + '"';
+			str += (item.type =='date') ? ' readonly="readonly"' : ' ';
 			str += (item.type =='date') ? ' value="{{displayDate ' + id + ' format="DD/MM/YYYY"}}"' : '  value="{{' + id + '}}"';
 			str += '>';
 

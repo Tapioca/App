@@ -13,3 +13,10 @@ legend {
 .dropdown legend .caret {
 	margin-top: 16px;
 }
+
+#tapioca-document-form input[type="date"] {
+	border: 1px solid #ccc;
+	background: #fff;
+	cursor: pointer;
+	width: 80px;
+}
