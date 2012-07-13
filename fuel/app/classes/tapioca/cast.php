@@ -17,7 +17,7 @@ class Cast
 		static::$types = \Config::get('tapioca.cast');
 	}
 
-	public static function set($document, $schema)
+	public static function set(&$document, $schema)
 	{
 		static::parse($schema);
 

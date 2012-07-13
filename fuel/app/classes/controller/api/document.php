@@ -62,7 +62,7 @@ class Controller_Api_Document extends Controller_Api
 				// list for back-office
 				if(static::$mode == 'list')
 				{
-					self::$data = $document->all();
+					self::$data = $document->all(static::$doc_status);
 				}
 				else // standard API call
 				{
@@ -79,8 +79,6 @@ class Controller_Api_Document extends Controller_Api
 				{
 					self::$data['debug'] = $document->last_query();
 				}
-//\Debug::show(self::$data);
-//exit;
 
 		} // if granted
 	}

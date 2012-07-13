@@ -1,6 +1,11 @@
 
 									<td>
+										{{#if select}}
+											{{file.filename}}
+										{{/if}}
+										{{#if home}}
 										<a href="/app/file/{{file.filename}}">{{file.filename}}</a>
+										{{/if}}
 									</td>
 									<td>
 										{{file.category}}

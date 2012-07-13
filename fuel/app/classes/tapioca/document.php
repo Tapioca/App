@@ -196,13 +196,20 @@ class Document
 	 * @return  array
 	 * @throws  TapiocaException
 	 */
-	public function all()
+	public function all($status = null)
 	{
+		$where = array(
+					'_summary' => array( '$exists' => true )
+				);
+
+		if(!is_null($status))
+		{
+			$where['revisions.list.status'] = (int) $status;
+		}
+
 		//query database for collections's summaries
 		return static::$db
-				->where(array(
-					'_summary' => array( '$exists' => true )
-				))
+				->where($where)
 				->order_by(array(
 					'date.created' => 'desc'
 				))
@@ -279,6 +286,11 @@ class Document
 		if(is_null(static::$collection))
 		{
 			throw new \TapiocaException(__('tapioca.no_collection_selected'));
+		}
+
+		if($mode == 'summary')
+		{
+			return $this->summary; 
 		}
 
 		// check if locale exists for this document
@@ -396,7 +408,7 @@ class Document
 
 		// Cast document's values
 
-		Cast::set(&$document, $collection_data['structure']);
+		Cast::set($document, $collection_data['structure']);
 
 		// Set document summary
 		try

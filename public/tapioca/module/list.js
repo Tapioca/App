@@ -3,8 +3,9 @@ define([
 	'backbone',
 	'underscore',
 	'aura/mediator',
-	'view/collection-home'
-], function(tapioca, Backbone, _, mediator, vCollectionHome) 
+	'view/collection-home',
+	'view/list-popin'
+], function(tapioca, Backbone, _, mediator, vCollectionHome, vListPopin) 
 {
 	// Create a new module
 	var List         = tapioca.module();
@@ -33,6 +34,22 @@ define([
 		$('#app-nav-collections-'+appslug).trigger('collection:highlight', namespace);
 		$('#apps-nav').find('a.app-nav-header[data-app-slug="'+appslug+'"]').trigger('click');
 	}
+
+	mediator.subscribe('callCollectionRef', function(appslug, namespace, locale)
+	{
+		var model     = tapioca.apps[appslug].models.get(namespace),
+			documents = new List.Collection(appslug, namespace);
+
+		var popion = new vListPopin({
+							collection: documents,
+							header: model.toJSON(),
+							appslug: appslug,
+							namespace: namespace,
+							el: $('#ref-popin-content')
+						});
+
+		documents.fetch({ data: $.param({ mode: 'list', status: 100, locale: locale}) })
+	});
 
 	mediator.subscribe('callCollectionHome', function(appslug, namespace)
 	{

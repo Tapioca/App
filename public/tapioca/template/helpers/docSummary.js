@@ -2,11 +2,19 @@ define('template/helpers/docSummary', ['Handlebars'], function ( Handlebars )
 {
 	function docSummary ( data, ref, appslug, namespace )
 	{
-		var _html = '';
-		
+		var _html    = '',
+			urlStart = '',
+			urlEnd   = '';
+			
+		if(!_.isUndefined(ref) && !_.isUndefined(appslug) && !_.isUndefined(namespace))
+		{
+			urlStart = '<a href="/app/' + appslug + '/document/' + namespace + '/' + ref + '">';
+			urlEnd   = '</a>';
+		}
+
 		for(var i in data)
 		{
-			_html += '<td><a href="/app/' + appslug + '/document/' + namespace + '/' + ref + '">' + data[i] + '</a></td>';
+			_html += '<td>' + urlStart + data[i] +  urlEnd + '</td>';
 		}
 
 		return _html;

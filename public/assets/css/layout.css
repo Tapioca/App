@@ -262,7 +262,7 @@ header#tapp {
 
 #app-container {
 	border-left: 1px solid #222;
-	left: 20%;
+	left: 288px;
 	right: 0;
 }
 
@@ -273,7 +273,7 @@ header#tapp {
     background: #33393D;
 	left: 0;
 	padding-top: 10px;
-	width: 20%;
+	width: 288px;
 	text-shadow : #000 1px 1px 1px;
 }
 

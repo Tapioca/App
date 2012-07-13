@@ -13,15 +13,17 @@ define([
 	'dropdown',
 	'template/helpers/setStatus',
 	'hbs!template/content/document-thumb',
+	'hbs!template/content/document-ref',
 	'wysiwyg',
 	'jqueryui'
-], function(tapioca, Handlebars, mediator, vContent, tContent, tRevisions, isSelected, atLeastOnce, localeSwitcher, _s, form2js, dropdown, setStatus, tThumb, wysiwyg)
+], function(tapioca, Handlebars, mediator, vContent, tContent, tRevisions, isSelected, atLeastOnce, localeSwitcher, _s, form2js, dropdown, setStatus, tThumb, tRef, wysiwyg)
 {
 	var view = vContent.extend(
 	{
 		template: tContent,    // Handlebars template
 		formStr: null,         // html string, partial Handlebars template
 		counters: {},          // object that keep the count ok increment for loops
+		initialized: false,    // prevent this.change() on page init
 
 		initialize: function(options)
 		{
@@ -67,6 +69,32 @@ define([
 
 				return self.embedData(context, '', prefix);
 			});
+			Handlebars.registerHelper('_embedDoc', function(context, options)
+			{
+				if(!_.isUndefined(context))
+				{
+					// NESTED HELPERS NOT ALLOWED 
+					// https://github.com/wycats/handlebars.js/issues/222
+					var prefix = options.hash.prefix;
+						prefix =  prefix.replace(/_#/g, '[{{').replace(/#_/g, '}}]').replace(/II/g, '"');
+					var template = Handlebars.compile(prefix);
+					prefix = template({})
+
+					var url   = tapioca.config.api_uri+self.appSlug+'/document/'+options.hash.collection+'/'+context.ref+'?mode=summary',
+						summary,
+						hxr = $.ajax({
+										url: url,
+										dataType: 'json',
+										async: false,
+										success: function(data)
+										{
+											summary = data;
+										}
+									});
+
+					return self.docPreview(context, summary, prefix);
+				}
+			});
 
 			if(options.forceRender)
 			{
@@ -81,9 +109,12 @@ define([
 			'click .array-repeat-trigger'                                        : 'addNode',
 			'click .input-repeat-list li:last-child .input-repeat-trigger'       : 'addInput',
 			'click .input-repeat-list li:not(:last-child) .input-repeat-trigger' : 'removeInput',
+			'click .doc-list-trigger'                                            : 'docList',
+			'click .doc-remove-trigger'                                          : 'docRemove',
 			'click .file-list-trigger'                                           : 'fileList',
 			'click .file-remove-trigger'                                         : 'fileRemove',
-			'document:addFile'                                                   : 'addFile'
+			'document:addFile'                                                   : 'addFile',
+			'document:addDoc'                                                    : 'addDoc'
 		},
 
 		change: function()
@@ -257,6 +288,71 @@ define([
 			this.bindInput();
 		},
 
+		docList: function(event)
+		{
+			this.target    = event;
+			var target     = this.targetData(this.target);
+
+			this.docCollection = target.$.attr('data-collection');
+			this.docEmbedded   = target.$.attr('data-embedded');
+			
+			mediator.publish('callCollectionRef', this.appSlug, this.docCollection, this.locale.working.key);
+		},
+
+		addDoc: function(event, doc)
+		{
+			var target   = this.targetData(this.target),
+				_html    = '',
+				ret      = {ref: doc._ref};
+
+			if(!_.isUndefined(this.docEmbedded))
+			{
+				var url   = tapioca.config.api_uri+this.appSlug+'/document/'+this.docCollection+'/'+doc._ref+'?locale='+this.locale.working.key,
+					query = {select: this.docEmbedded.split('::')},
+					self  = this;
+
+				url = url+'&q='+JSON.stringify(query);
+
+				hxr = $.ajax({
+					url: url,
+					dataType: 'json',
+					async: false,
+					success: function(data)
+					{
+						delete data._id;
+
+						ret.embedded = data;
+					}
+				});
+			}
+
+			_html = this.docPreview(ret, doc, target.prefix);
+
+			var $parent = target.$.parents('div.btn-group').eq(0);
+
+			$parent.after(_html);
+			$parent.hide();
+		},
+
+		docPreview: function(data, summary, prefix)
+		{
+			return tRef({
+				doc: summary,
+				fields: {
+					str: this.embedData(data, '', prefix)
+				}
+			});
+		},
+
+		docRemove: function(event)
+		{
+			var $target = $(event.target);
+			var $parent = $target.parents('table').eq(0);
+
+			$parent.prev('div.btn-group').eq(0).show();
+			$parent.remove();
+		},
+
 		fileList: function(event)
 		{
 			this.target = event;
@@ -295,7 +391,7 @@ define([
 			{
 				var prefixTmp = prefix + '.' + i;
 
-				if(_.isString(hash[i]))
+				if(_.isString(hash[i]) || _.isNumber(hash[i]))
 				{
 					str += '<input type="hidden" name="' + prefixTmp + '" value="' + hash[i] + '">';
 				}
@@ -333,12 +429,18 @@ define([
 
 			if(!_.isUndefined(hash))
 			{
-				// set unload warming
-				this.change();
+				if(this.initialized)
+				{
+					this.change();
+				}
 
 				if(!_.isUndefined(hash.filename) && !_.isUndefined(hash.category))
 				{
 					return this.embedDataFile(hash, str, prefix);
+				}
+				else
+				{
+					return str;
 				}
 			}
 		},
@@ -455,6 +557,8 @@ define([
 
 			this.bindInput();
 
+			this.initialized = true;
+
 			return this;
 		},
 
@@ -462,6 +566,11 @@ define([
 		{
 
 			var self = this;
+
+			this.$el.find('table[data-dbref=true]').each(function()
+			{
+				var $parent = $(this).prev('div.btn-group').eq(0).hide();
+			});
 
 			this.$el.find('textarea').not('[data-binded="true"]').each(function()
 			{
@@ -799,6 +908,28 @@ console.log(event)
 			}
 
 			formHtml += '</div>';
+		};
+
+		fields.dbref = function(item, prefix, key)
+		{
+			// NESTED HELPERS NOT ALLOWED 
+			// https://github.com/wycats/handlebars.js/issues/222
+			var _prefix =  getName(item, prefix).replace(/\[{{/g, '_#').replace(/}}\]/g, '#_').replace(/"/g, 'II')
+
+			formHtml += '<div class="btn-group float-left">\
+							<a class="btn doc-list-trigger" href="javascript:void(0)" data-prefix="' + getName(item, prefix) + '" data-key="'+key+'" data-collection="' + item.collection + '"';
+
+			if(!_.isUndefined(item.embedded))
+			{
+				formHtml += ' data-embedded="' + item.embedded.join('::') + '"';
+			}
+
+			formHtml += '>\
+								<i class="icon-file"></i>\
+								Select\
+							</a>\
+						</div>\
+						{{{ _embedDoc ' + item.id + ' prefix="' + _prefix + '" collection="' + item.collection + '"}}}';
 		};
 
 		fields.row = function(item, prefix, key)
