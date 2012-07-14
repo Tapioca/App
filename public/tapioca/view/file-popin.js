@@ -46,7 +46,11 @@ define([
 			$('#ref-popin')
 				.addClass('active')
 				.find('div.close')
-					.click(this.hide);
+					.click(function()
+					{
+						$('#ref-popin').removeClass('active');
+						self.overlay.hide();
+					});
 			
 			return this;
 		},
@@ -54,7 +58,7 @@ define([
 		hide: function()
 		{
 			$('#ref-popin').removeClass('active');
-			this.overlay.hide();			
+			this.overlay.hide();
 		},
 
 		onClose: function()

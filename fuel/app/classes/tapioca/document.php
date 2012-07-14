@@ -410,6 +410,10 @@ class Document
 
 		Cast::set($document, $collection_data['structure']);
 
+
+		// Global before callback
+		Callback::trigger('before', $document);
+
 		// Set document summary
 		try
 		{
@@ -425,9 +429,6 @@ class Document
 				'name'  => $user->get('name'),
 				'email' => $user->get('email'),
 			);
-
-		// Global before callback
-		Callback::trigger('before', $document);
 
 		// new document
 		if(is_null(static::$ref))
@@ -446,7 +447,7 @@ class Document
 		else // update Document
 		{
 			Callback::trigger('before::update', $document);
-			
+
 			$this->update($document, $summary, $user_data);
 
 			Callback::trigger('after::update', $document);
@@ -728,13 +729,18 @@ class Document
 
 		$summary = array('data' => array());
 
-		foreach($structure as $key => $v)
+		foreach($structure as $v)
 		{
-			$value = \Arr::get($document, $key, '__DOC_MISSING_VALUE__');
+			$value = \Arr::get($document, $v['path'], '__DOC_MISSING_VALUE__');
 
 			if($value != '__DOC_MISSING_VALUE__')
 			{
-				$summary['data'][$key] = $value;
+				// prevent MongoDb crash if key look like:
+				// deep.nested.key
+				$arrK = explode('.', $v['path']);
+				$storedKey = (count($arrK) > 1) ? end($arrK) : $v['path'];
+
+				$summary['data'][$storedKey] = $value;
 			}
 			else
 			{

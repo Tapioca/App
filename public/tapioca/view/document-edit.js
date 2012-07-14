@@ -139,6 +139,9 @@ define([
 			this.model.save(formData, {
 				success:function (model, response)
 				{
+					// prevent this.change()  to be trigged on render
+					this.initialized = false;
+
 					if(isNew)
 					{
 						var ref   = self.model.get('_ref');

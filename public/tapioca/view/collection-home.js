@@ -24,10 +24,10 @@ define([
 		render: function()
 		{
 			this.header.thead = [];
-
-			for(var i in this.header.summary)
+			
+			for(var i = -1, l = this.header.summary.length; ++i < l;)
 			{
-				this.header.thead.push(this.header.summary[i]);
+				this.header.thead.push(this.header.summary[i]['name']);
 			}
 			
 			var data = {
