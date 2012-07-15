@@ -3,6 +3,22 @@ Changelog
 
 This file lists the important changes between versions. For a list of minor changes, check the log.
 
+v1.17
+-----
+ - `js_inline` and `css_inline` won't spit out lots of consecutive tags.
+ - Casset_Exception inherits from FuelException instead of the (deprecated) Fuel_Exception.
+ - Various documentation fixes.
+
+v1.16
+-----
+ - Add 'img_url' to twig extension, and improve twig docs slightly.
+ - Default for $alt argument fof img() is now an empty string.
+
+v1.15
+----
+ - Add `render`, `render_js`, `render_css` and `img` to a new Twig extension. See `classes/casset/addons/readme.md`.
+ - Fix various typos.
+
 v1.14
 -----
  - Add gen_tags option to render_js and render_css.
@@ -48,7 +64,6 @@ v1.9
 ---
 Hotfix release.
 Fixes #1, reported by jaysonic, where add_path was (for some reason) private.
-
 
 v1.8
 ----

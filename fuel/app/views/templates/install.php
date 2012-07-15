@@ -14,9 +14,7 @@
 	<script src="http://code.jquery.com/jquery-1.7.min.js"></script>
     
     <!-- Le styles -->
-    <link rel="stylesheet" href="/assets/css/bootstrap.css">
-    <link rel="stylesheet" href="/assets/css/class.css">
-    <link rel="stylesheet" href="/assets/css/install.css">
+    <?= Casset::render_css('install'); ?> 
     
 
 </head>

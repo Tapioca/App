@@ -8,6 +8,7 @@ fuel/app/cache/*/*
 fuel/app/config/production/*
 fuel/app/tmp/*
 modules/*
+public/assets/cache/*
 public/client_test
 public/temp
 public/dynamic

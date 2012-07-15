@@ -1,4 +1,6 @@
-<!doctype html>
+<?php
+$uri_base	= Uri::base(false);
+?><!doctype html>
 <!--[if lt IE 7]> <html class="ie ie6 oldie" lang="fr"> <![endif]-->
 <!--[if IE 7]>    <html class="ie ie7 oldie" lang="fr"> <![endif]-->
 <!--[if IE 8]>    <html class="ie ie8 oldie" lang="fr"> <![endif]-->
@@ -22,7 +24,7 @@
 	<![endif]-->
 
 	<!-- Le styles -->
-	<link rel="stylesheet" href="/assets/css/styles.css">
+	<?= Casset::render_css('app'); ?> 
 
 
 </head>
@@ -31,7 +33,7 @@
 	<div id="main">
 		<div id="apps-nav" class="pane nano">
 			<a id="header-logo" href="<?= Uri::create('app'); ?>">
-				<img alt="tapioca logo" src="/assets/img/header-logo.png">
+				<img alt="tapioca logo" src="<?= $uri_base;?>assets/img/header-logo.png">
 			</a><!-- /#header-logo -->
 
 			<div id="user-shortcuts">
@@ -153,7 +155,7 @@
 	</div>
 
 	<!-- Application source -->
-	<script data-main="/tapioca/bootstrap" src="/assets/library/require/require.js"></script>
+	<script data-main="<?= $uri_base;?>tapioca/bootstrap" src="<?= $uri_base;?>assets/library/require/require.js"></script>
 	<script>
 	define('config', function()
 	{
