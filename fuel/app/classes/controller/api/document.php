@@ -17,7 +17,7 @@ class Controller_Api_Document extends Controller_Api
 		// to define with api key and query string
 		static::$collection = $this->param('collection', false);
 		static::$ref        = $this->param('ref', null);
-		static::$locale     = Input::get('locale', null);;
+		static::$locale     = Input::get('locale', null);
 		static::$revision   = Input::get('revision', null);
 		static::$doc_status = Input::get('status', null);
 		static::$query      = Input::get('q', null);
