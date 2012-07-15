@@ -118,25 +118,7 @@ require([
 						tapioca.apps[slug].locale.default = obj;
 					}
 				}
-
-/*
-//				tapioca.apps[slug].locale.list  = tapioca.config.user.groups[i].locales;
-
-				for(var j = -1, nbLocales = tapioca.config.user.groups[i].locales.length; ++j < nbLocales;)
-				{
-					var locale = tapioca.config.user.groups[i].locales[j];
-
-					if(!_.isUndefined(locale.default) && locale.default == true)
-					{
-						tapioca.apps[slug].locale.working = locale.key;
-						tapioca.apps[slug].locale.default = {
-							key: locale.key,
-							label: locale.label
-						};
-						break;
-					}
-				}
-*/
+				
 				new vAppCollections({
 					el: $('#app-nav-collections-'+slug),
 					model: tapioca.apps[slug].models, 

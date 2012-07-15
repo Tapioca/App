@@ -3,6 +3,8 @@
 
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
+	
+	SetEnv FUEL_ENV production
 
     RewriteRule ^(.*)$ index.php/$1 [L]
 </IfModule>

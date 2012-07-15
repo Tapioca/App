@@ -114,4 +114,12 @@ class Tapioca
 
 		return $defaults;
 	}
+
+	/**
+	 * @return  Bool
+	 */
+	public static function check_install()
+	{
+		return \Auth::user()->admin_set();
+	}
 }

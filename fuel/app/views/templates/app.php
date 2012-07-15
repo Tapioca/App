@@ -47,17 +47,28 @@
 
 				</nav>
 			</div><!-- /#user-shortcuts -->
-			<div class="pane-content">
 <?php
 	
+	$nbGroups = count($app_settings['user']['groups']);
+
+	echo '			<div class="pane-content';
+	if($nbGroups == 1)
+		echo ' pane-content-one-app';
+	echo '">';
+
 	foreach($app_settings['user']['groups'] as $group)
 	{
 ?>
-				<div class="app-nav">
+				<div class="app-nav <?php
+					if($nbGroups == 1)
+					{
+						echo ' app-nav-active';
+					}
+				?>">
 					<a href="javascript:void(0)" class="app-nav-header" data-app-id="<?= $group['id']; ?>" data-app-slug="<?= $group['slug']; ?>">
-						<span class="avatar">
+						<!--span class="avatar">
 							<img src="/dynamic/apps/dior-logo.jpg" alt="" />
-						</span>
+						</span-->
 						<h5 class="app-nav-name"><?= $group['name']; ?></h5>
 					</a><!-- /.app-nav-header -->
 					<div class="app-nav-lists">

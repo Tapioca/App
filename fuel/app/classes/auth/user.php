@@ -796,12 +796,13 @@ class User
 	/**
 	 * Grante user as admin.
 	 *
+	 * @param   int  admin level 
 	 * @return  bool
 	 * @throws  UserException
 	 */
-	public function granted_admin()
+	public function granted_admin(int $level)
 	{
-		return $this->update(array('is_admin' => 1));
+		return $this->update(array('is_admin' => 1, 'level' => $level));
 	}
 
 	/**
@@ -813,5 +814,19 @@ class User
 	public function revoke_admin()
 	{
 		return $this->update(array('is_admin' => 0));
+	}
+
+	/**
+	 * Query the database to check if admin has been created.
+	 *
+	 * @return  bool
+	 */
+	public function admin_set()
+	{
+		$admin = static::$db->get_where(static::$collection, array(
+			'is_admin' => 1
+		), 1);
+
+		return (bool) count($admin);
 	}
 }

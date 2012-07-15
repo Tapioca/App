@@ -282,6 +282,10 @@ header#tapp {
 	top:55px;
 }
 
+#apps-nav .pane-content.pane-content-one-app {
+	background: none
+}
+
 #apps-nav a,
 .app-nav-lists span.no-collection {
 	color: #fff;
@@ -349,7 +353,7 @@ header#tapp {
 	float: left;
     height: 25px;
     line-height: 25px;
-	margin-right: 10px;
+	margin-left: 15px;
 }
 
 .app-nav-lists {

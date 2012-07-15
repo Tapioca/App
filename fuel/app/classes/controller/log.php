@@ -2,6 +2,16 @@
 
 class Controller_Log extends Controller
 {
+	public function before()
+	{
+		Tapioca::base();
+
+		if(!Tapioca::check_install())
+		{
+			Response::redirect('install/start');
+		}
+	}
+
 	public function action_index()
 	{
 		$view_data = array(
