@@ -5,6 +5,7 @@ fuel/app/classes/controller/test
 fuel/app/classes/controller/redis.php
 fuel/app/logs/*/*/*
 fuel/app/cache/*/*
+fuel/app/config/production/*
 fuel/app/tmp/*
 modules/*
 public/client_test
