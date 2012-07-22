@@ -12,7 +12,7 @@ class Callback
 	private static $namespace;
 	private static $slug;
 	private static $events;
-	private static $callbacks;
+	private static $callbacks = null;
 
 	public static function register(\Auth\Group $group, $collection)
 	{
@@ -40,5 +40,10 @@ class Callback
 				$data = call_user_func_array('\\'.static::$namespace .'\\'.$cb, array($data));
 			}
 		}
+	}
+
+	public static function reset()
+	{
+		static::$callbacks = null;
 	}
 }

@@ -178,16 +178,18 @@ class Document
 	 */
 	public function reset()
 	{
-		static::$collection = null;
-		static::$group = null;
-		static::$namespace = null;
-		static::$ref = null;
-		static::$locale = null;
-		static::$active = null;
+		static::$collection    = null;
+		static::$group         = null;
+		static::$namespace     = null;
+		static::$ref           = null;
+		static::$locale        = null;
+		static::$active        = null;
 		static::$last_revision = null;
-		$this->document = null;
-		$this->summary = null;
-		$this->errors = array();
+		$this->document        = null;
+		$this->summary         = null;
+		$this->errors          = array();
+
+		Callback::reset();
 	}
 
 	/**
@@ -673,6 +675,12 @@ class Document
 								'_about.revision' => $revision
 							))
 							->update(static::$collection, $update);
+
+		// prevent mongodb crash
+		if(isset($this->summary['_id']))
+		{
+			unset($this->summary['_id']);
+		}
 
 		// Update Documant summary 
 		$new_summary = static::$db
