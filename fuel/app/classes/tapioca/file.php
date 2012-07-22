@@ -306,7 +306,7 @@ class Files
 	}
 
 	/**
-	 * List of files to create/update
+	 * Catch files from upload and save them
 	 *
 	 * @param  object User instance
 	 * @param  bool is Update 
@@ -316,6 +316,74 @@ class Files
 	public function save(\Auth\User $user, $update = false)
 	{
 		$files  = $this->upload();
+
+		$result = $this->doIt($user, $files, $update);
+
+		return $result;
+	}
+
+	/**
+	 * Import file from the filesystem to tapioca
+	 *
+	 * @param  object User instance
+	 * @param  array files list
+	 * @param  array tags
+	 * @return  array
+	 * @throws  TapiocaException
+	 */
+	public function import(\Auth\User $user, array $files, array $tags = array())
+	{
+		$fileTypes = \Config::get('tapioca.file_types');
+		$finfo     = new \finfo(FILEINFO_MIME);
+		$imported  = array();
+
+		foreach($files as $file)
+		{
+			$minetype	= explode(';', $finfo->file($file['path']));
+			$fileinfo	= pathinfo($file['path']);
+
+			$filename   = static::setFileName($file['path']);
+			// $filename	= \Inflector::friendly_title(trim(strtolower($fileinfo['filename'])));
+			// $basename   = $filename.'.'.$fileinfo['extension'];
+
+			$category   = static::getFileCategory($minetype[0]);
+
+			$new_file = array(
+				'saved_as' => $fileinfo['basename'],
+				'path' => $file['path'],
+				'mimetype' => $minetype[0],
+				'extension' => $fileinfo['extension'],
+				'basename' => $filename->filename,
+				'filename' => $filename->basename,
+				'length' => filesize($file['path']),
+				'md5' => md5_file($file['path']),
+				'tags' => $file['tags'],
+				'category' => $category,
+			);
+
+			// if file is an image, we get width/height
+			if(strpos($minetype[0], 'image') !== false)
+			{
+				$new_file['size'] = array();
+				list($new_file['size']['width'], $new_file['size']['height']) = getimagesize($file['path']);
+			}
+
+			$imported[] = $new_file;
+		}
+
+		return $this->doIt($user, $imported, false, true);
+	}
+
+	/**
+	 * List of files to create/update
+	 *
+	 * @param  object User instance
+	 * @param  bool is Update 
+	 * @return  bool
+	 * @throws  TapiocaException
+	 */
+	private function doIt(\Auth\User $user, array $files, $update = false, $import = false)
+	{
 		$result = array();
 
 		foreach($files as &$file)
@@ -332,7 +400,7 @@ class Files
 						$file['filename'] = strtolower($file['basename'].'.'.$file['extension']);
 					}
 
-					$ret = $this->create($file, $user, $update);
+					$ret = $this->create($file, $user, $update, $import);
 					
 					$file_api    = '/api/'.static::$group->get('slug').'/file/'.$file['filename'];
 					$file_url    = '/files/'.static::$group->get('slug').'/'.$file['category'].'/'.$file['filename'];
@@ -362,7 +430,10 @@ class Files
 						'delete_type'   => 'DELETE'
 					);
 
-					unlink($file['path']);
+					if(!$import)
+					{
+						unlink($file['path']);
+					}
 				}
 			} // if isset error
 			else
@@ -390,7 +461,7 @@ class Files
 	 * @return  bool
 	 * @throws  TapiocaException
 	 */
-	public function create(array &$fields, \Auth\User $user, $update = false)
+	public function create(array &$fields, \Auth\User $user, $update = false, $import = false)
 	{
 		$file_path = $fields['path'];
 		$saved_as  = $fields['saved_as'];
@@ -416,12 +487,21 @@ class Files
 			$this->delete(true);
 		}
 
-		$fields['uid'] = (string) static::$gfs
-									->storeFile($file_path, array(
-										'filename' => $fields['filename'],
-										'appid'    => static::$group->get('id'),
-										'category' => $fields['category']
-									));
+		try
+		{
+			$fields['uid'] = (string) static::$gfs
+										->storeFile($file_path, array(
+											'filename' => $fields['filename'],
+											'appid'    => static::$group->get('id'),
+											'category' => $fields['category']
+										));
+		}
+		catch(\MongoGridFSException $e)
+		{
+			throw new \TapiocaFileException(
+				__('tapioca.fail_to_store_file', array('filename' => $fields['filename'], 'error' => $e->getMessage()))
+			);
+		}
 
 		$new_file = array(
 			'ref'     => uniqid(),
@@ -455,22 +535,27 @@ class Files
 		// preview
 		if($ret && strpos($fields['mimetype'], 'image') !== false)
 		{
-			\Image::load($file_path)
-				->config('bgcolor', null)
-				->config('quality', 60)
-				->config('filetype', 'png')
-				->crop_resize(100, 100)
-				->save_pa('preview-');
-
 			$saved_to        = Config::get('tapioca.upload.path');
 			$preview_tmpname = 'preview-'.$saved_as;
 			$preview_name    = 'preview-'.$fields['filename'];
 			$preview_path    = $saved_to.DIRECTORY_SEPARATOR.$preview_tmpname;
 
-			$this->store($preview_name, $preview_path, $fields['category']);	
+			\Image::load($file_path)
+				->config('bgcolor', null)
+				->config('quality', 60)
+				->config('filetype', 'png')
+				->crop_resize(100, 100)
+				->save($preview_path);
+
+			// $saved_to        = Config::get('tapioca.upload.path');
+			// $preview_tmpname = 'preview-'.$saved_as;
+			// $preview_name    = 'preview-'.$fields['filename'];
+			// $preview_path    = $saved_to.DIRECTORY_SEPARATOR.$preview_tmpname;
+
+			$this->store($preview_name, $preview_path, $fields['category'], false);	
 		}
 
-		$this->store($fields['filename'], $file_path, $fields['category']);	
+		$this->store($fields['filename'], $file_path, $fields['category'], $import);	
 	}
 
 	/**
@@ -512,7 +597,7 @@ class Files
 		return false;
 	}
 
-	private function store($filename, $path, $category)
+	private function store($filename, $path, $category, $import)
 	{
 		$cat_path     = static::$appStorage.DIRECTORY_SEPARATOR.$category;
 		$file_path    = $cat_path.DIRECTORY_SEPARATOR.$filename;
@@ -534,7 +619,28 @@ class Files
 
 		File::copy($path, $file_path);
 
-		unlink($path);
+		if(!$import)
+		{
+			unlink($path);
+		}
+	}
+
+	public function delete_all(\Auth\User $user)
+	{
+		$files = static::$db
+					->get_where(static::$collection, array(
+						'type'   => array('$ne' => 'summary')
+					));
+		\Debug::show($files);
+		foreach($files as $file)
+		{
+			$this->file     = $file;
+			$this->filename = $file['filename'];
+
+			$this->delete();
+		}
+
+		exit;
 	}
 
 	public function delete($soft = false)
@@ -565,12 +671,20 @@ class Files
 			{
 				$cat_path = static::$appStorage.DIRECTORY_SEPARATOR.$this->file['category'];
 
-				foreach(static::$presets as $preset)
+				if($this->file['category'] == 'image')
 				{
-					$filename  = (empty($preset)) ? $this->filename : $preset.'-'.$this->filename;
+					foreach(static::$presets as $preset)
+					{
+						$filename  = (empty($preset)) ? $this->filename : $preset.'-'.$this->filename;
 
-					$file_path = $cat_path.DIRECTORY_SEPARATOR.$filename;
+						$file_path = $cat_path.DIRECTORY_SEPARATOR.$filename;
 
+						File::delete($file_path);
+					}
+				}
+				else
+				{
+					$file_path = $cat_path.DIRECTORY_SEPARATOR.$this->filename;
 					File::delete($file_path);
 				}
 
@@ -591,11 +705,40 @@ class Files
 		}
 	}
 
+	public static function getFileCategory($mimetype)
+	{
+		$file_types = Config::get('tapioca.file_types');		
+		$category   = 'other';
+
+		foreach ($file_types as $key => $values)
+		{
+			if(in_array($mimetype, $values))
+			{
+				return $key;
+			}
+		}
+
+		return $category;
+	}
+
+	public static function setFileName($path, $name = false)
+	{
+		$fileinfo	= pathinfo($path);
+		$name       = (!$name) ? $fileinfo['filename'] : $name;
+
+		$filename	= \Inflector::friendly_title(trim(strtolower($name)));
+		$basename   = $filename.'.'.$fileinfo['extension'];
+
+		return (object) array(
+				'filename' => $filename,
+				'basename' => $basename
+			);
+	}
+
 
 	public function upload()
 	{
 		$config     = Config::get('tapioca.upload');
-		$file_types = Config::get('tapioca.file_types');
 
 		// process the uploaded files in $_FILES
 		Upload::process($config);
@@ -656,25 +799,18 @@ class Files
 			{
 				$file_path  = $file['saved_to'].$file['saved_as'];
 
-				$basename	= \Inflector::friendly_title(trim(strtolower($file['filename'])));
-				$filename   = $basename.'.'.$file['extension'];
-				$category   = 'other';
-
-				foreach ($file_types as $key => $values)
-				{
-					if(in_array($file['mimetype'], $values))
-					{
-						$category = $key;
-					}
-				}
+				// $basename	= \Inflector::friendly_title(trim(strtolower($file['filename'])));
+				// $filename   = $basename.'.'.$file['extension'];
+				$filename   = static::setFileName($file_path, $file['filename']);
+				$category   = static::getFileCategory($file['mimetype']);
 
 				$new_file = array(
 								'saved_as'  => $file['saved_as'],
 								'path'      => $file_path,
 								'mimetype'  => $file['mimetype'],
 								'extension' => $file['extension'],
-								'basename'  => $basename,
-								'filename'  => $filename,
+								'basename'  => $filename->filename,
+								'filename'  => $filename->basename,
 								'length'    => $file['size'],
 								'md5'       => md5_file($file_path),
 								'tags'      => $file_tags,
