@@ -3,8 +3,9 @@ define([
 	'view/content',
 	'hbs!template/content/collection-home',
 	'dropdown',
-	'template/helpers/setStatus'
-], function(tapioca, vContent, tContent, dropdown, setStatus)
+	'template/helpers/setStatus',
+	'wtwui/Confirmation'
+], function(tapioca, vContent, tContent, dropdown, setStatus, Confirmation)
 {
 	var view = vContent.extend(
 	{
@@ -19,6 +20,37 @@ define([
 			this.baseUri    = tapioca.config.base_uri+this.appslug+'/collections/'+this.namespace;
 
 			this.collection.bind('reset', this.render, this);
+		},
+
+		events: {
+			'click .btn-delete-trigger': 'deleteDoc'
+		},
+
+		deleteDoc: function(event)
+		{
+			var $target = $(event.target).closest('tr'),
+				docRef  = $target.attr('data-ref'),
+				self    = this;
+
+			console.log(docRef, this.collection.get(docRef));
+
+			new Confirmation(
+			{
+				title:'',
+				message: 'Voulez vous effacer ce document ?',
+				ok: function()
+				{
+					self.collection.get(docRef).destroy();
+					$target.remove();
+				},
+				cancel: function(){},
+				overlay: {
+					css: {
+						background: 'black'
+					}
+				}
+			})
+			.show();
 		},
 
 		render: function()
