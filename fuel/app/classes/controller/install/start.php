@@ -45,7 +45,7 @@ class Controller_Install_Start extends Controller
 				$master = array(
 					'email'    => Input::post('email', null),
 					'password' => Input::post('password', null),
-					'name'     => Input::post('password', 0)
+					'name'     => Input::post('name', 0)
 				);
 
 				$firstGroup = array(
