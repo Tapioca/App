@@ -47,12 +47,12 @@ define([
 
 			this.$el.find('div.pane-content').html(_html);
 
+			this.overlay.show();
+			
 			this.$el.nanoScroller({
 					paneClass: 'track',
 					contentClass: '.pane-content'
 				});
-
-			this.overlay.show();
 
 			$('#ref-popin')
 				.addClass('active')

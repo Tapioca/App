@@ -151,7 +151,7 @@ $uri_base	= Uri::base(false);
 	</div><!-- /#main -->
 	<div id="ref-popin" class="wtwui-dialog wtwui-element fade overlay" data-content="">
 		<div class="close">×</div>
-		<div id="ref-popin-content" class="pane"><div class="pane-content"></div></div>
+		<div id="ref-popin-content" class="pane nano"><div class="pane-content"></div></div>
 	</div>
 
 	<!-- Application source -->
