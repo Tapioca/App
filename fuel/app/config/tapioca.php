@@ -113,7 +113,7 @@ return array(
 		'field'               => 'tappfile',
 		'randomize'           => true,
 		'fileinfo_magic_path' => '',
-		'ext_whitelist'	      => array('jpg', 'jpeg', 'gif', 'png', 'flv', 'mp4', 'ogv', 'doc') //, 'pdf', 'zip')
+		'ext_whitelist'	      => array('jpg', 'jpeg', 'gif', 'png', 'flv', 'mp4', 'ogv', 'doc', 'pdf', 'zip')
 	),
 
 	/*
