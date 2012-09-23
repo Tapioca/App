@@ -31,6 +31,7 @@ body .redactor_air {
 }
 
 .redactor_editor, .redactor_editor:focus {
+	color: #555;
 	position: relative;
 	outline: none;
 	box-shadow: none !important;
@@ -39,7 +40,7 @@ body .redactor_air {
 	background: none;	
 	background: #fff !important;
 	overflow: auto;
-	font-family: Arial, Helvetica, Verdana, Tahoma, sans-serif !important;      
+	font-family : 'Helvetica Neue', Helvetica, Arial, sans-serif;     
 	font-size: 13px !important;
 	line-height: 1.45em !important;	
 	white-space: normal;
@@ -86,8 +87,8 @@ body .redactor_air {
 	margin: 0 !important;
 	margin-bottom: 15px !important;
 	line-height: 1.45em !important;
-	font-family: Arial, Helvetica, Verdana, Tahoma, sans-serif !important;      
-	font-size: 15px !important;
+	font-family : 'Helvetica Neue', Helvetica, Arial, sans-serif;
+	font-size: 13px !important;
 	border: none;	
 }
 .redactor_editor iframe, 

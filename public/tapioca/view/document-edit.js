@@ -581,8 +581,9 @@ define([
 					config = ($this.attr('data-wysiwyg')) ? {} : { air: true},
 					settings = $.extend({}, {
 						buttons: ['html', '|', 'bold', 'italic', 'link'],
-						airButtons: ['html', '|', 'bold', 'italic', 'link'],
-						keyupCallback: self.change
+						airButtons: ['bold', 'italic', 'link'],
+						keyupCallback: self.change,
+						paragraphy: false
 					}, config);
 
 				$this
