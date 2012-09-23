@@ -11,11 +11,14 @@ define([
 		template: tFileListItem,
 		home: false,
 		select: false,
+		tag: true,
+		category: true,
 
 		initialize: function(options)
 		{
 			this.home = (options.mode == 'home');
 			this.select = (options.mode == 'select');
+			this.mergedTags = options.mergedTags;
 
 			this.model.bind('change', this.render, this);
 			this.model.bind('destroy', this.close, this);
@@ -24,7 +27,54 @@ define([
 		events: 
 		{
 			'click .delete-file-trigger': 'destroy',
-			'click .select-file-trigger': 'selected'
+			'click .select-file-trigger': 'selected',
+			'files::filterTags':          'filterTags',
+			'files::filterCategory':      'filterCategory'
+		},
+
+		filterTags: function(event, tag)
+		{
+			if(tag == 'all')
+			{
+				this.$el.show();
+				this.tag = true;
+				return;
+			}
+
+			if(this.category)
+			{
+				if($.inArray(tag, this.mergedTags) == -1)
+				{
+					this.tag = false;
+					this.$el.hide();
+					return;
+				}
+				this.tag = true;
+				this.$el.show();
+			}
+		},
+
+		filterCategory: function(event, category)
+		{
+			if(category == 'all')
+			{
+				this.$el.show();
+				this.category = true;
+				return;
+			}
+
+			if(this.tag)
+			{
+				if(this.model.get('category') != category)
+				{
+					this.category = false;
+					this.$el.hide();
+					return;
+				}
+
+				this.category = true;
+				this.$el.show();
+			}
 		},
 
 		selected: function(event)
@@ -68,7 +118,8 @@ define([
 			var _html = tFileListItem({
 							file: this.model.toJSON(),
 							select: this.select,
-							home: this.home
+							home: this.home,
+							mergedTags: this.mergedTags
 						});
 			
 			this.$el.html(_html);

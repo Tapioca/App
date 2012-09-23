@@ -1,22 +1,18 @@
+
 						<div class="row-fluid">
-							<div class="span2">&nbsp;</div>
-							<div class="span10 offset2">
-								<ul class="nav nav-pills">
-									<li>
-										<a href="#">all</a>
-									</li>
-									<li class="active">
-										<a href="#">image</a>
-									</li>
-									<li>
-										<a href="#">videos</a>
-									</li>
+							<div class="span2" id="library-filters">
+								<h4>Categories</h4>
+								<ul id="category-list">
+									<li class="active" data-category="all">toutes les categories</li>
+									<li data-category="image">images</li>
+									<li data-category="video">videos</li>
+									<li data-category="document">documents</li>
+									<li data-category="other">autres</li>
 								</ul>
-							</div>
-						</div>
-						<div class="row-fluid">
-							<div class="span2">
-								tags
+								<h4>Tags</h4>
+								<ul id="tags-list">
+									<li data-tag="all" class="active">tous les tags</li>
+								</ul>
 							</div>
 							<div class="span10">
 								<table class="table table-striped" id="table-file-list">

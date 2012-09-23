@@ -854,6 +854,43 @@ header#tapp {
 	color: #0088CC;
 }
 
+
+	/* Tags list
+	------------------------------ */
+
+#library-filters {}
+
+#library-filters h4 {
+	font-size: 13px;
+	line-height:20px; 
+	margin: 7px 0;
+}
+
+#library-filters ul {
+	list-style: none;
+	margin: 0 0 20px;
+	overflow: hidden;
+	padding: 0 0 0 20px;
+}
+
+#library-filters li {
+    border-radius: 3px;
+    clear: left;
+	cursor: pointer;
+	float: left;
+	font-size: 11px;
+    margin: 0 0 1px;
+    padding: 3px 5px;
+}
+
+#library-filters li:hover {
+	background: #eee;
+}
+
+#library-filters li.active {
+	background: #08c;
+	color: #fff;
+}
 /*
 #app-content .form-footer p {
 	margin-bottom: 0;
