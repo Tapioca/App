@@ -20,7 +20,7 @@ require.config(
 		//'fileupload-ui'        : '../assets/library/fileupload/jquery.fileupload-ui',
 		//'jquery.ui.widget'     : '../assets/library/fileupload/jquery.ui.widget',
 		'dropdown'             : '../assets/library/bootstrap/dropdown',
-		'wysiwyg'              : '../assets/library/wysihtml5/wysiwyg'
+		'redactor'             : '../assets/library/redactor/redactor-wrapper'
 	},
 	packages: 
 	[

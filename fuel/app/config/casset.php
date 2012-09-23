@@ -24,7 +24,7 @@ return array(
 					'bootstrap-overload.css',
 					'colorpicker.css',
 					'datepicker.css',
-					'bootstrap-wysihtml5.css',
+					'redactor.css',
 
 					'wtwui/Crit.css',
 					'wtwui/Dialog.css',

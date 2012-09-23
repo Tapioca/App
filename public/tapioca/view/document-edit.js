@@ -14,8 +14,8 @@ define([
 	'template/helpers/setStatus',
 	'hbs!template/content/document-thumb',
 	'hbs!template/content/document-ref',
-	'wysiwyg',
-	'jqueryui'
+	'jqueryui',
+	'redactor'
 ], function(tapioca, Handlebars, mediator, vContent, tContent, tRevisions, isSelected, atLeastOnce, localeSwitcher, _s, form2js, dropdown, setStatus, tThumb, tRef, wysiwyg)
 {
 	var view = vContent.extend(
@@ -578,11 +578,16 @@ define([
 			this.$el.find('textarea').not('[data-binded="true"]').each(function()
 			{
 				var $this  = $(this),
-					config = ($this.attr('data-wysiwyg')) ? { toolbar: $this.attr('data-toolbar') } : {},
-					editor = wysiwyg($this[0], config);
+					config = ($this.attr('data-wysiwyg')) ? {} : { air: true},
+					settings = $.extend({}, {
+						buttons: ['html', '|', 'bold', 'italic', 'link'],
+						airButtons: ['html', '|', 'bold', 'italic', 'link'],
+						keyupCallback: self.change
+					}, config);
 
-				$this.attr('data-binded', 'true');
-				editor.on('change', self.change);
+				$this
+					.redactor(settings)
+					.attr('data-binded', 'true');
 			});
 
 			this.$el.find('input[type="date"]').not('[data-binded="true"]').each(function()
@@ -816,34 +821,35 @@ console.log(event)
 
 		fields.textarea = function(item, prefix)
 		{
-			if(!_.isUndefined(item.wysiwyg))
-			{
-				++wysiwygInc;
-				formHtml += '<div id="wysihtml5-toolbar-'+wysiwygInc+'" class="wysihtml5-toolbar" style="display: none;">'+"\n"+
-'  <a data-wysihtml5-command="bold" title="bold"><i class="icon-bold"></i></a>'+"\n"+
-'  <a data-wysihtml5-command="italic" title="italic"><i class="icon-italic"></i></a>'+"\n"+
-'  <span class="separator">&nbsp;</span>'+"\n"+
-'  <a data-wysihtml5-command="createLink" title="insert link"><i class="icon-link"></i></a>'+"\n"+
-'  <span class="separator">&nbsp;</span>'+"\n"+
-'  <a data-wysihtml5-command="insertOrderedList" title="insert ordered list"><i class="icon-list-ol"></i></a>'+"\n"+
-'  <a data-wysihtml5-command="insertUnorderedList" title="insert unordered list"><i class="icon-list-ul"></i></a>'+"\n"+
-'  <span class="separator">&nbsp;</span>'+"\n"+
-'  <a data-wysihtml5-command="change_view" title="Show HTML"><i class="icon-list-ul"></i></a>'+"\n"+
-'  <div data-wysihtml5-dialog="createLink" style="display: none;">'+"\n"+
-'    <label>'+"\n"+
-'      Link:'+"\n"+
-'      <input data-wysihtml5-dialog-field="href" value="http://" class="text"> '+"\n"+
-'      <a data-wysihtml5-dialog-action="save" title="save"><i class="icon-ok"></i></a> <a data-wysihtml5-dialog-action="cancel" title="cancel"><i class="icon-remove"></i></a>'+"\n"+
-'    </label>'+"\n"+
-'  </div>'+"\n"+
-'</div>';
-			}
+// 			if(!_.isUndefined(item.wysiwyg))
+// 			{
+// 				++wysiwygInc;
+// 				formHtml += '<div id="wysihtml5-toolbar-'+wysiwygInc+'" class="wysihtml5-toolbar" style="display: none;">'+"\n"+
+// '  <a data-wysihtml5-command="bold" title="bold"><i class="icon-bold"></i></a>'+"\n"+
+// '  <a data-wysihtml5-command="italic" title="italic"><i class="icon-italic"></i></a>'+"\n"+
+// '  <span class="separator">&nbsp;</span>'+"\n"+
+// '  <a data-wysihtml5-command="createLink" title="insert link"><i class="icon-link"></i></a>'+"\n"+
+// '  <span class="separator">&nbsp;</span>'+"\n"+
+// '  <a data-wysihtml5-command="insertOrderedList" title="insert ordered list"><i class="icon-list-ol"></i></a>'+"\n"+
+// '  <a data-wysihtml5-command="insertUnorderedList" title="insert unordered list"><i class="icon-list-ul"></i></a>'+"\n"+
+// '  <span class="separator">&nbsp;</span>'+"\n"+
+// '  <a data-wysihtml5-command="change_view" title="Show HTML"><i class="icon-list-ul"></i></a>'+"\n"+
+// '  <div data-wysihtml5-dialog="createLink" style="display: none;">'+"\n"+
+// '    <label>'+"\n"+
+// '      Link:'+"\n"+
+// '      <input data-wysihtml5-dialog-field="href" value="http://" class="text"> '+"\n"+
+// '      <a data-wysihtml5-dialog-action="save" title="save"><i class="icon-ok"></i></a> <a data-wysihtml5-dialog-action="cancel" title="cancel"><i class="icon-remove"></i></a>'+"\n"+
+// '    </label>'+"\n"+
+// '  </div>'+"\n"+
+// '</div>';
+// 			}
 
 			formHtml += '<textarea class="span7"';
 			
 			if(!_.isUndefined(item.wysiwyg))
 			{
-				formHtml += ' data-wysiwyg="true" data-toolbar="wysihtml5-toolbar-'+wysiwygInc+'" id="wysihtml5-textarea-'+wysiwygInc+'"'
+				formHtml += ' data-wysiwyg="true"'
+				// data-toolbar="wysihtml5-toolbar-'+wysiwygInc+'" id="wysihtml5-textarea-'+wysiwygInc+'"
 			}
 
 			formHtml += ' name="' + getName(item, prefix) + '" rows="3">{{' + item.id + '}}</textarea>';
