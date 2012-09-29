@@ -1,14 +1,15 @@
 define([
 	'tapioca',
+	'aura/mediator',
 	'view/content',
-	'hbs!template/content/collection-home',
-	'dropdown',
-	'template/helpers/setStatus',
-	'wtwui/Confirmation'
-], function(tapioca, vContent, tContent, dropdown, setStatus, Confirmation)
+	'view/collection-home-row',
+	'hbs!template/content/collection-home'
+], function(tapioca, mediator, vContent, vColectionRow, tContent)
 {
 	var view = vContent.extend(
 	{
+		viewsPointers:[],
+
 		initialize: function(options)
 		{
 			this.header    = options.header;
@@ -22,37 +23,6 @@ define([
 			this.collection.bind('reset', this.render, this);
 		},
 
-		events: {
-			'click .btn-delete-trigger': 'deleteDoc'
-		},
-
-		deleteDoc: function(event)
-		{
-			var $target = $(event.target).closest('tr'),
-				docRef  = $target.attr('data-ref'),
-				self    = this;
-
-			console.log(docRef, this.collection.get(docRef));
-
-			new Confirmation(
-			{
-				title:'',
-				message: 'Voulez vous effacer ce document ?',
-				ok: function()
-				{
-					self.collection.get(docRef).destroy();
-					$target.remove();
-				},
-				cancel: function(){},
-				overlay: {
-					css: {
-						background: 'black'
-					}
-				}
-			})
-			.show();
-		},
-
 		render: function()
 		{
 			this.header.thead = [];
@@ -61,31 +31,52 @@ define([
 			{
 				this.header.thead.push(this.header.summary[i]['name']);
 			}
-			
+
 			var data = {
 				header: this.header,
 				appslug: this.appslug,
 				namespace: this.namespace,
 				editable: this.header.editable,
 				baseUri: this.baseUri,
-				locale: this.locale,
-				documents: this.collection.toJSON()
+				locale: this.locale
 			};
 
 			var _html = tContent(data)
 
 			this.html(_html);
 
-			this.$el.find('.dropdown-toggle').dropdown();
-			this.$el.find('ul[data-type="set-status"] a').setStatus();
+			this.$table = this.$el.find('table tbody');
+
+			_.each(this.collection.models, this.displayRow, this);
+
+
+			mediator.publish('search::enable');
 
 			return this;
 		},
 
+		displayRow: function(model)
+		{
+			this.viewsPointers[model.cid] = new vColectionRow({
+				model: model,
+				parent: this.$table,
+				editable: this.header.editable,
+				namespace: this.namespace,
+				appslug: this.appslug,
+				appId: this.header.app_id
+			});
+		},
+
 		onClose: function()
 		{
-			this.collection.unbind('fetch', this.render);
-			//this.model.unbind('reset', this.render);
+			mediator.publish('search::disabled');
+
+			this.collection.unbind('reset', this.render);
+
+			for(var i in this.viewsPointers)
+			{
+				this.viewsPointers[i].close();
+			}
 		}
 	});
 

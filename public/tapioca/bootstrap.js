@@ -58,11 +58,12 @@ require([
 	'aura/mediator',
 	'view/apps-list',
 	'module/breadcrumb',
+	'module/search',
 	'module/collection',
 	'module/document',
 	'module/list',
 	'module/file'
-], function($, nanoScroller, Confirmation, tapioca, mediator, vAppCollections, Breadcrumb, Collections, Document, List, File)
+], function($, nanoScroller, Confirmation, tapioca, mediator, vAppCollections, Breadcrumb, Search, Collections, Document, List, File)
 {
 	// Defining the application router.
 	var Router = Backbone.Router.extend(

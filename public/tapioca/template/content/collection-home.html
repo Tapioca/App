@@ -52,27 +52,6 @@
 							</tr>
 						</thead>
 						<tbody>
-						{{#each documents}}
-							<tr data-ref="{{_ref}}">
-								{{{docSummary data _ref ../header.app_id ../namespace}}}
-								<td> 
-									{{{displayStatus _ref revisions ../appslug ../namespace}}}
-								</td>
-								<td>
-									<div class="btn-group float-right">
-										<a href="/app/{{../appslug}}/document/{{../namespace}}/{{_ref}}" class="btn btn-mini">
-											<i class="icon-pencil"></i>
-											Edit
-										</a>
-										{{#../header.editable}}
-										<a href="javascript:;" class="btn btn-mini btn-danger btn-delete-trigger">
-											<i class="icon-trash"></i>
-										</a>
-										{{/../header.editable}}
-									</div>
-								</td>
-							</tr>
-						{{/each}}
 						</tbody>
 					</table>
 				</div><!-- /.pane-content -->
