@@ -21,7 +21,8 @@ define([
 
 		events:
 		{
-			'collection:highlight': 'highlight'
+			'collection:highlight': 'highlight',
+			'library:highlight':    'highlightLibrary'
 		},
 
 		highlight: function(event, collection)
@@ -32,6 +33,15 @@ define([
 				
 				this.$el.find('li').removeClass('active');
 				this.$el.find('li[data-namespace="' + collection + '"]').addClass('active');
+			}
+		},
+
+		highlightLibrary: function(event)
+		{
+			if(this.currentHighlight != 'library')
+			{
+				this.currentHighlight = 'library';
+				this.$el.find('li').removeClass('active');
 			}
 		},
  

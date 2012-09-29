@@ -39,6 +39,8 @@ define([
 
 		onClose: function()
 		{
+			$('#app-nav-files-'+this.appSlug).find('li[data-namespace="library"]').removeClass('active');
+			
 			this.fileList.close();
 		}
 	});

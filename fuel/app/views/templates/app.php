@@ -113,7 +113,7 @@ $uri_base	= Uri::base(false);
 
 						<h6>Fichiers</h6>
 						<ul id="app-nav-files-<?= $group['slug']; ?>">
-							<li>
+							<li data-namespace="library">
 								<a href="app/<?= $group['slug']; ?>/file">Library</a>
 							</li>
 							<li class="divider"></li>

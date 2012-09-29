@@ -42,9 +42,12 @@ define([
 		publicStorage,
 		appSlug;
 
-	var highlight = function(appslug, namespace)
+	var highlight = function(appslug)
 	{
-		$('#app-nav-collections-'+appslug).trigger('collection:highlight', namespace);
+		$('#app-nav-collections-'+appslug).trigger('library:highlight');
+		
+		$('#app-nav-files-'+appslug).find('li[data-namespace="library"]').addClass('active');
+
 		$('#apps-nav').find('a.app-nav-header[data-app-slug="'+appslug+'"]').trigger('click');
 	}
 
@@ -52,7 +55,7 @@ define([
 	{
 		model = tapioca.apps[appslug].models.get(namespace);
 
-		highlight(appslug, namespace);
+		highlight(appslug);
 
 		if(tapioca.view != null) tapioca.view.close();
 		tapioca.view  = new vCollectionEdit({
@@ -82,6 +85,8 @@ define([
 
 		publicStorage = tapioca.config.file.base_path+appslug;
 		appSlug = appslug;
+
+		highlight(appslug);
 
 		collection = new Files.Collection({
 							appSlug: appslug
