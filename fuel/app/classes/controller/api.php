@@ -2,6 +2,8 @@
 
 class Controller_Api extends Controller_Rest
 {
+	protected $rest_format    = 'json'; // default format
+
 	protected static $granted = true;
 	protected static $data    = array('message' => 'Method Not Implemented');
 	protected static $status  = 501;
@@ -59,6 +61,13 @@ class Controller_Api extends Controller_Rest
 			}
 
 		}// if Auth
+
+		// if no url define format
+		// set default format
+		if(is_null($this->format))
+		{
+			$this->format = $this->rest_format;
+		}
 
 	}
 
