@@ -55,6 +55,26 @@ class Collection
 	protected $callback = array();
 
 	/**
+	 * @var  array  List of fields who need to be cast, get from config
+	 */
+	protected static $castable = array();
+
+	/**
+	 * @var  array  path and value of fields to cast
+	 */
+	protected $castablePath = array();
+
+	/**
+	 * @var  array  path and label of summary fields
+	 */
+	protected $summaryPath = array();
+
+	/**
+	 * @var  array  path and label of fieds who need validation
+	 */
+	protected $rulesPath = array();
+
+	/**
 	 * Loads in the Collection object
 	 *
 	 * @param   object  Group instace
@@ -399,6 +419,10 @@ class Collection
 		
 		self::validation($fields, $check_list);
 
+		static::$castable = Config::get('tapioca.cast');
+
+		$this->parse($fields['structure']);
+
 		$arrData    = Config::get('tapioca.collection.dispatch.data');
 
 		$revision = (count($this->data) + 1);
@@ -410,11 +434,16 @@ class Collection
 		);
 
 		$data = array(
-			'app_id' => static::$group->get('slug'),
-			'type' => 'data',
+			'app_id'    => static::$group->get('slug'),
+			'type'      => 'data',
 			'namespace' => $this->namespace,
-			'revision' => $revision,
-		) + $fields;
+			'revision'  => $revision,
+			'summary'   => $this->summaryPath,
+			'cast'      => $this->castablePath,
+			'rules'     => $this->rulesPath,
+			'structure' => $fields['structure'],
+			'callback'  => $fields['callback']
+		);
 
 		$revision = array(
 			'revison' => $revision,
@@ -545,5 +574,83 @@ class Collection
 		}
 
 		return false;
+	}
+
+	/**
+	 * Collection fields who need a post traitment
+	 *
+	 * @param   object 
+	 * @param   string 	use for recustion
+	 * @return  bool
+	 */
+	private function parse(&$schema, $path = '/')
+	{
+		foreach($schema as &$item)
+		{
+			if($item['type'] == 'object' || $item['type'] == 'array')
+			{
+				$tmp_path = $path.$item['id'].'/';
+				$this->parse($item['node'], $tmp_path);
+			}
+			else
+			{
+				$tmp_path = $path.$item['id'];
+
+				if(in_array($item['type'], static::$castable))
+				{
+					$obj = new \stdClass;
+					$obj->path = $tmp_path;
+					$obj->type = $item['type'];
+
+					$this->castablePath[] = $obj;
+				}
+
+				if(isset($item['summary']) && $item['summary'])
+				{
+					$itemPath = static::setItemPath($path, $item['id']);
+
+					$obj = new \stdClass;
+					$obj->path = $itemPath;
+					$obj->name = $item['label'];
+
+					$this->summaryPath[] = $obj;
+
+					if(!isset( $item['rules']))
+					{
+						$item['rules'] = array('required');
+					}
+
+					if(!in_array('required', $item['rules']))
+					{
+						$item['rules'][] = 'required';
+					}	
+				}
+
+				if(isset($item['rules']) && count($item['rules']) > 0)
+				{
+					$obj = new \stdClass;
+					$obj->path = $tmp_path;
+					$obj->name = $item['rules'];
+
+					$this->rulesPath[] = $obj;
+				}
+			}
+		}
+	}
+
+	/**
+	 * Format field path
+	 *
+	 * @param   string  xpath
+	 * @param   string 	ite ID
+	 * @return  string
+	 */
+	private static function setItemPath($path, $id)
+	{
+		$itemPath = $path.$id;
+		$itemPath = str_replace('/', '.', $itemPath);
+		$itemPath = substr($itemPath, 1); // remove root
+
+		return $itemPath;
 	}
 }

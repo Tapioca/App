@@ -56,9 +56,9 @@ define([
 				desc      : $('#desc').val(),
 				status    : $('#status').val(),
 				structure : jQuery.parseJSON($('#structure').val()),
-				summary   : jQuery.parseJSON($('#summary').val()),
+				// summary   : jQuery.parseJSON($('#summary').val()),
 				callback  : jQuery.parseJSON($('#callback').val()),
-				rules     : jQuery.parseJSON($('#rules').val())
+				// rules     : jQuery.parseJSON($('#rules').val())
 			});
 
 			if (this.model.isNew())
