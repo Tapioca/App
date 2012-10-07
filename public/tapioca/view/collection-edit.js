@@ -22,6 +22,11 @@ define([
 				view.callback  = JSON.stringify(view.callback);
 				view.rules     = JSON.stringify(view.rules);
 
+			if(view.summaryEdit)
+			{
+				view.summaryEdit = ' checked="checked"';
+			}
+
 			var _html = Mustache.render(tContent, view);
 
 			this.html(_html);
@@ -52,12 +57,13 @@ define([
 
 			this.model.set(
 			{
-				name      : $('#name').val(),
-				desc      : $('#desc').val(),
-				status    : $('#status').val(),
-				structure : jQuery.parseJSON($('#structure').val()),
-				// summary   : jQuery.parseJSON($('#summary').val()),
-				callback  : jQuery.parseJSON($('#callback').val()),
+				name       : $('#name').val(),
+				desc       : $('#desc').val(),
+				status     : $('#status').val(),
+				structure  : jQuery.parseJSON($('#structure').val()),
+				summary    : jQuery.parseJSON($('#summary').val()),
+				summaryEdit: $('#summary-edit').is(':checked'),
+				callback   : jQuery.parseJSON($('#callback').val()),
 				// rules     : jQuery.parseJSON($('#rules').val())
 			});
 

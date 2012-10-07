@@ -29,7 +29,7 @@ define([
 			
 			for(var i = -1, l = this.header.summary.length; ++i < l;)
 			{
-				this.header.thead.push(this.header.summary[i]['name']);
+				this.header.thead.push(this.header.summary[i]['label']);
 			}
 
 			var data = {

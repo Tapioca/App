@@ -61,12 +61,10 @@ return array(
 			'summary' => array(
 				'namespace',
 				'name',
-				'status', 
-				'summary'
+				'status'
 			),
 			'data' => array(
-				'structure', 
-				'summary'
+				'structure'
 			)
 		)
 	),
@@ -83,7 +81,8 @@ return array(
 			),
 			'data' => array(
 				'structure', 
-				'summary',
+				'summary', 
+				'summaryEdit',
 				'dependencies',
 				'indexes',
 				'callback',

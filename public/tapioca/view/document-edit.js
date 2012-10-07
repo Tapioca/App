@@ -771,8 +771,6 @@ define([
 
 			this.form = document.forms['tapioca-document-form'];
 
-			console.log(this.fields);
-
 			return this;
 		},
 

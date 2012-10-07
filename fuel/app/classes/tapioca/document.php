@@ -395,8 +395,6 @@ class Document
 			throw new \TapiocaException( $e->getMessage() );
 		}
 
-		Callback::register(self::$group, $collection_data);
-
 		// Test document rules
 		if(isset($collection_data['rules']))
 		{
@@ -407,8 +405,9 @@ class Document
 			}
 		}
 
-		// Cast document's values
+		Callback::register(self::$group, $collection_data);
 
+		// Cast document's values
 		Cast::set($collection_data['cast'], $document);
 
 		// Global before callback
@@ -645,7 +644,7 @@ class Document
 		$update = array('_about.status' => (int) $status);
 
 		// if new status is 100 (Published),
-		// we set other revison at -1 (out of date)
+		// we set the others revisons at -1 (out of date)
 		// and define the revision as "Active"
 		if($set_out_of_date)
 		{

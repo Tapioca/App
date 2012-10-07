@@ -69,6 +69,8 @@ class Collection
 	 */
 	protected $summaryPath = array();
 
+	protected $summaryEdit = 0;
+
 	/**
 	 * @var  array  path and label of fieds who need validation
 	 */
@@ -190,11 +192,15 @@ class Collection
 	public function all($status = 100, \Auth\User $user)
 	{
 		//query database for collections's summaries
-		$ret = static::$db->get_where(static::$collection, array(
-			'app_id' => static::$group->get('slug'),
-			'type'   => 'summary',
-			'status' => array('$gte' => (int) $status)
-		));
+		$ret = static::$db
+				->select(array(), array(
+					'revisions'
+				))
+				->get_where(static::$collection, array(
+					'app_id' => static::$group->get('slug'),
+					'type'   => 'summary',
+					'status' => array('$gte' => (int) $status)
+				));
 
 		if($ret)
 		{
@@ -421,6 +427,8 @@ class Collection
 
 		static::$castable = Config::get('tapioca.cast');
 
+		$this->summaryEdit = $fields['summaryEdit'];
+
 		$this->parse($fields['structure']);
 
 		$arrData    = Config::get('tapioca.collection.dispatch.data');
@@ -428,15 +436,16 @@ class Collection
 		$revision = (count($this->data) + 1);
 
 		$data = array(
-			'app_id'    => static::$group->get('slug'),
-			'type'      => 'data',
-			'namespace' => $this->namespace,
-			'revision'  => $revision,
-			'summary'   => $this->summaryPath,
-			'cast'      => $this->castablePath,
-			'rules'     => $this->rulesPath,
-			'structure' => $fields['structure'],
-			'callback'  => $fields['callback']
+			'app_id'      => static::$group->get('slug'),
+			'type'        => 'data',
+			'namespace'   => $this->namespace,
+			'revision'    => $revision,
+			'summary'     => ($this->summaryEdit) ? $fields['summary'] : $this->summaryPath,
+			'summaryEdit' => $this->summaryEdit,
+			'cast'        => $this->castablePath,
+			'rules'       => $this->rulesPath,
+			'structure'   => $fields['structure'],
+			'callback'    => $fields['callback']
 		);
 
 		$revision = array(
@@ -461,7 +470,10 @@ class Collection
 
 			$update_summary = static::$db
 								->where(static::$summary_where)
-								->update(static::$collection, array('revisions' => $this->summary['revisions']));
+								->update(static::$collection, array(
+									'revisions' => $this->summary['revisions'],
+									'summary'   => $data['summary']
+								));
 
 			if(!$update_summary)
 			{
@@ -590,6 +602,7 @@ class Collection
 			{
 				$tmp_path = $path.$item['id'];
 
+				// cast fields
 				if(in_array($item['type'], static::$castable))
 				{
 					$obj = new \stdClass;
@@ -609,27 +622,32 @@ class Collection
 					}
 				}
 
-				if(isset($item['summary']) && $item['summary'])
+				// summary
+				if(!$this->summaryEdit) // if we don't set summary mannualy
 				{
-					$itemPath = static::setItemPath($path, $item['id']);
-
-					$obj = new \stdClass;
-					$obj->path = $itemPath;
-					$obj->name = $item['label'];
-
-					$this->summaryPath[] = $obj;
-
-					if(!isset( $item['rules']))
+					if(isset($item['summary']) && $item['summary'])
 					{
-						$item['rules'] = array('required');
+						$itemPath = static::setItemPath($path, $item['id']);
+
+						$obj = new \stdClass;
+						$obj->path  = $itemPath;
+						$obj->label = $item['label'];
+
+						$this->summaryPath[] = $obj;
+
+						if(!isset( $item['rules']))
+						{
+							$item['rules'] = array('required');
+						}
+
+						if(!in_array('required', $item['rules']))
+						{
+							$item['rules'][] = 'required';
+						}	
 					}
-
-					if(!in_array('required', $item['rules']))
-					{
-						$item['rules'][] = 'required';
-					}	
 				}
 
+				// rules
 				if(isset($item['rules']) && count($item['rules']) > 0)
 				{
 					$obj = new \stdClass;
