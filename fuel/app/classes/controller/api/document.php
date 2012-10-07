@@ -100,8 +100,16 @@ class Controller_Api_Document extends Controller_Api
 			{
 				$this->clean($model);
 
-				self::$data   = $document->save($model, self::$user);
-				self::$status = 200;
+				try
+				{
+					self::$data   = $document->save($model, self::$user);
+					self::$status = 200;
+
+				} catch (TapiocaDocumentException $e)
+				{
+					self::$data   = array('error' => $e->getMessage());
+					self::$status = 500;
+				}
 			}
 		} // if granted
 	}

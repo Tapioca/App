@@ -402,16 +402,14 @@ class Document
 		{
 			if(!$this->test_rules($collection_data['rules'], $document))
 			{
-				//\Debug::show($this->errors);
-				//exit;
-				throw new \TapiocaException( 'fuck the rules!!' );
+				// TODO: find a way to display $this->errors in Execption
+				throw new \TapiocaDocumentException( __('tapioca.document_failed_at_rules_validation') );
 			}
 		}
 
 		// Cast document's values
 
-		Cast::set($document, $collection_data['structure']);
-
+		Cast::set($collection_data['cast'], $document);
 
 		// Global before callback
 		Callback::trigger('before', $document);
@@ -794,12 +792,11 @@ class Document
 	 */
 	private function test_rules($rules_list, $document)
 	{
-		foreach($rules_list as $field => $rules)
+		foreach($rules_list as $field)
 		{
-			$value = \Arr::get($document, $field, null);
-			$args  = array($value);
-			
-			foreach($rules as $rule)
+			$args = Set::extract($field['path'], $document);
+
+			foreach($field['rules'] as $rule)
 			{
 				// Strip the parameter (if exists) from the rule
 				// Rules can contain a parameter: max_length[5]
@@ -811,14 +808,15 @@ class Document
 					$param	= explode('|', $match[2]);
 					$args	= array_merge($args, $param);
 				}
-				
+
 				$valid = call_user_func_array(array(__NAMESPACE__ .'\Rules', $rule), $args);
-				
+
 				if(!$valid)
 				{
 					$obj = new \stdClass;
 					$obj->rule = $rule;
-					$obj->args = array_merge(array('$item[id]'), (array) $param);
+					$obj->path = $field['path'];
+					// $obj->args = array_merge(array($item['id']), (array) $param);
 					
 					$this->errors[] = $obj;
 					

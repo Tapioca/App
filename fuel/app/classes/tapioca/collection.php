@@ -427,12 +427,6 @@ class Collection
 
 		$revision = (count($this->data) + 1);
 
-		$user_data = array(
-			'id'    => $user->get('id'),
-			'name'  => $user->get('name'),
-			'email' => $user->get('email'),
-		);
-
 		$data = array(
 			'app_id'    => static::$group->get('slug'),
 			'type'      => 'data',
@@ -447,9 +441,9 @@ class Collection
 
 		$revision = array(
 			'revison' => $revision,
-			'date' => new \MongoDate(),
-			'user' => $user_data,
-			'status' => (int) 100 
+			'date'    => new \MongoDate(),
+			'user'    => $user->get('id'),
+			'status'  => (int) 100 
 		);
 
 		$insert_data = static::$db->insert(static::$collection, $data);
@@ -603,6 +597,16 @@ class Collection
 					$obj->type = $item['type'];
 
 					$this->castablePath[] = $obj;
+
+					if($item['type'] == 'number' && !isset( $item['rules']))
+					{
+						$item['rules'] = array('numeric');
+					}
+
+					if(!in_array('numeric', $item['rules']))
+					{
+						$item['rules'][] = 'numeric';
+					}
 				}
 
 				if(isset($item['summary']) && $item['summary'])
@@ -629,8 +633,8 @@ class Collection
 				if(isset($item['rules']) && count($item['rules']) > 0)
 				{
 					$obj = new \stdClass;
-					$obj->path = $tmp_path;
-					$obj->name = $item['rules'];
+					$obj->path  = $tmp_path;
+					$obj->rules = $item['rules'];
 
 					$this->rulesPath[] = $obj;
 				}

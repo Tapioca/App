@@ -9,51 +9,18 @@ class TapiocaCastException extends FuelException {}
 
 class Cast
 {
-	private static $types;
-	private static $paths = array();
-
-	public static function _init()
+	public static function set($fields, &$document)
 	{
-		static::$types = \Config::get('tapioca.cast');
-	}
-
-	public static function set(&$document, $schema)
-	{
-		static::parse($schema);
-
-		foreach(static::$paths as $path => $type)
+		foreach($fields as $field)
 		{
-			$results = Set::extract($path, $document);
-			$results = call_user_func_array(array('self', '_'.$type), array($results));
+			$results = Set::extract($field['path'], $document);
+			$results = call_user_func_array(array('self', '_'.$field['type']), array($results));
 
-			//$casted  = self::makeMulti($path, $results);
-
-			self::apply($document, $path, $results);//array_merge($document, $casted);
+			self::apply($document, $field['path'], $results);
 
 		}
 
 		return $document;
-	}
-
-	private static function parse($schema, $path = '/')
-	{
-		foreach($schema as $item)
-		{
-			if($item['type'] == 'object' || $item['type'] == 'array')
-			{
-				$tmp_path = $path.$item['id'].'/';
-				static::parse($item['node'], $tmp_path);
-			}
-			else
-			{
-				if(in_array($item['type'], static::$types))
-				{
-					$tmp_path = $path.$item['id'];
-
-					static::$paths[$tmp_path] = $item['type'];
-				}
-			}
-		}
 	}
 
 	private static function apply(&$document, $path, $result)
@@ -66,7 +33,22 @@ class Cast
 		{
 			if($key == $target)
 			{
-				if(is_array($result))
+				// our key is part of this level
+				if( array_key_exists($target, $doc) )
+				{
+					// if the key contains array
+					// result remplace all the values
+					if( is_array($doc[$key]) )
+					{
+						$doc[$key] = $result;
+					}
+					else
+					{
+						$doc[$key] = reset($result);
+					}
+				}
+				// our key is part of an array of object
+				else
 				{
 					$nbResult = count($result);
 
@@ -74,10 +56,6 @@ class Cast
 					{
 						$doc[$i][$key] = $result[$i];
 					}
-				}
-				else
-				{
-					$doc[$key] = $result;
 				}
 			}
 			else
@@ -88,40 +66,12 @@ class Cast
 
 	}
 
-	private static function makeMulti($path, $result)
-	{
-		$multi  = array();
-		$temp   =& $multi;
-		$items  = array_filter(explode('/', $path));
-		$target = end($items);
-		
-		foreach ($items as $key)
-		{
-			if($key == $target)
-			{
-				if(is_array($result))
-				{
-					foreach($result as $value)
-					{
-						$temp[][$key] = $value;
-					}
-				}
-				else
-				{
-					$temp[$key] = $value;
-				}
-			}
-			else
-			{
-				$temp[$key] = array();
-				$temp =& $temp[$key];
-			}
-		}
-
-		return $multi;
-	} 
-
 	private static function _date($results)
+	{
+		return static::_number($results);
+	}
+
+	private static function _number($results)
 	{
 		array_walk($results, function(&$item)
 		{
@@ -131,4 +81,36 @@ class Cast
 		return $results;
 	}
 
+	// private static function makeMulti($path, $result)
+	// {
+	// 	$multi  = array();
+	// 	$temp   =& $multi;
+	// 	$items  = array_filter(explode('/', $path));
+	// 	$target = end($items);
+		
+	// 	foreach ($items as $key)
+	// 	{
+	// 		if($key == $target)
+	// 		{
+	// 			if(is_array($result))
+	// 			{
+	// 				foreach($result as $value)
+	// 				{
+	// 					$temp[][$key] = $value;
+	// 				}
+	// 			}
+	// 			else
+	// 			{
+	// 				$temp[$key] = $value;
+	// 			}
+	// 		}
+	// 		else
+	// 		{
+	// 			$temp[$key] = array();
+	// 			$temp =& $temp[$key];
+	// 		}
+	// 	}
+
+	// 	return $multi;
+	// } 
 }

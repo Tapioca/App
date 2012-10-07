@@ -16,6 +16,7 @@ return array(
 	'document_revision_not_found'  => 'Revison ":revision" does not exist for Document ":ref" in collection ":collection".',
 	'no_document_selected'         => 'No document is selected.',
 	'document_column_is_empty'     => ':column must not be empty.',
+	'document_failed_at_rules_validation' => 'document failed at rules validation',
 
 	/** File Exception Messages **/
 	'file_already_exists'          => 'The file name ":name" already exists.',
