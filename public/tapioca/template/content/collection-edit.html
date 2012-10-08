@@ -1,52 +1,78 @@
 				<div class="pane-content">
+					<form id="tapioca-collection-form" name="tapioca-collection-form" class="form-horizontal">
+						<fieldset>
+							<legend>Gestion de la collection</legend>
 
-<label>Id:</label>
-<input id="namespace" name="namespace" type="text" value="{{ namespace }}" disabled />
+							<div class="control-group">
+								<label class="control-label">Id</label>
+								<div class="controls">
+									<input id="namespace" name="namespace" type="text" value="{{ namespace }}" disabled class="span7">
+								</div>
+							</div>
 
-<hr>
+							<div class="control-group">
+								<label class="control-label">Nom</label>
+								<div class="controls">
+									<input type="text" id="name" name="name" value="{{ name }}" required class="span7">
+								</div>
+							</div>
 
-<label>Name:</label>
-<input type="text" id="name" name="name" value="{{ name }}" required />
+							<div class="control-group">
+								<label class="control-label">Description</label>
+								<div class="controls">
+									<textarea rows="3" id="desc" name="desc" class="span7">{{ desc }}</textarea>
+								</div>
+							</div>
 
-<hr>
+							<div class="control-group">
+								<label class="control-label">Status</label>
+								<div class="controls">
+									<input type="text" id="status" name="status" value="{{ status }}" required class="span1">
+								</div>
+							</div>
 
-<label>Description:</label>
-<textarea id="desc" name="desc">{{ desc }}</textarea>
+							<hr>
 
-<hr>
+							<div class="control-group">
+								<label class="control-label">Schema</label>
+								<div class="controls">
+									<textarea id="structure" name="structure" rows="10" class="span7 lined">{{ structure }}</textarea>
+								</div>
+							</div>
 
-<label>Status:</label>
-<input type="text" id="status" name="status" value="{{ status }}" required />
+							<hr>
 
-<hr>
+							<div class="control-group">
+								<label class="control-label">Summary</label>
+								<div class="controls">
+									<textarea id="summary" name="summary" rows="7" class="span7 lined">{{ summary }}</textarea>
+									<p class="help-block">
+										<label>
+											<input type="checkbox" id="summary-edit" value="1" {{{summaryEdit}}}> 
+											Editer manullement le résumé
+										</label>
+									</p>
+								</div>
+							</div>
 
-<label>Structure:</label>
-<textarea id="structure" name="structure">{{ structure }}</textarea>
+							<hr>
+							<div class="control-group">
+								<label class="control-label">callback</label>
+								<div class="controls">
+									<textarea id="callback" name="callback" rows="7" class="span7 lined">{{ callback }}</textarea>
+								</div>
+							</div>
+		<!-- <hr>
 
-<hr>
+		<button class="save">Save</button>
+		<button class="delete">Delete</button> 
 
-<label>Summary:</label>
-<textarea id="summary" name="summary">{{ summary }}</textarea>
-
-<p>
-	<label><input type="checkbox" id="summary-edit" value="1" {{{summaryEdit}}}> Editer manullement le résumé</label>
-</p>
-
-<hr>
-
-<label>Rules:</label>
-<textarea id="rules" name="rules">{{ rules }}</textarea>
-
-<hr>
-
-<label>callback:</label>
-<textarea id="callback" name="callback">{{ callback }}</textarea>
-
-<hr>
-
-<button class="save">Save</button>
-<button class="delete">Delete</button>
-
-<input type="text" id="app_id" name="app_id" value="{{ app_id }}" required />
-
+							<input type="text" id="app_id" name="app_id" value="{{ app_id }}" required />
+							-->
+					</fieldset>
+				</form>
 				</div><!-- /.pane-content -->
+				<div class="form-actions form-footer">
+					<button type="submit" id="tapioca-collection-form-save" class="btn btn-primary disabled" disabled="disabled">Save changes</button>
+					<button type="reset" class="btn">Cancel</button>
+				</div><!-- /.form-actions -->

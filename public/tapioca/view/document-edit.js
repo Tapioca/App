@@ -158,7 +158,7 @@ define([
 		{
 			tapioca.beforeunload = {
 				type: 'confirm',
-				title: 'Etes vous sur de voiloir quiter cette page ? ',
+				title: 'Etes vous sur de vouloir quiter cette page ? ',
 				message: 'Vos modifications ne seront pas sauvegarder'
 			};
 

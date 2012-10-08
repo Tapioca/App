@@ -20,7 +20,8 @@ require.config(
 		//'fileupload-ui'        : '../assets/library/fileupload/jquery.fileupload-ui',
 		//'jquery.ui.widget'     : '../assets/library/fileupload/jquery.ui.widget',
 		'dropdown'             : '../assets/library/bootstrap/dropdown',
-		'redactor'             : '../assets/library/redactor/redactor-wrapper'
+		'redactor'             : '../assets/library/redactor/redactor-wrapper',
+		'linedtextarea'        : '../assets/library/jquery-linedtextarea/linedtextarea-wrapper'
 	},
 	packages: 
 	[
