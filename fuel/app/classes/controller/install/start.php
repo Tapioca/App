@@ -23,18 +23,18 @@ class Controller_Install_Start extends Controller
 
 		$validation = Validation::forge('admin_validation');
 
-		$validation->add('email', 'Your e-mail')
+		$validation->add('email', 'E-mail')
 					->add_rule('required')
 					->add_rule('valid_email');
 
-		$validation->add('name', 'Your name')
+		$validation->add('name', 'Name')
 					->add_rule('required');
 
-		$validation->add('password', 'Your password')
+		$validation->add('password', 'Password')
 					->add_rule('required')
 					->add_rule('min_length', 3);
 
-		$validation->add('appname', 'Application name')
+		$validation->add('appname', 'Application Name')
 					->add_rule('required');
 
 		// run validation on just post
@@ -59,22 +59,22 @@ class Controller_Install_Start extends Controller
 					$firstGroup['slug'] = $slug;
 				}
 
-				$ret = Tapioca\Install::start($master, $firstGroup);
+				$ret = Install::start($master, $firstGroup);
 
 				if($ret)
 				{
 					Response::redirect('install/end');
 				}
 			}
-			catch(TapiocaInstallException $e)
+			catch(InstallException $e)
 			{
 				$view_data['form_error'] = $e->getMessage();
 			}
 		}
 		else
 		{
-			$errorsKey = array();
-			$errors    = $validation->error();
+			$errorsKeys = array();
+			$errors     = $validation->error();
 			
 			foreach($errors as $key => $error)
 			{
@@ -126,9 +126,9 @@ class Controller_Install_Start extends Controller
 
 		try
 		{
-			Tapioca\Install::start($master, $firstGroup);
+			Install::start($master, $firstGroup);
 		}
-		catch(TapiocaInstallException $e)
+		catch(InstallException $e)
 		{
 			Debug::show($e->getMessage());
 		}
@@ -136,7 +136,7 @@ class Controller_Install_Start extends Controller
 		return $this->response;
 	}
 
-	public function after()
+	public function after( $response )
 	{
 		return View::forge('templates/install', self::$data)->auto_filter(false);
 	}

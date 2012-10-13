@@ -7,11 +7,11 @@ class Controller_App extends Controller
 
 	public function before()
 	{
-		if (Auth::check())
+		if (Tapioca::check())
 		{
-			static::$user = Auth::user();
+			static::$user = Tapioca::user();
 
-			$groups = static::$user->get('groups');
+			$groups = static::$user->get('apps');
 
 			
 		}

@@ -46,7 +46,7 @@ class User
 	{
 		// load and set config
 
-		static::$collection = strtolower(Config::get('tapioca.tables.users'));
+		static::$collection = strtolower(Config::get('tapioca.collections.users'));
 
 		static::$db = \Mongo_Db::instance();
 
@@ -609,11 +609,10 @@ class User
 	 * Adds this user to the app.
 	 *
 	 * @param   string|int  app ID or app name
-	 * @param   array  User's role in app
 	 * @return  bool
 	 * @throws  UserException
 	 */
-	public function add_to_app($id, $role = array())
+	public function add_to_app($id)
 	{
 		if ($this->in_app($id))
 		{
@@ -635,9 +634,7 @@ class User
 				'slug'     => $app->get('slug'),
 			);
 
-		$data = array_merge($app_info, $role);
-
-		$update = array('$push' => array('apps' => $data));
+		$update = array('$push' => array('apps' => $app_info));
 
 		$where = array('_id' => $this->user['_id']);
 
@@ -647,7 +644,7 @@ class User
 
 		if($query)
 		{
-			$this->apps[] = $data;
+			$this->apps[] = $app_info;
 
 			return true;
 		}
@@ -743,11 +740,10 @@ class User
 	/**
 	 * Grante user as admin.
 	 *
-	 * @param   int  admin level 
 	 * @return  bool
 	 * @throws  UserException
 	 */
-	public function granted_admin(int $level)
+	public function granted_admin()
 	{
 		return $this->update( array('admin' => 1) );
 	}

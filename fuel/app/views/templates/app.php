@@ -38,9 +38,9 @@ $uri_base	= Uri::base(false);
 
 			<div id="user-shortcuts">
 				<a href="#" class="avatar">
-					<img src="<?= Gravy::from_email(Auth::user()->get('email'), 37, 'g', null, true); ?>" alt="" height="37" width="37">
+					<img src="<?= Gravy::from_email(Tapioca::user()->get('email'), 37, 'g', null, true); ?>" alt="" height="37" width="37">
 				</a>
-				<h5>Hello <strong><?= Auth::user()->get('name'); ?></strong></h5>
+				<h5>Hello <strong><?= Tapioca::user()->get('name'); ?></strong></h5>
 				<nav>
 
 					<?= Html::anchor(Uri::create('#'), __('tapioca.ui.user_account')); ?>

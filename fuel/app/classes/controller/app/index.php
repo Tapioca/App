@@ -7,7 +7,7 @@ class Controller_App_Index extends Controller_App
 		Tapioca::base();
 
 		// get user's groups info
-		$user_groups    = static::$user->get('groups');
+		$user_groups    = static::$user->get('apps');
 		$user_groups_id = array();
 
 		foreach($user_groups as $group)
@@ -15,7 +15,7 @@ class Controller_App_Index extends Controller_App
 			$user_groups_id[] = $group['id'];
 		}
 
-		$groups = Auth::group()->read($user_groups_id);
+		$groups = Tapioca::app()->read($user_groups_id);
 		
 		foreach($groups as $group)
 		{

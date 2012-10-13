@@ -22,32 +22,28 @@ Autoloader::add_classes(array(
 	'Phpredis'			=> APPPATH.'classes/core/phpredis.php',
 	'Set'			    => APPPATH.'classes/core/set.php',
 
-	// Auth
-	'Auth\\Auth'                    => APPPATH.'classes/auth.php',
-	'Auth\\AuthException'           => APPPATH.'classes/auth.php',
-	// 'Auth\\User'                    => APPPATH.'classes/auth/user.php',
-	// 'Auth\\UserException'           => APPPATH.'classes/auth/user.php',
-	// 'Auth\\UserNotFoundException'   => APPPATH.'classes/auth/user.php',
-	'Auth\\Group'                   => APPPATH.'classes/auth/group.php',
-	'Auth\\GroupException'          => APPPATH.'classes/auth/group.php',
-	'Auth\\GroupNotFoundException'  => APPPATH.'classes/auth/group.php',
-	'Auth\\Attempts'                => APPPATH.'classes/auth/attempts.php',
-	'Auth\\AttemptsException'       => APPPATH.'classes/auth/attempts.php',
-	'Auth\\UserSuspendedException'  => APPPATH.'classes/auth/attempts.php',
-
 	// Tapioca
 	'Tapioca\\Tapioca'                    => APPPATH.'classes/tapioca.php',
+
 	'Tapioca\\TapiocaException'           => APPPATH.'classes/tapioca.php',
-	'Tapioca\\User'                       => APPPATH.'classes/tapioca/user.php',
+	'Tapioca\\AuthException'              => APPPATH.'classes/tapioca.php',
 	'Tapioca\\UserException'              => APPPATH.'classes/tapioca/user.php',
 	'Tapioca\\UserNotFoundException'      => APPPATH.'classes/tapioca/user.php',
+	'Tapioca\\AttemptsException'          => APPPATH.'classes/tapioca/attempts.php',
+	'Tapioca\\UserSuspendedException'     => APPPATH.'classes/tapioca/attempts.php',
+	'Tapioca\\AppException'               => APPPATH.'classes/tapioca/group.php',
+	'Tapioca\\AppNotFoundException'       => APPPATH.'classes/tapioca/group.php',
+
 	'Tapioca\\TapiocaCollectionException' => APPPATH.'classes/tapioca/collection.php', 
 	'Tapioca\\TapiocaDocumentException'   => APPPATH.'classes/tapioca/document.php',  
 	'Tapioca\\TapiocaFileException'       => APPPATH.'classes/tapioca/file.php', 
 	'Tapioca\\TapiocaCallbackException'   => APPPATH.'classes/tapioca/callback.php', 
 	'Tapioca\\TapiocaCastException'       => APPPATH.'classes/tapioca/cast.php', 
-	'Tapioca\\TapiocaInstallException'    => APPPATH.'classes/tapioca/install.php', 
+	'Tapioca\\InstallException'           => APPPATH.'classes/tapioca/install.php', 
 
+	'Tapioca\\User'                       => APPPATH.'classes/tapioca/user.php',
+	'Tapioca\\Attempts'                   => APPPATH.'classes/tapioca/attempts.php',
+	'Tapioca\\Group'                      => APPPATH.'classes/tapioca/app.php',
 	'Tapioca\\Collection'                 => APPPATH.'classes/tapioca/collection.php',
 	'Tapioca\\Document'                   => APPPATH.'classes/tapioca/document.php',
 	'Tapioca\\Rules'                      => APPPATH.'classes/tapioca/rules.php',
@@ -57,7 +53,7 @@ Autoloader::add_classes(array(
 	'Tapioca\\Install'                    => APPPATH.'classes/tapioca/install.php',
 
 	// Tapioca Resque jobs
-	'Tapioca\\Jobs\\PHP_Job' => APPPATH.'classes/tapioca/jobs/job.php',
+	'Tapioca\\Jobs\\PHP_Job'              => APPPATH.'classes/tapioca/jobs/job.php',
 ));
 
 // Register the autoloader

@@ -22,9 +22,9 @@ class Controller_Log extends Controller
 
 		$validation = Validation::forge('login_validation');
 
-		$validation->add('email', 'Your e-mail')->add_rule('required')
+		$validation->add('email', 'E-mail')->add_rule('required')
 		           ->add_rule('valid_email');
-		$validation->add('password', 'Your password')->add_rule('required')
+		$validation->add('password', 'Password')->add_rule('required')
 		           ->add_rule('min_length', 3);
 
 		// run validation on just post
@@ -37,7 +37,7 @@ class Controller_Log extends Controller
 				$remember = Input::post('remember', 0);
 
 				// log the user in
-				$valid_login = Auth::login($email, $password, $remember);
+				$valid_login = Tapioca::login($email, $password, $remember);
 		
 				if ($valid_login)
 				{
@@ -65,7 +65,7 @@ class Controller_Log extends Controller
 	public function action_out()
 	{
 		// log the user out
-		Auth::logout();	
+		Tapioca::logout();	
 		Response::redirect('log');
 	}
 }

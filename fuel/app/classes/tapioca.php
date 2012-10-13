@@ -8,7 +8,8 @@ use Lang;
 use Session;
 use Cookie;
 
-class TapiocaException extends \FuelException {}
+class TapiocaException extends FuelException {}
+class AuthException extends FuelException {}
 
 class Tapioca 
 {
@@ -145,8 +146,33 @@ class Tapioca
 	 */
 	public static function check_install()
 	{
-		return \Auth::user()->admin_set();
+		return static::user()->admin_set();
 	}
+
+	/**
+	 * Get's either the currently logged in user's app object or the
+	 * specified app by id or name.
+	 *
+	 * @param   int|string  App id or or name
+	 * @return  Group
+	 */
+	public static function app($id = null)
+	{
+		try
+		{
+			if ($id)
+			{
+				return new App($id);
+			}
+
+			return new App();
+		}
+		catch (AppNotFoundException $e)
+		{
+			throw new AuthException($e->getMessage());
+		}
+	}
+
 
 	/**
 	 * Get's either the currently logged in user or the specified user by id or Login
@@ -199,6 +225,99 @@ class Tapioca
 
 
 	/**
+	 * Gets the Attempts object
+	 *
+	 * @return  Attempts
+	 */
+	 public static function attempts($login_id = null, $ip_address = null)
+	 {
+	 	return new Attempts($login_id, $ip_address);
+	 }
+
+	/**
+	 * Attempt to log a user in.
+	 *
+	 * @param   string  Login column value
+	 * @param   string  Password entered
+	 * @param   bool    Whether to remember the user or not
+	 * @return  bool
+	 * @throws  MontryAuthException
+	 */
+	public static function login($login_column_value, $password, $remember = false)
+	{
+		// log the user out if they hit the login page
+		static::logout();
+
+		// get login attempts
+		if (static::$suspend)
+		{
+			$attempts = static::attempts($login_column_value, \Input::real_ip());
+
+			// if attempts > limit - suspend the login/ip combo
+			if ($attempts->get() >= $attempts->get_limit())
+			{
+				try
+				{
+					$attempts->suspend();
+				}
+				catch(UserSuspendedException $e)
+				{
+					throw new \AuthException($e->getMessage());
+				}
+			}
+		}
+
+		// make sure vars have values
+		if (empty($login_column_value) or empty($password))
+		{
+			return false;
+		}
+
+		// if user is validated
+		if ($user = static::validate_user($login_column_value, $password, 'password'))
+		{
+			if (static::$suspend)
+			{
+				// clear attempts for login since they got in
+				$attempts->clear();
+			}
+
+			// set update array
+			$update = array();
+
+			// if they wish to be remembers, set the cookie and get the hash
+			if ($remember)
+			{
+				$update['remember_me'] = static::remember($login_column_value);
+			}
+
+			// if there is a password reset hash and user logs in - remove the password reset
+			if ($user->get('password_reset_hash'))
+			{
+				$update['password_reset_hash'] = '';
+				$update['temp_password'] = '';
+			}
+
+			$update['last_login'] = new \MongoDate();
+			$update['ip_address'] = \Input::real_ip();
+
+			// update user
+			if (count($update))
+			{
+				$user->update($update, false);
+			}
+
+			// set session vars
+			Session::set(Config::get('tapioca.session.user'), $user->get('id'));
+			Session::set(Config::get('tapioca.session.provider'), 'Tapioca');
+
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
 	 * Checks if the current user is logged in.
 	 *
 	 * @return  bool
@@ -232,9 +351,10 @@ class Tapioca
 	 */
 	public static function logout()
 	{
-		Cookie::delete(Config::get('tapioca.remember_me.cookie_name'));
-		Session::delete(Config::get('tapioca.session.user'));
-		Session::delete(Config::get('tapioca.session.provider'));
+		Cookie::delete( Config::get('tapioca.remember_me.cookie_name') );
+
+		Session::delete( Config::get('tapioca.session.user') );
+		Session::delete( Config::get('tapioca.session.provider') );
 	}
 
 	/**
@@ -270,6 +390,7 @@ class Tapioca
 		if ($encoded_val)
 		{
 			$val = base64_decode($encoded_val);
+
 			list($login_column, $hash) = explode(':', $val);
 
 			// if user is validated
@@ -298,5 +419,43 @@ class Tapioca
 	}
 
 
+	/**
+	 * Validates a Login and Password.  This takes a password type so it can be
+	 * used to validate password reset hashes as well.
+	 *
+	 * @param   string  Login column value
+	 * @param   string  Password to validate with
+	 * @param   string  Field name (password type)
+	 * @return  bool|User
+	 */
+	protected static function validate_user($login_column_value, $password, $field)
+	{
+		// get user
+		$user = static::user($login_column_value);
+
+		// check activation status
+		if ($user->activated != 1 and $field != 'activation_hash')
+		{
+			throw new \AuthException('account_not_activated');
+		}
+
+		// check user status
+		if ($user->status != 1)
+		{
+			throw new \AuthException('account_is_disabled');
+		}
+
+		// check password
+		if ( ! $user->check_password($password, $field))
+		{
+			if (static::$suspend and ($field == 'password' or $field == 'password_reset_hash'))
+			{
+				static::attempts($login_column_value, \Input::real_ip())->add();
+			}
+			return false;
+		}
+
+		return $user;
+	}
 
 }

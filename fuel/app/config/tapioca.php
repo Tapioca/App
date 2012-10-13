@@ -3,9 +3,9 @@
 return array(
 
 	/*
-	 * Table Names
+	 * Collections Names
 	 */
-	'tables' => array(
+	'collections' => array(
 		'users'           => 'users',
 		'apps'            => 'apps',
 		'users_suspended' => 'users_suspended',

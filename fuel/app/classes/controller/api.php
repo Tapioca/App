@@ -17,32 +17,32 @@ class Controller_Api extends Controller_Rest
 	{
 		parent::before();
 
-		static::$apiKey = Input::get('apikey', false);
+		self::$apiKey = Input::get('apikey', false);
 
-		if (!Auth::check() && !static::$apiKey)
+		if ( !Tapioca::check() && !static::$apiKey )
 		{
 			self::restricted();
 		}
 		else
 		{
-			static::$debug = Input::get('debug', false);
-			static::$valid = true;
+			self::$debug = Input::get('debug', false);
+			self::$valid = true;
 			
 			// TODO: add api key check
 			try
 			{
-				self::$user = Auth::user();
+				self::$user = Tapioca::user();
 			}
-			catch (UserException $e)
+			catch ( UserException $e )
 			{
-				static::$valid = false;
-				static::error($e->getMessage());
+				self::$valid = false;
+				self::error( $e->getMessage() );
 			}
 		}// if Auth
 
 		// if no url define format
 		// set default format
-		if(is_null($this->format))
+		if( is_null( $this->format ) )
 		{
 			$this->format = $this->rest_format;
 		}
@@ -54,14 +54,15 @@ class Controller_Api extends Controller_Rest
 		try
 		{
 			self::$group = Auth::group( array( 'slug' => static::$appslug ) );
-			return true;
 		}
-		catch (AuthException $e)
+		catch ( AuthException $e )
 		{
 			static::$valid = false;
-			static::error($e->getMessage());
+			static::error( $e->getMessage() );
 			return false;
 		}
+
+		return true;
 	}
 
 	protected static function restricted()
@@ -75,13 +76,13 @@ class Controller_Api extends Controller_Rest
 
 	protected static function isInGroup()
 	{
-		if(static::$valid && !static::$apiKey)
+		if( static::$valid && !static::$apiKey )
 		{
 			// Check if user is a member of the group
 			$user_email = self::$user->get('email');
 			$in_group   = self::$group->in_group($user_email);
 
-			if(!$in_group)
+			if( !$in_group )
 			{
 				self::restricted();
 				return false;
@@ -93,24 +94,30 @@ class Controller_Api extends Controller_Rest
 
 	protected static function isAdmin()
 	{
-		if(self::$user)
+		if( self::$user )
 			return self::$user->is_admin();
 
 		return false;
 	}
 
-	protected static function error($message, $status = 501, $debug = null)
+	protected static function error( $message, $status = 501, $debug = null )
 	{
-		self::$data = array('error' => $message);
+		if( !is_array( $message ) )
+		{
+			$message = array('error' => $message);
+		}
 
-		if(!is_null($debug))
+		self::$data = $message;
+
+		if( !is_null( $debug ) )
 		{
 			self::$data['debug'] = $debug;
 		}
+
 		self::$status = $status;
 	}
 
-	public function after($response)
+	public function after( $response )
 	{
 		$this->response->set_header('Content-Type', 'application/json; charset=UTF-8');
 		$this->response(self::$data, self::$status);

@@ -88,7 +88,7 @@ class Collection
 	{
 		// load and set config
 		static::$group         = $group;
-		static::$collection    = strtolower(Config::get('tapioca.tables.collections'));		
+		static::$collection    = strtolower(Config::get('tapioca.collections.collections'));		
 		static::$db            = \Mongo_Db::instance();
 
 		// if an ID was passed

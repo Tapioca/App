@@ -4,62 +4,61 @@ namespace Tapioca;
 
 use FuelException;
 use Set;
-use Auth;
 
-class TapiocaInstallException extends FuelException {}
+class InstallException extends FuelException {}
 
 class Install
 {
-	public static function start(array $master, array $firstGroup)
+	public static function start(array $master, array $firstApp)
 	{
 		try
 		{
 			// create regular account
-			$masterId = Auth::user()->create($master);
+			$masterId = Tapioca::user()->create( $master );
 		}
 		catch (UserException $e)
 		{
-			throw new \TapiocaInstallException($e->getMessage());
+			throw new \InstallException( $e->getMessage() );
 		}
 
-		$masterObject = Auth::user($master['email']);
+		$masterObject = Tapioca::user( $master['email'] );
 		
 		// then grant him admin
-		$masterObject->granted_admin(100);
+		$masterObject->granted_admin();
 
 
-		// create first group
+		// create first app
 		try
 		{
-			$groupId = Auth::group()->create($firstGroup);
+			$appId = Tapioca::app()->create( $firstApp );
 		}
-		catch (GroupException $e)
+		catch (AppException $e)
 		{
-			throw new \TapiocaInstallException($e->getMessage());
+			throw new \InstallException( $e->getMessage() );
 		}
 
-		// add group to user profile
+		// add app to user profile
 		try
 		{
-			$masterObject->add_to_group($groupId, array('is_admin' => 1, 'level' => 100));
+			$masterObject->add_to_app( $appId );
 		}
 		catch (UserException $e)
 		{
-			throw new \TapiocaInstallException($e->getMessage());
+			throw new \InstallException( $e->getMessage() );
 		}
 
-		// add master to group granted witch admin permission
+		// add master to app granted witch admin permission
 		try
 		{
-			$groupObject = Auth::group($groupId);
+			$appObject = Tapioca::app( $appId );
 
-			$groupObject->add_to_group($master['email']); //, array('is_admin' => 1, 'level' => 100));
+			$appObject->add_to_app( $masterId, 100 );
 
-			$groupObject->add_admin($master['email']);
+			$appObject->add_admin( $masterId );
 		}
 		catch (AuthException $e)
 		{
-			throw new \TapiocaInstallException($e->getMessage());
+			throw new \InstallException($e->getMessage());
 		}
 
 		return true;
