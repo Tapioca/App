@@ -1,6 +1,6 @@
 <?php
 
-namespace Auth;
+namespace Tapioca;
 
 use Config;
 use FuelException;
@@ -21,9 +21,9 @@ class User
 	protected $user = array();
 
 	/**
-	 * @var  array  Groups
+	 * @var  array  Apps
 	 */
-	protected $groups = array();
+	protected $apps = array();
 
 	/**
 	 * @var  string  Collection name
@@ -46,7 +46,7 @@ class User
 	{
 		// load and set config
 
-		static::$collection = strtolower(Config::get('auth.collection.users'));
+		static::$collection = strtolower(Config::get('tapioca.tables.users'));
 
 		static::$db = \Mongo_Db::instance();
 
@@ -85,10 +85,10 @@ class User
 			// user doesn't exist
 			else
 			{
-				throw new \UserNotFoundException(__('auth.user_not_found'));
+				throw new \UserNotFoundException(__('tapioca.user_not_found'));
 			}
 
-			$this->groups = $user[0]['groups'];
+			$this->apps = $user[0]['apps'];
 		}
 	}
 
@@ -115,6 +115,23 @@ class User
 		return $this->get($field);
 	}
 
+	/**
+	 * Copy user properties and remove
+	 * privates data (ex: password, etc..)
+	 * for public display
+	 *
+	 * @return  User object
+	 */
+	public function __clone()
+	{
+		unset( $this->user['_id'] );
+		unset( $this->user['password'] );
+		unset( $this->user['ip_address'] );
+		unset( $this->user['status'] );
+		unset( $this->user['remember_me'] );
+		unset( $this->user['password_reset_hash'] );
+	}
+
 
 	/**
 	 * Create's a new user.  Returns user '_id'.
@@ -129,7 +146,7 @@ class User
 		if (empty($user['email']) or empty($user['password']))
 		{
 			throw new \UserException(
-				__('auth.email_and_password_empty')
+				__('tapioca.email_and_password_empty')
 			);
 		}
 
@@ -160,24 +177,23 @@ class User
 				return false;
 			}
 
-			throw new \UserException(__('auth.email_already_exists'));
+			throw new \UserException(__('tapioca.email_already_exists'));
 		}
 
 		$user_id = uniqid();
 
 		// set new user values
 		$new_user = array(
-			'id' => $user_id,
-			'email' => $user['email'],
-			'password' => $this->generate_password($user['password']),
-			'created_at' => new \MongoDate(),
-			'activated' => ($activation) ? 0 : 1,
-			'status' => 1,
-			'remember_me' => null,
+			'id'                  => $user_id,
+			'email'               => $user['email'],
+			'password'            => $this->generate_password($user['password']),
+			'register'            => new \MongoDate(),
+			'activated'           => ($activation) ? 0 : 1,
+			'status'              => 1,
+			'remember_me'         => null,
 			'password_reset_hash' => null,
-			'is_admin' => 0,
-			'level' => 0,
-			'groups' => array()
+			'admin'               => 0,
+			'apps'                => array()
 		) + $user;
 
 		// set activation hash if activation = true
@@ -223,13 +239,15 @@ class User
 		// make sure a user id is set
 		if (empty($this->user))
 		{
-			throw new \UserException(__('auth.no_user_selected_to_get'));
+			throw new \UserException(__('tapioca.no_user_selected_to_get'));
 		}
 
-		// if no fields were passed - return entire user
-		if ($field === null)
+		// if no fields were passed - return the public user's data
+		if ( is_null( $field ) )
 		{
-			return $this->user;
+			$public = clone $this;
+
+			return $public->user;
 		}
 		// if field is an array - return requested fields
 		else if (is_array($field))
@@ -249,7 +267,7 @@ class User
 				else
 				{
 					throw new \UserException(
-						__('auth.not_found_in_user_object', array('field' => $key))
+						__('tapioca.not_found_in_user_object', array('field' => $key))
 					);
 				}
 			}
@@ -268,9 +286,18 @@ class User
 			}
 
 			throw new \UserException(
-				__('auth.not_found_in_user_object', array('field' => $field))
+				__('tapioca.not_found_in_user_object', array('field' => $field))
 			);
 		}
+	}
+
+	public function getAll()
+	{
+		$users = static::$db
+					->select( array('id', 'email', 'name', 'apps', 'admin', 'activated', 'status', 'register', 'updated', 'last_login') )
+					->hash(static::$collection, true);
+
+		return $users;
 	}
 
 
@@ -287,7 +314,7 @@ class User
 		// make sure a user id is set
 		if (empty($this->user))
 		{
-			throw new \UserException(__('auth.no_user_selected'));
+			throw new \UserException(__('tapioca.no_user_selected'));
 		}
 
 		// init update array
@@ -298,12 +325,12 @@ class User
 			$fields['email'] != $this->user['email'] and
 			$this->user_exists($fields['email']))
 		{
-			throw new \UserException(__('auth.email_already_exists'));
+			throw new \UserException(__('tapioca.email_already_exists'));
 		}
 		elseif (array_key_exists('email', $fields) and
 				$fields['email'] == '')
 		{
-			throw new \UserException(__('auth.email_and_password_empty'));
+			throw new \UserException(__('tapioca.email_and_password_empty'));
 		}
 		elseif (array_key_exists('email', $fields))
 		{
@@ -316,7 +343,7 @@ class User
 		{
 			if (empty($fields['password']))
 			{
-				throw new \UserException(__('auth.email_and_password_empty'));
+				throw new \UserException(__('tapioca.email_and_password_empty'));
 			}
 			if ($hash_password)
 			{
@@ -401,7 +428,7 @@ class User
 		}
 
 		// add update time
-		$update['updated_at'] = new \MongoDate();
+		$update['updated'] = new \MongoDate();
 
 		$update_user = self::$db
 						->where(array('_id' => $this->user['_id']))
@@ -429,7 +456,7 @@ class User
 		// make sure a user id is set
 		if (empty($this->user))
 		{
-			throw new \UserException(__('auth.no_user_selected_to_delete'));
+			throw new \UserException(__('tapioca.no_user_selected_to_delete'));
 		}
 
 		$delete_user = self::$db
@@ -457,7 +484,7 @@ class User
 	{
 		if ($this->user['status'] == 1)
 		{
-			throw new \UserException(__('auth.user_already_enabled'));
+			throw new \UserException(__('tapioca.user_already_enabled'));
 		}
 		return $this->update(array('status' => 1));
 	}
@@ -472,7 +499,7 @@ class User
 	{
 		if ($this->user['status'] == 0)
 		{
-			throw new \UserException(__('auth.user_already_disabled'));
+			throw new \UserException(__('tapioca.user_already_disabled'));
 		}
 		return $this->update(array('status' => 0));
 	}
@@ -561,7 +588,7 @@ class User
 		// make sure old password matches the current password
 		if ( ! $this->check_password($old_password))
 		{
-			throw new \UserException(__('auth.invalid_old_password'));
+			throw new \UserException(__('tapioca.invalid_old_password'));
 		}
 
 		return $this->update(array('password' => $password));
@@ -569,50 +596,48 @@ class User
 
 
 	/**
-	 * Returns an array of groups the user is part of.
+	 * Returns an array of apps the user is part of.
 	 *
 	 * @return  array
 	 */
-	public function groups()
+	public function apps()
 	{
-		return $this->groups;
+		return $this->apps;
 	}
 
 	/**
-	 * Adds this user to the group.
+	 * Adds this user to the app.
 	 *
-	 * @param   string|int  Group ID or group name
-	 * @param   array  User's role in group
+	 * @param   string|int  app ID or app name
+	 * @param   array  User's role in app
 	 * @return  bool
 	 * @throws  UserException
 	 */
-	public function add_to_group($id, $role = array())
+	public function add_to_app($id, $role = array())
 	{
-		if ($this->in_group($id))
+		if ($this->in_app($id))
 		{
-			throw new \UserException(__('auth.user_already_in_group'));
+			throw new \UserException(__('tapioca.user_already_in_app'));
 		}
 
 		try
 		{
-			$group = new Group($id);
+			$app = new App($id);
 		}
-		catch (GroupNotFoundException $e)
+		catch (AppNotFoundException $e)
 		{
 			throw new \UserException($e->getMessage());
 		}
 
-		$group_info = array(
-				'id'       => $group->get('id'),
-				'name'     => $group->get('name'),
-				'slug'     => $group->get('slug'),
-				'level'    => 0,
-				'is_admin' => 0
+		$app_info = array(
+				'id'       => $app->get('id'),
+				'name'     => $app->get('name'),
+				'slug'     => $app->get('slug'),
 			);
 
-		$data = array_merge($group_info, $role);
+		$data = array_merge($app_info, $role);
 
-		$update = array('$push' => array('groups' => $data));
+		$update = array('$push' => array('apps' => $data));
 
 		$where = array('_id' => $this->user['_id']);
 
@@ -622,86 +647,40 @@ class User
 
 		if($query)
 		{
-			$this->groups[] = $data;
+			$this->apps[] = $data;
 
 			return true;
 		}
 		return false;
 	}
 
+
 	/**
-	 * Update user level in a specific group.
+	 * Removes this user from the app.
 	 *
-	 * @param   string  Group ID
-	 * @param   array  User's role in group
+	 * @param   string|int  app ID or app name
 	 * @return  bool
 	 * @throws  UserException
 	 */
-	public function update_group_status($id, $role = array())
+	public function remove_from_app($id)
 	{
-		if (!$this->in_group($id))
+		if ( ! $this->in_app($id))
 		{
-			throw new \UserException(__('auth.user_not_in_group'));
+			throw new \UserException(__('tapioca.user_not_in_app'));
 		}
 
 		try
 		{
-			$group = new Group($id);
+			$app = new App($id);
 		}
-		catch (GroupNotFoundException $e)
-		{
-			throw new \UserException($e->getMessage());
-		}
-
-		foreach($this->groups as &$group)
-		{
-			if($group['id'] == $id)
-			{
-				$group = array_merge($group, $role);				
-			}
-		}
-
-		$update = array('groups' => $this->groups);
-
-		$where = array('_id' => $this->user['_id']);
-
-		$query = static::$db
-					->where($where)
-					->update(static::$collection, $update);
-
-		if($query)
-		{
-			return true;
-		}
-		return false;
-	}
-
-	/**
-	 * Removes this user from the group.
-	 *
-	 * @param   string|int  Group ID or group name
-	 * @return  bool
-	 * @throws  UserException
-	 */
-	public function remove_from_group($id)
-	{
-		if ( ! $this->in_group($id))
-		{
-			throw new \UserException(__('auth.user_not_in_group'));
-		}
-
-		try
-		{
-			$group = new Group($id);
-		}
-		catch (GroupNotFoundException $e)
+		catch (AppNotFoundException $e)
 		{
 			throw new \UserException($e->getMessage());
 		}
 
 		$query = (is_array($id)) ? $id : array('id' => $id);
 
-		$update = array('$pull' => array('groups' => $query));
+		$update = array('$pull' => array('apps' => $query));
 
 		$where = array('_id' => $this->user['_id']);
 
@@ -714,11 +693,11 @@ class User
 			$val = current($query);
 			$key = key($query);
 
-			foreach ($this->groups as $group)
+			foreach ($this->apps as $app)
 			{
-				if ($group[$key] == $val)
+				if ($app[$key] == $val)
 				{
-					unset($group);
+					unset($app);
 				}
 			}
 
@@ -729,20 +708,20 @@ class User
 	}
 
 	/**
-	 * Checks if the current user is part of the given group.
+	 * Checks if the current user is part of the given app.
 	 *
-	 * @param   string|array  Group ID or specific filed
+	 * @param   string|array  app ID or specific filed
 	 * @return  bool
 	 */
-	public function in_group($query)
+	public function in_app($query)
 	{
 		$query = (is_array($query)) ? $query : array('id' => $query);
 		$val   = current($query);
 		$key   = key($query);
 
-		foreach ($this->groups as $group)
+		foreach ($this->apps as $app)
 		{
-			if ($group[$key] == $val)
+			if ($app[$key] == $val)
 			{
 				return true;
 			}
@@ -758,39 +737,7 @@ class User
 	 */
 	public function is_admin()
 	{
-		return (bool) $this->user['is_admin'];
-	}
-
-	/**
-	 * Checks if the user has the given level
-	 *
-	 * @param   int  Level to check
-	 * @return  bool
-	 */
-	public function has_level($level)
-	{
-		if ($this->user['level'] == $level)
-		{
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
-	 * Checks if the user has at least given level
-	 *
-	 * @param   int  Level to check
-	 * @return  bool
-	 */
-	public function atleast_level($level)
-	{
-		if ($this->user['level'] >= $level)
-		{
-			return true;
-		}
-
-		return false;
+		return (bool) $this->user['admin'];
 	}
 
 	/**
@@ -802,7 +749,7 @@ class User
 	 */
 	public function granted_admin(int $level)
 	{
-		return $this->update(array('is_admin' => 1, 'level' => $level));
+		return $this->update( array('admin' => 1) );
 	}
 
 	/**
@@ -813,7 +760,7 @@ class User
 	 */
 	public function revoke_admin()
 	{
-		return $this->update(array('is_admin' => 0));
+		return $this->update(array('admin' => 0));
 	}
 
 	/**
@@ -824,7 +771,7 @@ class User
 	public function admin_set()
 	{
 		$admin = static::$db->get_where(static::$collection, array(
-			'is_admin' => 1
+			'admin' => 1
 		), 1);
 
 		return (bool) count($admin);

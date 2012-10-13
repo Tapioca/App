@@ -1,18 +1,25 @@
 <?php
 return array(
-	'_root_'  => 'app/index',  // The default route
-	'_404_'   => 'welcome/404',    // The main 404 route
-	
-	//'log' => array(array('GET', new Route('log/index')), array('POST', new Route('log/in'))),
-/*
-	'file/:app_slug/preview/:ref'  => array('app/file/preview', 'name' => 'file_ref_preview'),
-	'file/:app_slug/download/:ref' => array('app/file/download', 'name' => 'file_ref_download'),
-	'file/:app_slug/:ref'          => array('app/file', 'name' => 'file_ref'),
-*/
-	'app/(:any)'                      => 'app/index',
-	'app'                             => 'app/index',
+	'_root_'     => 'app/index',   // The default route
+	'_404_'      => 'welcome/404', // The main 404 route
+
+	// FRONT	
+	'app/(:any)' => 'app/index',
+	'app'        => 'app/index',
 
 	// API REST 
+
+		// user
+	'api/user/me'                     => array('api/user/me', 'name' => 'api_user_me'),
+	'api/user/:userid'                => array('api/user',    'name' => 'api_user_id'),
+	'api/user'                        => array('api/user',    'name' => 'api_user'),
+
+		// app
+	'api/app/:appslug/admin'          => array('api/app/admin', 'name' => 'api_app_admin'),
+	'api/app/:appslug/user'           => array('api/app/user',  'name' => 'api_app_user'),
+	'api/app/:appslug'                => array('api/app',       'name' => 'api_app'),
+
+
 	'api/:app_slug/collection/:namespace/drop'   => array('api/collection/drop', 'name' => 'api_collection_drop'),
 	'api/:app_slug/collection/:namespace'        => array('api/collection/', 'name' => 'api_collection_ref'),
 	'api/:app_slug/collection'                   => array('api/collection/', 'name' => 'api_collection'),

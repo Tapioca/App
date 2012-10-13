@@ -12,7 +12,7 @@ class Mongo_Db extends Fuel\Core\Mongo_Db
 	*
 	*/
 	
-	 public function hash($collection = "", $page = 1, $skip = 10)
+	 public function hash($collection = "", $unsetId = false)
 	 {
 		if(empty($collection))
 		{
@@ -30,6 +30,11 @@ class Mongo_Db extends Fuel\Core\Mongo_Db
 		{
 			foreach ($documents as $doc)
 			{
+				if($unsetId)
+				{
+					unset($doc['_id']);
+				}
+
 				$returns[] = $doc;
 			}
 		}

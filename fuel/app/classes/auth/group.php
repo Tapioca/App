@@ -128,6 +128,13 @@ class Group
 		}
 	}
 
+	public static function getAll()
+	{
+		$groups = static::$db->hash(static::$collection, true);
+
+		return $groups;
+	}
+
 
 	/**
 	 * Return group's info.
@@ -164,7 +171,7 @@ class Group
 			throw new \GroupException(__('auth.group_name_empty'));
 		}
 
-		$slug = \Arr::get($group, 'slug', $group['name']);
+		$slug          = \Arr::get($group, 'slug', $group['name']);
 		$group['slug'] = \Inflector::friendly_title($slug, '-', true);
 
 		\Config::load('slug', true);
@@ -228,10 +235,17 @@ class Group
 			throw new \GroupException(__('auth.no_group_selected'));
 		}
 
-		// if no fields were passed - return entire user
+		// if no fields were passed - return entire group
 		if ($field === null)
 		{
-			return $this->group;
+			return array(
+				'id'      => $this->group['id'],
+				'name'    => $this->group['name'],
+				'slug'    => $this->group['slug'],
+				'admins'  => $this->group['admins'],
+				'locales' => $this->group['locales'],
+				'team'    => $this->group['team']
+			);
 		}
 		// if field is an array - return requested fields
 		else if (is_array($field))
@@ -419,10 +433,7 @@ class Group
 
 		$user_info = array(
 				'id'       => $user->get('id'),
-				'name'     => $user->get('name'),
-				'email'    => $user->get('email'),
 				'level'    => 0,
-				'is_admin' => 0
 			);
 
 		$data = array_merge($user_info, $role);

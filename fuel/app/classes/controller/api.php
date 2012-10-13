@@ -7,10 +7,11 @@ class Controller_Api extends Controller_Rest
 	protected static $granted = true;
 	protected static $data    = array('message' => 'Method Not Implemented');
 	protected static $status  = 501;
-	protected static $user    = null;
+	protected static $user    = false;
 	protected static $group   = null;
 	protected static $debug   = null;
 	protected static $apiKey  = false;
+	protected static $valid   = false;
 
 	public function before()
 	{
@@ -25,41 +26,18 @@ class Controller_Api extends Controller_Rest
 		else
 		{
 			static::$debug = Input::get('debug', false);
-			$valid = true;
+			static::$valid = true;
 			
+			// TODO: add api key check
 			try
 			{
 				self::$user = Auth::user();
 			}
 			catch (UserException $e)
 			{
-				$valid = false;
+				static::$valid = false;
 				static::error($e->getMessage());
 			}
-
-			try
-			{
-				$app_slug = $this->param('app_slug', false);
-				self::$group = Auth::group(array('slug' => $app_slug));
-			}
-			catch (AuthException $e)
-			{
-				$valid = false;
-				static::error($e->getMessage());
-			}
-
-			if($valid && !static::$apiKey)
-			{
-				// Check if user is a member of the group
-				$user_email = self::$user->get('email');
-				$in_group   = self::$group->in_group($user_email);
-
-				if(!$in_group)
-				{
-					self::restricted();
-				}
-			}
-
 		}// if Auth
 
 		// if no url define format
@@ -71,6 +49,21 @@ class Controller_Api extends Controller_Rest
 
 	}
 
+	protected static function assignGroup()
+	{
+		try
+		{
+			self::$group = Auth::group( array( 'slug' => static::$appslug ) );
+			return true;
+		}
+		catch (AuthException $e)
+		{
+			static::$valid = false;
+			static::error($e->getMessage());
+			return false;
+		}
+	}
+
 	protected static function restricted()
 	{
 		self::$granted = false;
@@ -80,7 +73,33 @@ class Controller_Api extends Controller_Rest
 		);
 	}
 
-	protected static function error($message, $debug = null)
+	protected static function isInGroup()
+	{
+		if(static::$valid && !static::$apiKey)
+		{
+			// Check if user is a member of the group
+			$user_email = self::$user->get('email');
+			$in_group   = self::$group->in_group($user_email);
+
+			if(!$in_group)
+			{
+				self::restricted();
+				return false;
+			}
+
+			return true;
+		}
+	}
+
+	protected static function isAdmin()
+	{
+		if(self::$user)
+			return self::$user->is_admin();
+
+		return false;
+	}
+
+	protected static function error($message, $status = 501, $debug = null)
 	{
 		self::$data = array('error' => $message);
 
@@ -88,7 +107,7 @@ class Controller_Api extends Controller_Rest
 		{
 			self::$data['debug'] = $debug;
 		}
-		self::$status = 501;
+		self::$status = $status;
 	}
 
 	public function after($response)

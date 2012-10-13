@@ -25,9 +25,9 @@ Autoloader::add_classes(array(
 	// Auth
 	'Auth\\Auth'                    => APPPATH.'classes/auth.php',
 	'Auth\\AuthException'           => APPPATH.'classes/auth.php',
-	'Auth\\User'                    => APPPATH.'classes/auth/user.php',
-	'Auth\\UserException'           => APPPATH.'classes/auth/user.php',
-	'Auth\\UserNotFoundException'   => APPPATH.'classes/auth/user.php',
+	// 'Auth\\User'                    => APPPATH.'classes/auth/user.php',
+	// 'Auth\\UserException'           => APPPATH.'classes/auth/user.php',
+	// 'Auth\\UserNotFoundException'   => APPPATH.'classes/auth/user.php',
 	'Auth\\Group'                   => APPPATH.'classes/auth/group.php',
 	'Auth\\GroupException'          => APPPATH.'classes/auth/group.php',
 	'Auth\\GroupNotFoundException'  => APPPATH.'classes/auth/group.php',
@@ -38,6 +38,9 @@ Autoloader::add_classes(array(
 	// Tapioca
 	'Tapioca\\Tapioca'                    => APPPATH.'classes/tapioca.php',
 	'Tapioca\\TapiocaException'           => APPPATH.'classes/tapioca.php',
+	'Tapioca\\User'                       => APPPATH.'classes/tapioca/user.php',
+	'Tapioca\\UserException'              => APPPATH.'classes/tapioca/user.php',
+	'Tapioca\\UserNotFoundException'      => APPPATH.'classes/tapioca/user.php',
 	'Tapioca\\TapiocaCollectionException' => APPPATH.'classes/tapioca/collection.php', 
 	'Tapioca\\TapiocaDocumentException'   => APPPATH.'classes/tapioca/document.php',  
 	'Tapioca\\TapiocaFileException'       => APPPATH.'classes/tapioca/file.php', 
