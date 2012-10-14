@@ -151,25 +151,26 @@ class Tapioca
 
 	/**
 	 * Get's either the currently logged in user's app object or the
-	 * specified app by id or name.
+	 * specified app by id or slug.
 	 *
-	 * @param   int|string  App id or or name
-	 * @return  Group
+	 * @param   int|string  App id or slug
+	 * @throws  AuthException
+	 * @return  App
 	 */
-	public static function app($id = null)
+	public static function app( $id = null )
 	{
 		try
 		{
 			if ($id)
 			{
-				return new App($id);
+				return new App( $id );
 			}
 
 			return new App();
 		}
 		catch (AppNotFoundException $e)
 		{
-			throw new AuthException($e->getMessage());
+			throw new \AuthException( $e->getMessage() );
 		}
 	}
 
@@ -184,12 +185,6 @@ class Tapioca
 	 */
 	public static function user($id = null, $recache = false)
 	{
-		if ( $id === 'all' )
-		{
-			$list = new User();
-			return $list->getAll();
-		}
-
 		if ($id === null and $recache === false and static::$current_user !== null)
 		{
 			return static::$current_user;

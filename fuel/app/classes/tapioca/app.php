@@ -94,22 +94,27 @@ class App
 		}
 
 		$query = (is_array($id)) ? $id : array('id' => $id);
-		$val   = current($query);
-		$key   = key($query);
+			
+		$this->load( $query );
+	}
 
+	private function load( $query )
+	{
 		//query database for app
 		$app = static::$db->get_where(static::$collection, $query, 1);
+		$val = current($query);
 
-		// if there was a result - update user
 		if (count($app) == 1)
 		{
-			$this->app  = $app[0];
-			$this->team   = $app[0]['team'];
-			$this->admins = $app[0]['admins'];
+			$app          = $app[0];
+
+			$this->app    = $app;
+			$this->team   = $app['team'];
+			$this->admins = $app['admins'];
 
 			$this->app['locales_keys'] = array();
 
-			foreach ($app[0]['locales'] as $locale)
+			foreach ($app['locales'] as $locale)
 			{
 				$this->app['locales_keys'][] = $locale['key'];
 
@@ -135,29 +140,6 @@ class App
 		return $apps;
 	}
 
-
-	/**
-	 * Return app's info.
-	 *
-	 * @param   string|array  App ID, can be an array of ID 
-	 * @return  int|bool
-	 */
-	public function read($id)
-	{
-		static::$db->select(array(), array('_id', 'admins', 'name', 'slug'));
-
-		if(is_array($id))
-		{
-			static::$db->where_in('id', $id);
-		}
-		else
-		{
-			static::$db->where(array('id' => $id));
-		}
-
-		return static::$db->get(static::$collection);
-	}
-
 	/**
 	 * Creates the given app.
 	 *
@@ -168,10 +150,10 @@ class App
 	{
 		if ( ! array_key_exists('name', $app) || $app['name'] == '')
 		{
-			throw new \AppException(__('tapioca.app_name_empty'));
+			throw new \AppException( __('tapioca.app_name_empty') );
 		}
 
-		$slug          = \Arr::get($app, 'slug', $app['name']);
+		$slug        = \Arr::get($app, 'slug', $app['name']);
 		$app['slug'] = \Inflector::friendly_title($slug, '-', true);
 
 		\Config::load('slug', true);
@@ -242,9 +224,9 @@ class App
 				'id'      => $this->app['id'],
 				'name'    => $this->app['name'],
 				'slug'    => $this->app['slug'],
-				'admins'  => $this->app['admins'],
+				'admins'  => $this->admins,
 				'locales' => $this->app['locales'],
-				'team'    => $this->app['team']
+				'team'    => $this->team
 			);
 		}
 		// if field is an array - return requested fields
@@ -304,30 +286,17 @@ class App
 		// init the update array
 		$update = array();
 
-		// update name ?? check Slug migth be better ?
+		// update name
 		if (array_key_exists('name', $fields) and $fields['name'] != $this->app['name'])
 		{
-			// make sure name does not already exist
-			if (static::app_exists($fields['name']))
-			{
-				throw new \AppException(
-					__('tapioca.app_already_exists', array('app' => $fields['name']))
-				);
-			}
 			$update['name'] = $fields['name'];
 			unset($fields['name']);
 		}
 
-		// update level
-		if (array_key_exists('level', $fields))
+		// update locales
+		if (array_key_exists('locales', $fields))
 		{
-			$update['level'] = $fields['level'];
-		}
-
-		// update is_admin
-		if (array_key_exists('is_admin', $fields))
-		{
-			$update['is_admin'] = $fields['is_admin'];
+			$update['locales'] = $fields['locales'];
 		}
 
 		if (empty($update))
@@ -335,9 +304,19 @@ class App
 			return true;
 		}
 
-		return static::$db
-						->where(array('_id' => $this->app['_id']))
-						->update(static::$collection, $update);
+		$where = array('_id' => $this->app['_id']);
+
+		$query = static::$db
+						->where( $where )
+						->update( static::$collection, $update );
+
+		if( $query )
+		{
+			$this->load( $where );
+			return true;
+		}
+
+		return false;
 	}
 
 
@@ -352,11 +331,16 @@ class App
 		// make sure a user id is set
 		if (empty($this->app['id']))
 		{
-			throw new \AppException(__('tapioca.no_app_selected'));
+			throw new \AppException( __('tapioca.no_app_selected') );
 		}
 
-		$delete_app = self::$db
-							->where(array('_id' => $this->app['_id']))
+		foreach ($this->team as $team)
+		{
+			Tapioca::user( $team['id'] )->remove_from_app( $this->get('id') );
+		}
+
+		$delete_app = static::$db
+							->where( array('_id' => $this->app['_id']) )
 							->delete(static::$collection);
 
 		if($delete_app )
@@ -372,13 +356,13 @@ class App
 	/**
 	 * Checks if the app exists
 	 *
-	 * @param   string|int  App name|App id
+	 * @param   string  App slug
 	 * @return  bool
 	 */
-	public static function app_exists($app)
+	public static function app_exists( $appslug )
 	{
 		$app_exists = static::$db
-							->where(array('slug' => $app))
+							->where(array('slug' => $appslug))
 							->limit(1)
 							->count(Config::get('tapioca.collections.apps'));
 
@@ -427,11 +411,11 @@ class App
 		}
 		catch (UserNotFoundException $e)
 		{
-			throw new \AppException( $e->getMessage() );
+			throw new \AppException($e->getMessage());
 		}
 
 		$user_info = array(
-				'id'       => $user->get('id'),
+				'id'       => $userId,
 				'level'    => $level,
 			);
 
@@ -456,13 +440,13 @@ class App
 	/**
 	 * Removes this user from the app.
 	 *
-	 * @param   string|int  App ID or app name
+	 * @param   string  User Id
 	 * @return  bool
 	 * @throws  AppException
 	 */
-	public function remove_from_app($email)
+	public function remove_from_app( $userId )
 	{
-		if ( ! $this->in_app($email))
+		if ( ! $this->in_app( $userId ))
 		{
 			throw new \AppException(
 				__('tapioca.user_not_in_app', array('app' => $this->get('name')))
@@ -471,14 +455,14 @@ class App
 
 		try
 		{
-			$user = new User($email);
+			$user = new User($userId);
 		}
 		catch (UserNotFoundException $e)
 		{
 			throw new \AppException($e->getMessage());
 		}
 
-		$update = array('$pull' => array('team' => array('email' => $email)));
+		$update = array('$pull' => array('team' => array('id' => $userId) ) );
 
 		$where = array('_id' => $this->app['_id']);
 
@@ -488,11 +472,11 @@ class App
 
 		if($query)
 		{
-			foreach ($this->team as $team)
+			foreach ($this->team as $key => $row)
 			{
-				if ($team['email'] == $email)
+				if ($row['id'] == $userId)
 				{
-					unset($team);
+					unset($this->team[ $key ]);
 				}
 			}
 
@@ -502,6 +486,57 @@ class App
 		return false;
 	}
 
+	/**
+	 * Set user level
+	 *
+	 * @param   string User ID
+	 * @param   int    User level
+	 * @return  bool
+	 * @throws  AppException
+	 */
+	public function user_level( $userId, $level )
+	{
+		if ( ! $this->in_app( $userId ))
+		{
+			throw new \AppException(
+				__('tapioca.user_not_in_app', array('app' => $this->get('name')))
+			);
+		}
+		
+		try
+		{
+			$user = new User($userId);
+		}
+		catch (UserNotFoundException $e)
+		{
+			throw new \AppException($e->getMessage());
+		}
+
+		foreach ($this->team as &$team)
+		{
+			if ($team['id'] == $userId)
+			{
+				$team['level'] = $level;
+			}
+		}
+
+		$update = array( 'team' => $this->team );
+
+		$where = array('_id' => $this->app['_id']);
+
+		$query = static::$db
+					->where($where)
+					->update(static::$collection, $update);
+
+		if($query)
+		{
+			$this->load( $where );
+
+			return true;
+		}
+
+		return false;
+	}
 
 	/**
 	 * Checks if the user is admin of the current app.
@@ -530,6 +565,11 @@ class App
 			throw new \AppException(
 				__('tapioca.user_not_in_app', array('app' => $this->get('name')))
 			);
+		}
+
+		if( $this->is_admin( $userId) )
+		{
+			return true;
 		}
 
 		try
@@ -573,29 +613,34 @@ class App
 	/**
 	 * Revoke user as admin for the app.
 	 *
-	 * @param   string User _ID
+	 * @param   string User Id
 	 * @return  bool
 	 * @throws  AppException
 	 */
-	public function revoke_admin($id)
+	public function revoke_admin( $userId )
 	{
-		if ( ! $this->in_app($id))
+		if ( ! $this->in_app( $userId ))
 		{
 			throw new \AppException(
 				__('tapioca.user_not_in_app', array('app' => $this->get('name')))
 			);
 		}
 
+		if( !$this->is_admin( $userId) )
+		{
+			return true;
+		}
+
 		try
 		{
-			$user = new User($id);
+			$user = new User( $userId );
 		}
 		catch (UserNotFoundException $e)
 		{
 			throw new \AppException($e->getMessage());
 		}
 
-		$update = array('$pull' => array('admins' => $user->get('id')));
+		$update = array('$pull' => array('admins' => $userId ));
 
 		$where = array('_id' => $this->app['_id']);
 
@@ -605,17 +650,11 @@ class App
 
 		if($query)
 		{
-			/*
-			if(!($id instanceof \MongoId))
+			foreach ($this->admins as $key => $row)
 			{
-				$id = new \MongoId($id);
-			}
-			*/
-			foreach ($this->admins as $admin)
-			{
-				if ($admin == $id)
+				if ($row == $userId)
 				{
-					unset($admin);
+					unset( $this->admins[ $key ] );
 				}
 			}
 

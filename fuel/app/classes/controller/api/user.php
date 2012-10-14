@@ -34,7 +34,7 @@ class Controller_Api_User extends Controller_Api
 			{
 				if( static::isAdmin() )
 				{
-					static::$data   = Tapioca::user( 'all' );
+					static::$data   = User::getAll();
 					static::$status = 200;
 				}
 				else

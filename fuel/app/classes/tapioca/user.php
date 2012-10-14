@@ -291,7 +291,7 @@ class User
 		}
 	}
 
-	public function getAll()
+	public static function getAll()
 	{
 		$users = static::$db
 					->select( array('id', 'email', 'name', 'apps', 'admin', 'activated', 'status', 'register', 'updated', 'last_login') )
@@ -629,7 +629,7 @@ class User
 		}
 
 		$app_info = array(
-				'id'       => $app->get('id'),
+				'id'       => $app->get('id'),   // usefull ?
 				'name'     => $app->get('name'),
 				'slug'     => $app->get('slug'),
 			);
@@ -655,7 +655,7 @@ class User
 	/**
 	 * Removes this user from the app.
 	 *
-	 * @param   string|int  app ID or app name
+	 * @param   string app ID
 	 * @return  bool
 	 * @throws  UserException
 	 */
@@ -663,7 +663,7 @@ class User
 	{
 		if ( ! $this->in_app($id))
 		{
-			throw new \UserException(__('tapioca.user_not_in_app'));
+			throw new \UserException( __('tapioca.user_not_in_app') );
 		}
 
 		try
@@ -672,7 +672,7 @@ class User
 		}
 		catch (AppNotFoundException $e)
 		{
-			throw new \UserException($e->getMessage());
+			throw new \UserException( $e->getMessage() );
 		}
 
 		$query = (is_array($id)) ? $id : array('id' => $id);

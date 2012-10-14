@@ -43,7 +43,7 @@ Autoloader::add_classes(array(
 
 	'Tapioca\\User'                       => APPPATH.'classes/tapioca/user.php',
 	'Tapioca\\Attempts'                   => APPPATH.'classes/tapioca/attempts.php',
-	'Tapioca\\Group'                      => APPPATH.'classes/tapioca/app.php',
+	'Tapioca\\App'                        => APPPATH.'classes/tapioca/app.php',
 	'Tapioca\\Collection'                 => APPPATH.'classes/tapioca/collection.php',
 	'Tapioca\\Document'                   => APPPATH.'classes/tapioca/document.php',
 	'Tapioca\\Rules'                      => APPPATH.'classes/tapioca/rules.php',

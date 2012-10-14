@@ -2,16 +2,13 @@
 
 class Controller_Api extends Controller_Rest
 {
-	protected $rest_format    = 'json'; // default format
-
 	protected static $granted = true;
 	protected static $data    = array('message' => 'Method Not Implemented');
 	protected static $status  = 501;
 	protected static $user    = false;
-	protected static $group   = null;
+	protected static $app     = null;
 	protected static $debug   = null;
 	protected static $apiKey  = false;
-	protected static $valid   = false;
 
 	public function before()
 	{
@@ -26,7 +23,6 @@ class Controller_Api extends Controller_Rest
 		else
 		{
 			self::$debug = Input::get('debug', false);
-			self::$valid = true;
 			
 			// TODO: add api key check
 			try
@@ -35,34 +31,54 @@ class Controller_Api extends Controller_Rest
 			}
 			catch ( UserException $e )
 			{
-				self::$valid = false;
+				self::$granted = false;
 				self::error( $e->getMessage() );
 			}
-		}// if Auth
+		} // Auth
 
-		// if no url define format
 		// set default format
-		if( is_null( $this->format ) )
-		{
-			$this->format = $this->rest_format;
-		}
+		$this->format = 'json';
 
 	}
 
-	protected static function assignGroup()
+	protected static function assignApp()
 	{
 		try
 		{
-			self::$group = Auth::group( array( 'slug' => static::$appslug ) );
+			self::$app = Tapioca::app( array( 'slug' => static::$appslug ) );
 		}
-		catch ( AuthException $e )
+		catch ( \AuthException $e )
 		{
-			static::$valid = false;
-			static::error( $e->getMessage() );
+			self::$granted = false;
+			self::error( $e->getMessage() );
+
 			return false;
 		}
 
 		return true;
+	}
+
+	protected static function isInApp()
+	{
+		if( self::$granted )
+		{
+			// Check if user is a member of the app
+			$userId = self::$user->get('id');
+			$inApp  = self::$app->in_app( $userId );
+
+			if( !$inApp )
+			{
+				self::restricted();
+				return false;
+			}
+
+			return true;
+		}
+	}
+
+	protected static function isAppAdmin()
+	{
+		return static::$app->is_admin( static::$user->get('id') );
 	}
 
 	protected static function restricted()
@@ -72,24 +88,6 @@ class Controller_Api extends Controller_Rest
 		self::$data    = array(
 			'message' => 'Access not allowed'
 		);
-	}
-
-	protected static function isInGroup()
-	{
-		if( static::$valid && !static::$apiKey )
-		{
-			// Check if user is a member of the group
-			$user_email = self::$user->get('email');
-			$in_group   = self::$group->in_group($user_email);
-
-			if( !$in_group )
-			{
-				self::restricted();
-				return false;
-			}
-
-			return true;
-		}
 	}
 
 	protected static function isAdmin()
@@ -115,6 +113,7 @@ class Controller_Api extends Controller_Rest
 		}
 
 		self::$status = $status;
+		self::$granted = false;
 	}
 
 	public function after( $response )

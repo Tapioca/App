@@ -11,7 +11,6 @@ class Controller_Api_User_Me extends Controller_Api
 	{
 		if( static::$granted )
 		{
-
 			static::$data   = Tapioca::user()->get();
 			static::$status = 200;
 		}

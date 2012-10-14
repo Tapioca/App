@@ -15,8 +15,8 @@ return array(
 	'api/user'                        => array('api/user',    'name' => 'api_user'),
 
 		// app
-	'api/app/:appslug/admin'          => array('api/app/admin', 'name' => 'api_app_admin'),
-	'api/app/:appslug/user'           => array('api/app/user',  'name' => 'api_app_user'),
+	'api/app/:appslug/admin/:userid'  => array('api/app/admin', 'name' => 'api_app_admin'),
+	'api/app/:appslug/user/:userid'   => array('api/app/user',  'name' => 'api_app_user'),
 	'api/app/:appslug'                => array('api/app',       'name' => 'api_app'),
 
 
