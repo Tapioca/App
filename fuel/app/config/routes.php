@@ -15,14 +15,16 @@ return array(
 	'api/user'                        => array('api/user',    'name' => 'api_user'),
 
 		// app
-	'api/app/:appslug/admin/:userid'  => array('api/app/admin', 'name' => 'api_app_admin'),
-	'api/app/:appslug/user/:userid'   => array('api/app/user',  'name' => 'api_app_user'),
-	'api/app/:appslug'                => array('api/app',       'name' => 'api_app'),
+	'api/app'                     => array('api/app',       'name' => 'api_app_list'),
+	'api/:appslug/admin/:userid'  => array('api/app/admin', 'name' => 'api_app_admin'),
+	'api/:appslug/user/:userid'   => array('api/app/user',  'name' => 'api_app_user'),
+	'api/:appslug'                => array('api/app',       'name' => 'api_app'),
 
 
-	'api/:app_slug/collection/:namespace/drop'   => array('api/collection/drop', 'name' => 'api_collection_drop'),
-	'api/:app_slug/collection/:namespace'        => array('api/collection/', 'name' => 'api_collection_ref'),
-	'api/:app_slug/collection'                   => array('api/collection/', 'name' => 'api_collection'),
+	'api/:appslug/collection/:namespace/document' => array('api/collection/document', 'name' => 'api_collection_document'),
+	'api/:appslug/collection/:namespace/drop'     => array('api/collection/drop',     'name' => 'api_collection_drop'),
+	'api/:appslug/collection/:namespace'          => array('api/collection',          'name' => 'api_collection_ref'),
+	'api/:appslug/collection'                     => array('api/collection',          'name' => 'api_collection'),
 
 	'api/:app_slug/document/:collection/:ref/status'  => array('api/document/status', 'name' => 'api_document_status'),
 	'api/:app_slug/document/:collection/:ref'         => array('api/document/', 'name' => 'api_document_ref'),
