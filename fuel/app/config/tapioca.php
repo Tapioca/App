@@ -12,6 +12,8 @@ return array(
 		'collections'     => 'collections',
 		'documents'       => 'documents',
 		'files'           => 'files',
+		'delete'          => 'delete',
+		'preview'         => 'preview',
 	),
 
 	/*
@@ -22,6 +24,12 @@ return array(
 		'provider' => 'tapioca_provider',
 	),
 
+	/*
+	 * Delete token
+	 */
+
+	'deleteToken' => 600, // 10 minutes
+	
 	/*
 	 * Remember Me settings
 	 */

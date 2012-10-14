@@ -23,7 +23,7 @@ class Controller_Api_User extends Controller_Api
 					static::$data   = Tapioca::user( static::$userId )->get();
 					static::$status = 200;
 				}
-				catch (UserException $e)
+				catch ( AuthException $e )
 				{
 					// catch errors such as user doesn't exists
 					static::error( $e->getMessage() );
@@ -47,7 +47,7 @@ class Controller_Api_User extends Controller_Api
 
 	public function post_index()
 	{
-		if( static::$granted && static::isAdmin() )
+		if( static::$granted && !static::$userId && static::isAdmin() )
 		{
 			// fixtures
 			$fields = array(
@@ -73,7 +73,7 @@ class Controller_Api_User extends Controller_Api
 				}
 
 			}
-			catch (UserException $e)
+			catch ( UserException $e )
 			{
 				// catch errors such as user exists or bad fields
 				static::error( $e->getMessage() );
@@ -119,6 +119,33 @@ class Controller_Api_User extends Controller_Api
 	{
 		if( static::$granted && static::isAdmin() && static::$userId )
 		{
+			if( ! static::$token )
+			{
+				try
+				{
+					static::$data   = tapioca::getDeleteToken( 'user', static::$userId );
+					static::$status = 200;
+					return;
+				}
+				catch (TapiocaException $e)
+				{
+					static::error( $e->getMessage() );
+					return;
+				}
+			}
+			else 
+			{
+				try
+				{
+					Tapioca::checkDeleteToken( static::$token );
+				}
+				catch (TapiocaException $e)
+				{
+					static::error( $e->getMessage() );
+					return;
+				}
+			}
+
 			try
 			{
 				$action = Tapioca::user( static::$userId )->delete();

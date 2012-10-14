@@ -9,12 +9,14 @@ class Controller_Api extends Controller_Rest
 	protected static $app     = null;
 	protected static $debug   = null;
 	protected static $apiKey  = false;
+	protected static $token   = false;
 
 	public function before()
 	{
 		parent::before();
 
 		self::$apiKey = Input::get('apikey', false);
+		self::$token  = Input::get('token', false);
 
 		if ( !Tapioca::check() && !static::$apiKey )
 		{

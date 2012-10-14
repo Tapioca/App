@@ -48,6 +48,33 @@ class Controller_Api_App_Admin extends Controller_Api
 	{
 		if( static::$granted )
 		{
+			if( ! static::$token )
+			{
+				try
+				{
+					static::$data   = tapioca::getDeleteToken( 'app_admin', static::$userId );
+					static::$status = 200;
+					return;
+				}
+				catch (TapiocaException $e)
+				{
+					static::error( $e->getMessage() );
+					return;
+				}
+			}
+			else 
+			{
+				try
+				{
+					Tapioca::checkDeleteToken( static::$token );
+				}
+				catch (TapiocaException $e)
+				{
+					static::error( $e->getMessage() );
+					return;
+				}
+			}
+
 			try
 			{
 				static::$app->revoke_admin( static::$userId );

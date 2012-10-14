@@ -2,7 +2,9 @@
 
 return array(
 
-	'internal_server_error'  => 'Internal Serveur Error',
+	'internal_server_error'  => 'Internal Server Error',
+	'no_valid_token'         => 'Not valid token for delete',
+	'token_expire'           => 'token has expired',
 	
 	/** General Exception Messages **/
 	'account_not_activated'  => 'User has not activated their account.',

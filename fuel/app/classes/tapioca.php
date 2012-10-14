@@ -453,4 +453,81 @@ class Tapioca
 		return $user;
 	}
 
+
+	/**
+	 * Provide a token, required for delete action
+	 *
+	 * @param   string  object type to delete
+	 * @param   string  object ID
+	 * @throws  TapiocaException
+	 * @return  object
+	 */
+	public static function getDeleteToken( $object, $id )
+	{
+		if( is_null( static::$db ) )
+		{
+			static::$db = \Mongo_Db::instance();			
+		}
+
+		$collection = Config::get('tapioca.collections.delete');
+
+		$token = \Str::random('alnum', 16);
+
+		$array = array(
+						'token'  => $token,
+						'object' => $object,
+						'id'     => $id,
+						'date'   => new \MongoDate()
+					);
+
+		$action = static::$db->insert( $collection, $array);
+
+		if( !$action )
+		{
+			throw new \TapiocaException( __('tapioca.internal_server_error') );
+		}
+
+		unset( $array['date'] );
+		unset( $array['_id'] );
+
+		return $array;
+	}
+
+	/**
+	 * Check if given token is valid for delete action
+	 *
+	 * @param   string  token
+	 * @throws  TapiocaException
+	 * @return  object
+	 */
+	public static function checkDeleteToken( $token )
+	{
+		if( is_null( static::$db ) )
+		{
+			static::$db = \Mongo_Db::instance();			
+		}
+
+		$collection = Config::get('tapioca.collections.delete');
+		$limitDate  = ( time() - Config::get('tapioca.deleteToken') );
+
+		$object = static::$db->get_where( $collection, array(
+				'token' => $token
+			));
+
+		if( count( $object ) != 1 )
+		{
+			throw new \TapiocaException( __('tapioca.no_valid_token') );
+		}
+
+		if( $object[0]['date']->sec <= $limitDate )
+		{
+			throw new \TapiocaException( __('tapioca.token_expire') );
+		}
+
+
+		static::$db->where( array('token' => $token) )->delete( $collection );
+
+		return true;
+	}
+
 }
