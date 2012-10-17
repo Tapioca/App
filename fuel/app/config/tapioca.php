@@ -121,7 +121,7 @@ return array(
 				'status'
 			),
 			'data' => array(
-				'structure'
+				'schema'
 			)
 		)
 	),
@@ -137,7 +137,7 @@ return array(
 				'summary'
 			),
 			'data' => array(
-				'structure', 
+				'schema', 
 				'summary', 
 				'summaryEdit',
 				'dependencies',

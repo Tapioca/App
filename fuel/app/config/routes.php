@@ -9,22 +9,27 @@ return array(
 
 	// API REST 
 
+		// log
+	'api/log/out'                     => array('api/log/out', 'name' => 'api_log_out'),
+	'api/log'                         => array('api/log',     'name' => 'api_log'),
+
 		// user
 	'api/user/me'                     => array('api/user/me', 'name' => 'api_user_me'),
 	'api/user/:userid'                => array('api/user',    'name' => 'api_user_id'),
 	'api/user'                        => array('api/user',    'name' => 'api_user'),
+
+		// collection
+	'api/:appslug/collection/:namespace/document' => array('api/collection/document', 'name' => 'api_collection_document'),
+	'api/:appslug/collection/:namespace/empty'    => array('api/collection/empty',    'name' => 'api_collection_empty'),
+	'api/:appslug/collection/:namespace/drop'     => array('api/collection/drop',     'name' => 'api_collection_drop'),
+	'api/:appslug/collection/:namespace'          => array('api/collection',          'name' => 'api_collection_ref'),
+	'api/:appslug/collection'                     => array('api/collection',          'name' => 'api_collection'),
 
 		// app
 	'api/app'                     => array('api/app',       'name' => 'api_app_list'),
 	'api/:appslug/admin/:userid'  => array('api/app/admin', 'name' => 'api_app_admin'),
 	'api/:appslug/user/:userid'   => array('api/app/user',  'name' => 'api_app_user'),
 	'api/:appslug'                => array('api/app',       'name' => 'api_app'),
-
-
-	'api/:appslug/collection/:namespace/document' => array('api/collection/document', 'name' => 'api_collection_document'),
-	'api/:appslug/collection/:namespace/drop'     => array('api/collection/drop',     'name' => 'api_collection_drop'),
-	'api/:appslug/collection/:namespace'          => array('api/collection',          'name' => 'api_collection_ref'),
-	'api/:appslug/collection'                     => array('api/collection',          'name' => 'api_collection'),
 
 	'api/:app_slug/document/:collection/:ref/status'  => array('api/document/status', 'name' => 'api_document_status'),
 	'api/:app_slug/document/:collection/:ref'         => array('api/document/', 'name' => 'api_document_ref'),

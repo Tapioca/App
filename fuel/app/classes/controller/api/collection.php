@@ -2,65 +2,53 @@
 
 class Controller_Api_Collection extends Controller_Api
 {
+	protected static $appslug;
 	private static $namespace;
-	private static $is_allowed;
 
 	public function before()
 	{
 		parent::before();
 
-		// to define with api key and query string
+		static::$appslug   = $this->param('appslug', false);
 		static::$namespace = $this->param('namespace', false);
 
-		static::$is_allowed = self::$group->is_admin(self::$user->get('id'));
-	}
-
-	// Only admins are allowed to edit Collections
-	private static function is_granted()
-	{
-		if(!static::$is_allowed)
+		// check collection's namespace 
+		// and app exists
+		if( static::$appslug && !static::assignApp())
 		{
-			self::restricted();
+			return;
 		}
-	} 
 
-	/* Data
-	----------------------------------------- */
+		// check if user is allowed
+		// for this app
+		static::isInApp();
+	}
 
 	public function get_index()
 	{
-		if(self::$granted)
+		if( static::$granted )
 		{
 			try
 			{
-				self::$status = 200;
+				static::$status = 200;
 
-				if(static::$namespace)
+				if( static::$namespace )
 				{
-					$revision = Input::get('revision', null);
+					$revision     = Input::get('revision', null);
+					$collection   = Tapioca::collection(static::$app, static::$namespace);
 
-					$collection = Tapioca::collection(static::$group, static::$namespace);
-
-					self::$data = $collection->get($revision, self::$user);
+					static::$data = $collection->get( $revision );
 				}
 				else
 				{
-					$status     = (static::$is_allowed) ? 0 : 100;
+					$status       = ( static::isAppAdmin() ) ? 0 : 100;
 
-					$collection = Tapioca::collection(static::$group);
-					$all        = $collection->all($status, static::$user);
-
-					if(count($all) == 0)
-					{
-						self::$status = 204;
-					}
-
-					self::$data = $all;
+					static::$data = Collection::getAll( static::$appslug, $status );;
 				}
 			}
-			catch (TapiocaException $e)
+			catch (CollectionException $e)
 			{
-				self::error($e->getMessage());
+				static::error($e->getMessage());
 			}
 		}
 	}
@@ -68,142 +56,137 @@ class Controller_Api_Collection extends Controller_Api
 	//create collection data.
 	public function post_index()
 	{
-		self::is_granted();
-
-		if(self::$granted)
+		if( static::$granted && static::isAppAdmin() )
 		{
-			$model = json_decode(Input::post('model', false), true);
-
+			$model = $this->setModel();
+\Debug::dump(file_get_contents('php://input'), $model ); exit;
 			try
 			{
 				// init tapioca first to get config & translation
-				$collection = Tapioca::collection(static::$group); 
+				$collection = Tapioca::collection( static::$app ); 
 			}
-			catch (TapiocaException $e)
+			catch (CollectionException $e)
 			{
-				self::error($e->getMessage());
+				static::error( $e->getMessage() );
 			}
 			
-			if(!$model)
+			$summary    = array();
+			$schema     = array();
+			$values     = $this->dispatch( $summary, $schema, $model );
+
+			try
 			{
-				self::$data   = array('error' => __('tapioca.missing_required_params'));
-				self::$status = 500;
+				$summary = $collection->create_summary( $summary );
+
+				if(count($schema) > 0)
+				{
+					$schema = $collection->update_data( $schema, static::$user );
+				}
+
+				static::$data   = $collection->get( null );
+				static::$status = 200;
+
 			}
-			else
+			catch (CollectionException $e)
 			{
-				$summary    = array();
-				$data       = array();
-				$values     = $this->dispatch($summary, $data, $model);
-
-				try
-				{
-					$summary = $collection->create_summary($summary);
-
-					if(count($data) > 0)
-					{
-						$data = $collection->update_data($data, self::$user);
-					}
-
-					self::$data   = $collection->get(null, self::$user);
-					self::$status = 200;
-
-				}
-				catch (TapiocaException $e)
-				{
-					self::error($e->getMessage());
-				}
-			}// if $model
+				static::error($e->getMessage());
+			}
 		} // if granted
 	}
 
 	//update collection data.
 	public function put_index()
-	{
-		self::is_granted();
-		
-		if(self::$granted)
+	{		
+		if( static::$granted && static::isAppAdmin() )
 		{
-			$model = json_decode(Input::put('model', false), true);
-
+			$model = $this->setModel();
+// \Debug::dump( file_get_contents('php://input'), $model ); exit;
 			try
 			{
 				// init tapioca first to get config & translation
-				$collection = Tapioca::collection(static::$group, static::$namespace); 
+				$collection = Tapioca::collection(static::$app, static::$namespace); 
 			}
-			catch (TapiocaException $e)
+			catch (CollectionException $e)
 			{
-				self::error($e->getMessage());
+				static::error( $e->getMessage() );
 			}
-				
-			if(!$model)
-			{
-				self::$data   = array('error' => __('tapioca.missing_required_params'));
-				self::$status = 500;
-			}
-			else
-			{
-				$summary    = array();
-				$data       = array();
-				
-				$this->dispatch($summary, $data, $model);
 
-				// format previous revision as new to compare
-				// goals is to know if we have a new revision or just the same data
-				// QUESTION: this migth be in the Collection Class ?
-				$foo      = array();
-				$previous = array();
-				$this->dispatch($foo, $previous, $collection->data());
+			$summary = array();
+			$schema  = array();
+			
+			$this->dispatch( $summary, $schema, $model );
+// \Debug::dump( $summary ); exit;
+			// format previous revision as new to compare
+			// goals is to know if we have a new revision or just the same data
+			// QUESTION: this migth be in the Collection Class ?
+			$foo      = array();
+			$previous = array();
 
-				try
+			$this->dispatch( $foo, $previous, $collection->data() );
+
+			try
+			{
+				$summary = $collection->update_summary($summary);
+
+				// TODO: find a better way to make a diff
+				if(json_encode($previous) != json_encode($schema))
 				{
-					$summary = $collection->update_summary($summary);
-
-					// TODO: find a better way to make a diff
-					if(json_encode($previous) != json_encode($data))
-					{
-						$data = $collection->update_data($data, self::$user);
-					}
-
-					self::$data   = $collection->get(null, self::$user);
-					self::$status = 200;
-
+					$schema = $collection->update_data($schema, static::$user);
 				}
-				catch (TapiocaException $e)
-				{
-					self::error($e->getMessage());
-				}
-			}// if $model
+
+				static::$data   = $collection->get( null );
+				static::$status = 200;
+
+			}
+			catch (CollectionException $e)
+			{
+				static::error( $e->getMessage() );
+			}
 		} // if granted
 	}
 
 	public function delete_index()
 	{
-		self::is_granted();
-
-		if(self::$granted)
+		if( static::$granted && static::isAppAdmin() )
 		{
-			$data = Tapioca::collection(static::$group, static::$namespace)->delete(); 
+			$data = Tapioca::collection(static::$app, static::$namespace)->delete(); 
 
-			self::$data   = array('status' => $data);
-			self::$status = 200;
+			static::$data   = array('status' => $data);
+			static::$status = 200;
 		}
 	}
 
 	public function delete_drop()
 	{
-		self::is_granted();
-
-		if(self::$granted)
+		if( static::$granted && static::isAppAdmin() )
 		{
-			$documents = Tapioca::document(self::$group, static::$namespace);
+			$documents = Tapioca::document(static::$app, static::$namespace);
 			$delete    = $documents->drop();
-			self::$data   = array('status' => $delete);
+			static::$data   = array('status' => $delete);
 			
-			self::$status = 200;
+			static::$status = 200;
 		}
 	}
 
-	private function dispatch(&$summary, &$data, $values)
+	private function setModel()
+	{
+		return array(
+				'namespace'    => Input::json('namespace', false),
+				'name'         => Input::json('name', false),
+				'desc'         => Input::json('desc', false),
+				'status'       => Input::json('status', false),
+				'preview'      => Input::json('preview', false), 
+				'schema'       => Input::json('schema', false), 
+				'summary'      => Input::json('summary', false), 
+				'summaryEdit'  => Input::json('summaryEdit', false),
+				'dependencies' => Input::json('dependencies', false),
+				'indexes'      => Input::json('indexes', false),
+				'callback'     => Input::json('callback', false),
+				'templates'    => Input::json('templates', false)
+			);
+	}
+
+	private function dispatch(&$summary, &$schema, $values)
 	{
 		$arrSummary = Config::get('tapioca.collection.dispatch.summary');
 		$arrData    = Config::get('tapioca.collection.dispatch.data');
@@ -217,7 +200,7 @@ class Controller_Api_Collection extends Controller_Api
 
 			if(in_array($key, $arrData))
 			{
-				$data[$key] = $value;
+				$schema[$key] = $value;
 			}
 		}
 

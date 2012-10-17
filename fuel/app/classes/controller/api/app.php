@@ -3,7 +3,6 @@
 class Controller_Api_App extends Controller_Api
 {
 	protected static $appslug;
-	protected static $isAllowed;
 
 	public function before()
 	{
@@ -24,7 +23,7 @@ class Controller_Api_App extends Controller_Api
 			return;
 		}
 
-		// if not admin and not in member of the app
+		// if not admin and not app's member
 		// GET App details
 		if( static::$appslug && ( !static::isAdmin() || !static::isInApp() ) )
 		{

@@ -5,7 +5,7 @@ namespace Tapioca;
 use FuelException;
 use Config;
 
-class TapiocaCollectionException extends FuelException {}
+class CollectionException extends FuelException {}
 
 class Collection
 {
@@ -15,9 +15,9 @@ class Collection
 	protected static $db = null;
 
 	/**
-	 * @var  object  Active group
+	 * @var  object  Active app
 	 */
-	protected static $group = null;
+	protected static $app = null;
 
 	/**
 	 * @var  array  Collection's name for exception message
@@ -69,6 +69,9 @@ class Collection
 	 */
 	protected $summaryPath = array();
 
+	/**
+	 * @var  array  does user alter natural summary order
+	 */
 	protected $summaryEdit = 0;
 
 	/**
@@ -79,54 +82,35 @@ class Collection
 	/**
 	 * Loads in the Collection object
 	 *
-	 * @param   object  Group instace
-	 * @param   MongoId|string  Collection id or Name Column value
+	 * @param   object  App instance
+	 * @param   string  Collection namespace
 	 * @return  void
-	 * @throws  TapiocaCollectionException
+	 * @throws  CollectionException
 	 */
-	public function __construct(\Auth\Group $group, $id = null, $check_exists = false)
+	public function __construct(\Tapioca\App $app, $namespace = false )
 	{
 		// load and set config
-		static::$group         = $group;
-		static::$collection    = strtolower(Config::get('tapioca.collections.collections'));		
-		static::$db            = \Mongo_Db::instance();
+		static::$app        = $app;
+		static::$collection = strtolower(Config::get('tapioca.collections.collections'));
+		static::$db         = \Mongo_Db::instance();
 
-		// if an ID was passed
-		if ($id)
+		// if an namespace was passed
+		if( $namespace )
 		{
-			// make sure ID is a MongoID
-			if($id instanceof \MongoId)
-			{
-				// set field to login_column
-				$field = '_id';
-			}
-			// if ID is not an MongoID
-			else
-			{
-				// set field to namespace for query
-				$field = 'namespace';
-			}
-
 			//query database for collection's summary
 			$summary = static::$db->get_where(static::$collection, array(
-				$field  => $id,
-				'type'  => 'summary',
-				'app_id' => static::$group->get('slug')
+				'namespace' => $namespace,
+				'type'      => 'summary',
+				'app_id'    => static::$app->get('slug')
 			), 1);
 
 			// if there was a result 
 			if (count($summary) == 1)
 			{
-				// if just a collection exists check - return true, no need for additional queries
-				if ($check_exists)
-				{
-					return true;
-				}
-
 				//query database for collection's summary
 				$data = static::$db
 							->where(array(
-								'app_id'    => static::$group->get('slug'),
+								'app_id'    => static::$app->get('slug'),
 								'namespace' => $summary[0]['namespace'],
 								'type'      => 'data'
 							))
@@ -140,7 +124,6 @@ class Collection
 				$this->namespace = $summary[0]['namespace'];
 				$this->name      = $summary[0]['name'];
 
-
 				if(isset($summary[0]['callback']))
 				{
 					$this->callback = $summary[0]['callback'];
@@ -152,8 +135,8 @@ class Collection
 			// collection doesn't exist
 			else
 			{
-				throw new \TapiocaCollectionException(
-					__('tapioca.collection_not_found', array('collection' => $id))
+				throw new \CollectionException(
+					__('tapioca.collection_not_found', array('collection' => $namespace))
 				);
 			}
 		}
@@ -166,7 +149,7 @@ class Collection
 	 */
 	private function set_summary_where()
 	{
-		static::$summary_where = array( 'app_id'    => static::$group->get('slug'),
+		static::$summary_where = array( 'app_id'    => static::$app->get('slug'),
 										'namespace' => $this->namespace,
 										'type'      => 'summary');		
 	}
@@ -184,35 +167,38 @@ class Collection
 
 	/**
 	 * Gets the summaries of all collections,
-	 * only admins can see non published (status 100) Collection
+	 * only admins can see non published Collection (status lower than 100)
 	 *
+	 * @param   string    app slug
+	 * @param   int       min collection status
 	 * @return  array
-	 * @throws  TapiocaException
 	 */
-	public function all($status = 100, \Auth\User $user)
+	public static function getAll( $appslug, $status = 100 )
 	{
+		static::$collection = strtolower(Config::get('tapioca.collections.collections'));
+		static::$db         = \Mongo_Db::instance();
+
 		//query database for collections's summaries
 		$ret = static::$db
-				->select(array(), array(
+				->select(array(
+						'name',
+						'namespace',
+						'documents',
+						'status'
+					), array(
 					'revisions'
 				))
-				->get_where(static::$collection, array(
-					'app_id' => static::$group->get('slug'),
+				->where(array(
+					'app_id' => $appslug,
 					'type'   => 'summary',
 					'status' => array('$gte' => (int) $status)
-				));
+				))
+				->order_by( array( 'name' => 'ASC' ) )
+				->hash( static::$collection, true );
 
-		if($ret)
+		foreach( $ret->results as &$row)
 		{
-			// Is User is an admin
-			$user_id  = $user->get('id');
-			$editable = (static::$group->is_admin($user_id));
-
-			foreach($ret as &$result)
-			{
-				$result['editable'] = $editable;
-				unset($result['_id']);
-			}
+			$row['url'] = \Router::get('api_collection_ref', array('appslug' => $appslug, 'namespace' => $row['namespace']));
 		}
 
 		return $ret;
@@ -223,22 +209,18 @@ class Collection
 	 *
 	 * @params  int Revision number 
 	 * @return  array
-	 * @throws  TapiocaException
+	 * @throws  CollectionException
 	 */
 
-	public function get(int $revision = null, \Auth\User $user)
+	public function get(int $revision = null)
 	{
-		$data       = $this->data($revision);
+		$data       = $this->data( $revision );
 
 		// Format return
 		$ret            = array_merge($this->summary, $data);
-		$ret['created'] = (int) $ret['created']->sec;
 
+		unset($ret['_id']);
 		unset($ret['type']);
-
-		// Is User is an admin
-		$user_id = $user->get('id');
-		$ret['editable'] = (static::$group->is_admin($user_id));
 
 		return $ret;
 	}
@@ -247,13 +229,13 @@ class Collection
 	 * Gets the summary of the current collection
 	 *
 	 * @return  array
-	 * @throws  TapiocaException
+	 * @throws  CollectionException
 	 */
 	public function summary()
 	{
 		if(is_null($this->summary))
 		{
-			throw new \TapiocaException(__('tapioca.no_collection_selected'));
+			throw new \CollectionException( __('tapioca.no_collection_selected') );
 		}
 		return $this->summary;
 	}
@@ -264,13 +246,13 @@ class Collection
 	 *
 	 * @param   int Revision number
 	 * @return  array
-	 * @throws  TapiocaException
+	 * @throws  CollectionException
 	 */
 	public function data($revision = null)
 	{
 		if(is_null($this->summary))
 		{
-			throw new \TapiocaException(__('tapioca.no_collection_selected'));
+			throw new \CollectionException( __('tapioca.no_collection_selected') );
 		}
 
 		// get a specific revison
@@ -285,7 +267,7 @@ class Collection
 				return $this->data[$revision];
 			}
 
-			throw new \TapiocaException(
+			throw new \CollectionException(
 				__('tapioca.collection_revision_not_found', array('collection' => $this->name, 'revision' => $revision))
 			);
 		}
@@ -299,7 +281,7 @@ class Collection
 	 * @param   array  Fields to update
 	 * @param   string list to check
 	 * @return  bool
-	 * @throws  TapiocaException
+	 * @throws  CollectionException
 	 */
 	private static function validation(array $fields, $check_list)
 	{
@@ -307,7 +289,7 @@ class Collection
 		{
 			if(!isset($fields[$item]) || empty($fields[$item]))
 			{
-				throw new \TapiocaException(
+				throw new \CollectionException(
 					__('tapioca.collection_column_is_empty', array('column' => $item))
 				);
 			}
@@ -319,7 +301,7 @@ class Collection
 	 *
 	 * @param   array  Fields
 	 * @return  bool
-	 * @throws  TapiocaException
+	 * @throws  CollectionException
 	 */
 	public function create_summary(array $fields)
 	{
@@ -330,7 +312,7 @@ class Collection
 
 		if($this->namespance_exists($fields['namespace']))
 		{
-			throw new \TapiocaException(
+			throw new \CollectionException(
 				__('tapioca.collection_already_exists', array('name' => $fields['name']))
 			);
 		}
@@ -349,11 +331,11 @@ class Collection
 		}
 
 		$new_summary = array(
-			'app_id' => static::$group->get('slug'),
-			'type' => 'summary',
+			'app_id'    => static::$app->get('slug'),
+			'type'      => 'summary',
 			'documents' => (int) 0,
-			'status' => $status,
-			'created' => new \MongoDate(),
+			'status'    => $status,
+			'created'   => new \MongoDate(),
 			'revisions' => array()
 		) + $fields;
 
@@ -372,13 +354,13 @@ class Collection
 	 *
 	 * @param   array  Fields to update
 	 * @return  bool
-	 * @throws  TapiocaException
+	 * @throws  CollectionException
 	 */
 	public function update_summary(array $fields)
 	{
 		if(is_null($this->summary))
 		{
-			throw new \TapiocaException(__('tapioca.no_collection_selected'));
+			throw new \CollectionException( __('tapioca.no_collection_selected') );
 		}
 
 		// check for required fields
@@ -406,20 +388,20 @@ class Collection
 	}
 
 	/**
-	 * Add a new structure revision to the current collection
+	 * Add a new schema revision to the current collection
 	 *
 	 * @param   array  Fields 
 	 * @param   object User object instance 
 	 * @return  bool
-	 * @throws  TapiocaException
+	 * @throws  CollectionException
 	 */
-	public function update_data(array $fields, \Auth\User $user)
+	public function update_data(array $fields, User $user)
 	{
 		if(is_null($this->summary))
 		{
-			throw new \TapiocaException(__('tapioca.no_collection_selected'));
+			throw new \CollectionException(__('tapioca.no_collection_selected'));
 		}
-
+\Debug::dump( $fields ); exit;
 		// check for required fields
 		$check_list = Config::get('tapioca.validation.collection.data');
 		
@@ -429,23 +411,27 @@ class Collection
 
 		$this->summaryEdit = $fields['summaryEdit'];
 
-		$this->parse($fields['structure']);
+		$this->parse($fields['schema']);
 
 		$arrData    = Config::get('tapioca.collection.dispatch.data');
 
 		$revision = (count($this->data) + 1);
 
 		$data = array(
-			'app_id'      => static::$group->get('slug'),
+			'app_id'      => static::$app->get('slug'),
 			'type'        => 'data',
 			'namespace'   => $this->namespace,
 			'revision'    => $revision,
-			'summary'     => ($this->summaryEdit) ? $fields['summary'] : $this->summaryPath,
-			'summaryEdit' => $this->summaryEdit,
-			'cast'        => $this->castablePath,
-			'rules'       => $this->rulesPath,
-			'structure'   => $fields['structure'],
-			'callback'    => $fields['callback']
+			'summary'     => array(
+				'fields' => ($this->summaryEdit) ? $fields['summary'] : $this->summaryPath,
+				'edited' => $this->summaryEdit
+			),
+			'cast'         => $this->castablePath,
+			'rules'        => $this->rulesPath,
+			'schema'       => $fields['schema'],
+			'callback'     => $fields['callback'],
+			'indexes'      => $fields['indexes'],
+			'dependencies' => $fields['dependencies']
 		);
 
 		$revision = array(
@@ -477,7 +463,7 @@ class Collection
 
 			if(!$update_summary)
 			{
-				throw new \TapiocaException(
+				throw new \CollectionException(
 					__('tapioca.can_not_update_collection_revision', array('name' => $this->name))
 				);				
 			}
@@ -485,7 +471,7 @@ class Collection
 			return true;
 		}
 
-		throw new \TapiocaException(
+		throw new \CollectionException(
 			__('tapioca.can_not_insert_collection_data', array('name' => $this->name))
 		);
 	}
@@ -494,13 +480,14 @@ class Collection
 	 * Increment/decrement total documents in Collection
 	 *
 	 * @param   int   Increment|Decrement
+	 * @throws  CollectionException
 	 * @return  void
 	 */
 	public function inc_document($direction = 1)
 	{
 		if(is_null($this->summary))
 		{
-			throw new \TapiocaException(__('tapioca.no_collection_selected'));
+			throw new \CollectionException(__('tapioca.no_collection_selected'));
 		}
 
 		$ret = static::$db->command(
@@ -520,13 +507,14 @@ class Collection
 	/**
 	 * Reset total documents in Collection
 	 *
+	 * @throws  CollectionException
 	 * @return  void
 	 */
 	public function reset_document()
 	{
 		if(is_null($this->summary))
 		{
-			throw new \TapiocaException(__('tapioca.no_collection_selected'));
+			throw new \CollectionException(__('tapioca.no_collection_selected'));
 		}
 		
 		$update = static::$db
@@ -543,19 +531,19 @@ class Collection
 	 * Delete the current collection
 	 *
 	 * @return  bool
-	 * @throws  TapiocaException
+	 * @throws  CollectionException
 	 */
 	public function delete()
 	{
 		if(is_null($this->summary))
 		{
-			throw new \TapiocaException(__('tapioca.no_collection_selected'));
+			throw new \CollectionException(__('tapioca.no_collection_selected'));
 		}
 
 		return static::$db
 					->where(array(
 							'namespace' => $this->namespace,
-							'app_id'    => static::$group->get('slug')
+							'app_id'    => static::$app->get('slug')
 					))
 					->delete_all(static::$collection);
 	}
@@ -570,7 +558,7 @@ class Collection
 	{
 		// query db to check for login_column
 		$result = static::$db->get_where(static::$collection, array(
-												'app_id'    => static::$group->get('slug'),
+												'app_id'    => static::$app->get('slug'),
 												'namespace' => $namespace,
 												'type'      => 'summary'
 											), 1);
