@@ -19,7 +19,6 @@ class Request_Curl extends \Request_Driver
 	 */
 	public function __construct($resource, array $options, $method = null)
 	{
-		$method and $this->set_method($method);
 
 		// check if we have libcurl available
 		if ( ! function_exists('curl_init'))
@@ -35,10 +34,7 @@ class Request_Curl extends \Request_Driver
 			$this->http_login($options['user'], $options['pass'], $options['auth']);
 		}
 
-		// we want to handle failure ourselves
-		$this->set_option('failonerror', false);
-
-		parent::__construct($resource, $options);
+		parent::__construct($resource, $options, $method);
 	}
 
 	/**
@@ -109,7 +105,7 @@ class Request_Curl extends \Request_Driver
 		}
 		if ( ! isset($this->options[CURLOPT_FAILONERROR]))
 		{
-			$this->options[CURLOPT_FAILONERROR] = true;
+			$this->options[CURLOPT_FAILONERROR] = false;
 		}
 
 		// Only set follow location if not running securely
@@ -155,7 +151,7 @@ class Request_Curl extends \Request_Driver
 		{
 			// Split the headers from the body
 			$raw_headers = explode("\n", str_replace("\r", "", substr($body, 0, $this->response_info['header_size'])));
-			$body = substr($body, $this->response_info['header_size']);
+			$body = $this->response_info['header_size'] >= strlen($body) ? '' : substr($body, $this->response_info['header_size']);
 
 			// Convert the header data
 			foreach ($raw_headers as $header)

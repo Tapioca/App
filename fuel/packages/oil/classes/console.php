@@ -88,7 +88,15 @@ class Console
 			ob_start();
 
 			// Unset the previous line and execute the new one
-			$ret = eval("unset(\$__line); $__line;");
+			try
+			{
+				$ret = eval("unset(\$__line); $__line;");
+			}
+			catch(\Exception $e)
+			{
+				$ret = false;
+				$__line = $e->getMessage();
+			}
 
 			// Error was returned
 			if ($ret === false)
@@ -206,7 +214,7 @@ class Console
 		ob_end_clean();
 
 		$x = strip_tags($x);
-		$x = explode(PHP_EOL, $x);
+		$x = explode("\n", $x);	// PHP_EOL doesn't work on Windows
 		$s = array('Build Date => ', 'Build Date ');
 
 		foreach ($x as $i)

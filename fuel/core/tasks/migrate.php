@@ -98,11 +98,14 @@ class Migrate
 			if ($packages === true)
 			{
 				// get all packages that have files in the migration folder
-				foreach (glob(PKGPATH . '*/') as $p)
+				foreach (\Config::get('package_paths', array(PKGPATH)) as $p)
 				{
-					if (count(glob($p.\Config::get('migrations.folder').'/*.php')))
+					foreach (glob($p . '*/') as $pp)
 					{
-						static::$packages[] = basename($p);
+						if (count(glob($pp.\Config::get('migrations.folder').'/*.php')))
+						{
+							static::$packages[] = basename($pp);
+						}
 					}
 				}
 			}
@@ -322,7 +325,7 @@ class Migrate
 		else
 		{
 			// there is no 'down'...
-			\Cli::write('You are already on the first migration for '.$type.':'.$name.'.');
+			\Cli::write('There are no migrations installed to revert for '.$type.':'.$name.'.');
 		}
 	}
 

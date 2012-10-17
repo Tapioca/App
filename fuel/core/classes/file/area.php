@@ -85,8 +85,10 @@ class File_Area
 		{
 			$info = pathinfo($path);
 
+			// deal with path names without an extension
+			isset($info['extension']) or $info['extension'] = '';
+
 			// check file extension
-			$info = pathinfo($path);
 			if ( ! empty($this->extensions) && ! in_array($info['extension'], $this->extensions))
 			{
 				throw new \FileAccessException('File operation not allowed: disallowed file extension.');
@@ -248,7 +250,7 @@ class File_Area
 
 	public function delete_dir($path, $recursive = true, $delete_top = true)
 	{
-		return \File::delete($path, $recursive, $delete_top, $this);
+		return \File::delete_dir($path, $recursive, $delete_top, $this);
 	}
 
 	public function update($basepath, $name, $new_content)

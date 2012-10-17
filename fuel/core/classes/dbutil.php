@@ -311,7 +311,6 @@ class DBUtil
 			$sql .= \DB::quote_identifier($field);
 			$sql .= (array_key_exists('NAME', $attr) and $attr['NAME'] !== $field) ? ' '.\DB::quote_identifier($attr['NAME'], $db ? $db : static::$connection).' ' : '';
 			$sql .= array_key_exists('TYPE', $attr) ? ' '.$attr['TYPE'] : '';
-			$sql .= array_key_exists('CHARSET', $attr) ? static::process_charset($attr['CHARSET'], $db ? $db : static::$connection) : '';
 			
 			if(array_key_exists('CONSTRAINT',$attr))
 			{
@@ -324,6 +323,8 @@ class DBUtil
 					$sql .= '('.$attr['CONSTRAINT'].')';
 				}
 			}
+			
+			$sql .= array_key_exists('CHARSET', $attr) ? static::process_charset($attr['CHARSET'], $db ? $db : static::$connection) : '';
 			
 			if (array_key_exists('UNSIGNED', $attr) and $attr['UNSIGNED'] === true)
 			{
@@ -469,16 +470,16 @@ class DBUtil
 			}
 
 			$sql = '';
-			! empty($definition['constraint']) and $sql .= " CONSTRAINT ".$definition['constraint'];
-			$sql .= " FOREIGN KEY (".$definition['key'].')';
-			$sql .= " REFERENCES ".$definition['reference']['table'].' (';
+			! empty($definition['constraint']) and $sql .= " CONSTRAINT ".\DB::quote_identifier($definition['constraint']);
+			$sql .= " FOREIGN KEY (".\DB::quote_identifier($definition['key']).')';
+			$sql .= " REFERENCES ".\DB::quote_identifier(\DB::table_prefix($definition['reference']['table'])).' (';
 			if (is_array($definition['reference']['column']))
 			{
-				$sql .= implode(', ', $definition['reference']['column']);
+				$sql .= implode(', ', \DB::quote_identifier($definition['reference']['column']));
 			}
 			else
 			{
-				$sql .= $definition['reference']['column'];
+				$sql .= \DB::quote_identifier($definition['reference']['column']);
 			}
 			$sql .= ')';
 			! empty($definition['on_update']) and $sql .= " ON UPDATE ".$definition['on_update'];

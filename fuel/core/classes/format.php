@@ -184,18 +184,39 @@ class Format
 	 * To CSV conversion
 	 *
 	 * @param   mixed   $data
+	 * @param   mixed   $delimiter
 	 * @return  string
 	 */
-	public function to_csv($data = null)
+	public function to_csv($data = null, $delimiter = null)
 	{
+		// csv format settings
+		$newline = \Config::get('format.csv.newline', "\n");
+		$delimiter or $delimiter = \Config::get('format.csv.delimiter', ',');
+		$enclosure = \Config::get('format.csv.enclosure', '"');
+		$escape = \Config::get('format.csv.escape', '\\');
+
+		// escape function
+		$escaper = function($items) use($enclosure, $escape) {
+			return array_map(function($item) use($enclosure, $escape){
+				return str_replace($enclosure, $escape.$enclosure, $item);
+			}, $items);
+		};
+
 		if ($data === null)
 		{
 			$data = $this->_data;
 		}
 
-		// Multi-dimentional array
-		if (is_array($data) and isset($data[0]))
+		if (is_object($data) and ! $data instanceof \Iterator)
 		{
+			$data = $this->to_array($data);
+		}
+
+		// Multi-dimensional array
+		if (is_array($data) and \Arr::is_multi($data))
+		{
+			$data = array_values($data);
+
 			if (\Arr::is_assoc($data[0]))
 			{
 				$headings = array_keys($data[0]);
@@ -205,7 +226,6 @@ class Format
 				$headings = array_shift($data);
 			}
 		}
-
 		// Single array
 		else
 		{
@@ -213,13 +233,14 @@ class Format
 			$data = array($data);
 		}
 
-		$output = implode(',', $headings) . "\n";
-		foreach ($data as &$row)
+		$output = $enclosure.implode($enclosure.$delimiter.$enclosure, $escaper($headings)).$enclosure.$newline;
+
+		foreach ($data as $row)
 		{
-			$output .= '"' . implode('","', (array) $row) . "\"\n";
+			$output .= $enclosure.implode($enclosure.$delimiter.$enclosure, $escaper((array) $row)).$enclosure.$newline;
 		}
 
-		return rtrim($output, "\n");
+		return rtrim($output, $newline);
 	}
 
 	/**
@@ -356,61 +377,19 @@ class Format
 	{
 		$data = array();
 
-		// Splits
-		$rows = explode("\n", trim($string));
+		$rows = preg_split('/(?<='.preg_quote(\Config::get('format.csv.enclosure', '"')).')'.\Config::get('format.csv.regex_newline', '\n').'/', trim($string));
 
-		// TODO: This means any headers with , will be split, but this is less likley thay a value containing it
-		$headings = array_map(
-			function($value)
-			{
-				return trim($value, '"');
-			},
-			explode(',', array_shift($rows))
-		);
+		// csv config
+		$delimiter = \Config::get('format.csv.delimiter', ',');
+		$enclosure = \Config::get('format.csv.enclosure', '"');
+		$escape = \Config::get('format.csv.escape', '\\');
 
-		$join_row = null;
+		// Get the headings
+		$headings = str_replace($escape.$enclosure, $enclosure, str_getcsv(array_shift($rows), $delimiter, $enclosure, $escape));
 
 		foreach ($rows as $row)
 		{
-			// Check for odd numer of double quotes
-			while (substr_count($row, '"') % 2)
-			{
-				// They have a line start to join onto
-				if ($join_row !== null)
-				{
-					// Lets stick this row onto a new line after the existing row, and see what happens
-					$row = $join_row."\n".$row;
-
-					// Did that fix it?
-					if (substr_count($row, '"') % 2)
-					{
-						// Nope, lets try adding the next line
-						continue 2;
-					}
-
-					else
-					{
-						// Yep, lets kill the join row.
-						$join_row = null;
-					}
-				}
-
-				// Lets start a new "join line"
-				else
-				{
-					$join_row = $row;
-
-					// Lets bust outta this join, and go to the next row (foreach)
-					continue 2;
-				}
-			}
-
-			// If present, remove the " from start and end
-			substr($row, 0, 1) === '"' and $row = substr($row,1);
-			substr($row, -1) === '"' and $row = substr($row,0,-1);
-
-			// Extract the fields from the row
-			$data_fields = explode('","', $row);
+			$data_fields = str_replace($escape.$enclosure, $enclosure, str_getcsv($row, $delimiter, $enclosure, $escape));
 
 			if (count($data_fields) == count($headings))
 			{
@@ -528,5 +507,12 @@ class Format
 
 		return $new_json;
 	}
-}
 
+	/**
+	 * Loads Format config.
+	 */
+	public static function _init()
+	{
+		\Config::load('format', true);
+	}
+}

@@ -23,12 +23,6 @@ class Command
 {
 	public static function init($args)
 	{
-		//set up the environment
-		if (($env = \Cli::option('env')))
-		{
-			\Fuel::$env = constant('\Fuel::'. strtoupper($env)) ?: \Fuel::DEVELOPMENT;
-		}
-		
 		// Remove flag options from the main argument list
 		$args = self::_clear_args($args);
 
@@ -114,10 +108,10 @@ class Command
 					// Developers of third-party tasks may not be displaying PHP errors. Report any error and quit
 					set_error_handler(function($errno, $errstr, $errfile, $errline) {
 						if (!error_reporting()) return; // If the error was supressed with an @ then we ignore it!
-						
+
 						\Cli::error("Error: {$errstr} in $errfile on $errline");
 						\Cli::beep();
-						exit;
+						exit(1);
 					});
 
 					$task = isset($args[2]) ? $args[2] : null;
@@ -185,14 +179,20 @@ class Command
 
 					// Respect the coverage-html option
 					\Cli::option('coverage-html') and $command .= ' --coverage-html '.\Cli::option('coverage-html');
+					\Cli::option('coverage-clover') and $command .= ' --coverage-clover '.\Cli::option('coverage-clover');
+					\Cli::option('coverage-text') and $command .= ' --coverage-text='.\Cli::option('coverage-text');
+					\Cli::option('coverage-php') and $command .= ' --coverage-php '.\Cli::option('coverage-php');
 
 					\Cli::write('Tests Running...This may take a few moments.', 'green');
 
+					$return_code = 0;
 					foreach(explode(';', $command) as $c)
 					{
-						passthru($c);
+						passthru($c, $return_code_task);
+						// Return failure if any subtask fails
+						$return_code |= $return_code_task;
 					}
-
+					exit($return_code);
 				break;
 
 				default:
@@ -207,6 +207,7 @@ class Command
 			\Cli::beep();
 
 			\Cli::option('speak') and `say --voice="Trinoids" "{$e->getMessage()}"`;
+			exit(1);
 		}
 	}
 
@@ -222,11 +223,14 @@ Runtime options:
   -s, [--skip]     # Skip files that already exist
   -q, [--quiet]    # Supress status output
   -t, [--speak]    # Speak errors in a robot voice
-  --env            # Specify the fuel environment
 
 Description:
   The 'oil' command can be used in several ways to facilitate quick development, help with
   testing your application and for running Tasks.
+
+Environment:
+  If you want to specify a specific environment oil has to run in, overload the environment
+  variable on the commandline: FUEL_ENV=staging php oil <commands>
 
 Documentation:
   http://docs.fuelphp.com/packages/oil/intro.html
