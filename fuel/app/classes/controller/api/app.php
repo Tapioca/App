@@ -132,31 +132,9 @@ class Controller_Api_App extends Controller_Api
 	{
 		if( static::$granted && static::$appslug && ( static::isAdmin() || static::isAppAdmin() ) )
 		{
-			if( ! static::$token )
+			if( ! static::deleteToken( 'app', static::$appslug ))
 			{
-				try
-				{
-					static::$data   = tapioca::getDeleteToken( 'app', static::$appslug );
-					static::$status = 200;
-					return;
-				}
-				catch (TapiocaException $e)
-				{
-					static::error( $e->getMessage() );
-					return;
-				}
-			}
-			else 
-			{
-				try
-				{
-					Tapioca::checkDeleteToken( static::$token );
-				}
-				catch (TapiocaException $e)
-				{
-					static::error( $e->getMessage() );
-					return;
-				}
+				return;
 			}
 
 			try

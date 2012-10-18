@@ -93,31 +93,9 @@ class Controller_Api_App_User extends Controller_Api
 	{
 		if( static::$granted )
 		{
-			if( ! static::$token )
+			if( ! static::deleteToken( 'app_user', static::$userId ))
 			{
-				try
-				{
-					static::$data   = tapioca::getDeleteToken( 'app_user', static::$userId );
-					static::$status = 200;
-					return;
-				}
-				catch (TapiocaException $e)
-				{
-					static::error( $e->getMessage() );
-					return;
-				}
-			}
-			else 
-			{
-				try
-				{
-					Tapioca::checkDeleteToken( static::$token );
-				}
-				catch (TapiocaException $e)
-				{
-					static::error( $e->getMessage() );
-					return;
-				}
+				return;
 			}
 
 			try
