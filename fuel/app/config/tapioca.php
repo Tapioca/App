@@ -138,12 +138,11 @@ return array(
 			),
 			'data' => array(
 				'schema', 
-				'summary', 
-				'summaryEdit',
+				'summary',
 				'dependencies',
 				'indexes',
 				'callback',
-				'templates'
+				'template'
 			)
 		)
 	),

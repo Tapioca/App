@@ -18,7 +18,6 @@ Autoloader::add_classes(array(
 	'Mongo_Db'			=> APPPATH.'classes/core/mongo/db.php',
 	'GridFs'			=> APPPATH.'classes/core/mongo/gridfs.php',	
 
-	'Debug'				=> APPPATH.'classes/core/debug.php',
 	'Phpredis'			=> APPPATH.'classes/core/phpredis.php',
 	'Set'			    => APPPATH.'classes/core/set.php',
 

@@ -118,6 +118,44 @@ class Controller_Api extends Controller_Rest
 		self::$granted = false;
 	}
 
+	protected static function deleteToken( $object = null, $id = null )
+	{
+		if( ! self::$token )
+		{
+			try
+			{
+				self::$data   = tapioca::getDeleteToken( $object , $id );
+				self::$status = 200;
+
+				// prevent next action
+				return false;
+			}
+			catch (TapiocaException $e)
+			{
+				self::error( $e->getMessage() );
+
+				// prevent next action
+				return false;
+			}
+		}
+		else 
+		{
+			try
+			{
+				Tapioca::checkDeleteToken( self::$token, $object, $id );
+
+				return true;
+			}
+			catch (TapiocaException $e)
+			{
+				self::error( $e->getMessage() );
+
+				// prevent next action
+				return false;
+			}
+		}
+	}
+
 	public function after( $response )
 	{
 		$this->response->set_header('Content-Type', 'application/json; charset=UTF-8');

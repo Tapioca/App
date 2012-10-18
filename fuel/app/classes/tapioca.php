@@ -83,9 +83,6 @@ class Tapioca
 		{
 			throw new \TapiocaException($e->getMessage());
 		}
-
-		//\Debug::dump('Tapioca collection call');
-		//
 	}
 
 	/**
@@ -500,7 +497,7 @@ class Tapioca
 	 * @throws  TapiocaException
 	 * @return  object
 	 */
-	public static function checkDeleteToken( $token )
+	public static function checkDeleteToken( $token, $object, $id )
 	{
 		if( is_null( static::$db ) )
 		{
@@ -511,7 +508,9 @@ class Tapioca
 		$limitDate  = ( time() - Config::get('tapioca.deleteToken') );
 
 		$object = static::$db->get_where( $collection, array(
-				'token' => $token
+				'token'  => $token,
+				'object' => $object,
+				'id'     => $id,
 			));
 
 		if( count( $object ) != 1 )

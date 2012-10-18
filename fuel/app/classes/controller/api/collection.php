@@ -59,7 +59,7 @@ class Controller_Api_Collection extends Controller_Api
 		if( static::$granted && static::isAppAdmin() )
 		{
 			$model = $this->setModel();
-\Debug::dump(file_get_contents('php://input'), $model ); exit;
+
 			try
 			{
 				// init tapioca first to get config & translation
@@ -97,10 +97,10 @@ class Controller_Api_Collection extends Controller_Api
 	//update collection data.
 	public function put_index()
 	{		
-		if( static::$granted && static::isAppAdmin() )
+		if( static::$granted && static::$namespace && static::isAppAdmin() )
 		{
 			$model = $this->setModel();
-// \Debug::dump( file_get_contents('php://input'), $model ); exit;
+
 			try
 			{
 				// init tapioca first to get config & translation
@@ -109,27 +109,42 @@ class Controller_Api_Collection extends Controller_Api
 			catch (CollectionException $e)
 			{
 				static::error( $e->getMessage() );
+				return;
 			}
 
 			$summary = array();
 			$schema  = array();
 			
 			$this->dispatch( $summary, $schema, $model );
-// \Debug::dump( $summary ); exit;
-			// format previous revision as new to compare
-			// goals is to know if we have a new revision or just the same data
-			// QUESTION: this migth be in the Collection Class ?
-			$foo      = array();
-			$previous = array();
 
-			$this->dispatch( $foo, $previous, $collection->data() );
+			try
+			{
+				// format previous revision as new to compare
+				// goals is to know if we have a new revision or just the same data
+				// QUESTION: this migth be in the Collection Class ?
+				$foo      = array();
+				$previous = array();
+	
+				$this->dispatch( $foo, $previous, $collection->data() );
+			}
+			catch (CollectionException $e)
+			{
+				static::error( $e->getMessage() );
+				return;
+			}
 
 			try
 			{
 				$summary = $collection->update_summary($summary);
 
+				ksort($previous);
+				ksort($schema);
+
+				$previousString = json_encode($previous);
+				$schemaString   = json_encode($schema);
+
 				// TODO: find a better way to make a diff
-				if(json_encode($previous) != json_encode($schema))
+				if( $previousString !== $schemaString )
 				{
 					$schema = $collection->update_data($schema, static::$user);
 				}
@@ -147,8 +162,13 @@ class Controller_Api_Collection extends Controller_Api
 
 	public function delete_index()
 	{
-		if( static::$granted && static::isAppAdmin() )
+		if( static::$granted && static::$namespace && static::isAppAdmin() )
 		{
+			if( ! static::deleteToken( 'collection', static::$namespace ))
+			{
+				return;
+			}
+
 			$data = Tapioca::collection(static::$app, static::$namespace)->delete(); 
 
 			static::$data   = array('status' => $data);
@@ -158,7 +178,7 @@ class Controller_Api_Collection extends Controller_Api
 
 	public function delete_drop()
 	{
-		if( static::$granted && static::isAppAdmin() )
+		if( static::$granted && static::$namespace && static::isAppAdmin() )
 		{
 			$documents = Tapioca::document(static::$app, static::$namespace);
 			$delete    = $documents->drop();
@@ -178,11 +198,10 @@ class Controller_Api_Collection extends Controller_Api
 				'preview'      => Input::json('preview', false), 
 				'schema'       => Input::json('schema', false), 
 				'summary'      => Input::json('summary', false), 
-				'summaryEdit'  => Input::json('summaryEdit', false),
 				'dependencies' => Input::json('dependencies', false),
 				'indexes'      => Input::json('indexes', false),
 				'callback'     => Input::json('callback', false),
-				'templates'    => Input::json('templates', false)
+				'template'     => Input::json('template', false)
 			);
 	}
 

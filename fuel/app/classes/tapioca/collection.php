@@ -335,7 +335,6 @@ class Collection
 			'type'      => 'summary',
 			'documents' => (int) 0,
 			'status'    => $status,
-			'created'   => new \MongoDate(),
 			'revisions' => array()
 		) + $fields;
 
@@ -401,7 +400,7 @@ class Collection
 		{
 			throw new \CollectionException(__('tapioca.no_collection_selected'));
 		}
-\Debug::dump( $fields ); exit;
+
 		// check for required fields
 		$check_list = Config::get('tapioca.validation.collection.data');
 		
@@ -409,7 +408,7 @@ class Collection
 
 		static::$castable = Config::get('tapioca.cast');
 
-		$this->summaryEdit = $fields['summaryEdit'];
+		$this->summaryEdit = $fields['summary']['edited'];
 
 		$this->parse($fields['schema']);
 
@@ -423,15 +422,16 @@ class Collection
 			'namespace'   => $this->namespace,
 			'revision'    => $revision,
 			'summary'     => array(
-				'fields' => ($this->summaryEdit) ? $fields['summary'] : $this->summaryPath,
-				'edited' => $this->summaryEdit
+				'fields' => ( $fields['summary']['edited'] ) ? $fields['summary']['fields'] : $this->summaryPath,
+				'edited' => $fields['summary']['edited']
 			),
 			'cast'         => $this->castablePath,
 			'rules'        => $this->rulesPath,
 			'schema'       => $fields['schema'],
 			'callback'     => $fields['callback'],
 			'indexes'      => $fields['indexes'],
-			'dependencies' => $fields['dependencies']
+			'dependencies' => $fields['dependencies'],
+			'template'     => $fields['template']
 		);
 
 		$revision = array(
