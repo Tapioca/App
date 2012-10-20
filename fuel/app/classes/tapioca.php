@@ -68,40 +68,40 @@ class Tapioca
 	}
 
 	/**
-	 * @param   string app id
-	 * @param   MongoId|string Collection id.
+	 * @param   string app slug
+	 * @param   string Collection namespace.
 	 * @throws  TapiocaException
 	 * @return  Collection
 	 */
-	public static function collection($appid, $id = null)
+	public static function collection( $appslug, $namespace = null )
 	{
 		try
 		{
-			return new \Collection($appid, $id);
+			return new \Collection($appslug, $namespace);
 		}
-		catch (TapiocaCollectionException $e)
+		catch ( CollectionException $e )
 		{
 			throw new \TapiocaException($e->getMessage());
 		}
 	}
 
 	/**
-	 * @param   string app slug
-	 * @param   string collection namespace.
-	 * @param   string document reference.
-	 * @param   string document locale.
+	 * @param   object App instance
+	 * @param   string Collection namespace.
+	 * @param   string Document reference.
+	 * @param   string Document locale.
 	 * @throws  TapiocaException
 	 * @return  Document
 	 */
-	public static function document($app_slug, $namespace, $ref = null, $locale = null)
+	public static function document( App $app, $namespace, $ref = null, $locale = null)
 	{
 		try
 		{
-			return new \Document($app_slug, $namespace, $ref, $locale);
+			return new \Document($app, $namespace, $ref, $locale);
 		}
-		catch (TapiocaDocumentException $e)
+		catch ( DocumentException $e )
 		{
-			throw new \TapiocaException($e->getMessage());
+			throw new \TapiocaException( $e->getMessage() );
 		}
 
 		//\Debug::dump('Tapioca collection call');
@@ -114,11 +114,11 @@ class Tapioca
 	 * @throws  TapiocaException
 	 * @return  Document
 	 */
-	public static function file($app_slug, $filename = null)
+	public static function file($appslug, $filename = null)
 	{
 		try
 		{
-			return new \Files($app_slug, $filename);
+			return new \Files($appslug, $filename);
 		}
 		catch (TapiocaFileException $e)
 		{

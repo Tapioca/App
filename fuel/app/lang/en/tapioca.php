@@ -48,20 +48,22 @@ return array(
     'user_suspended'       => 'You have been suspended from trying to login into account ":account" for :time minutes.',
     
 	/** Collection Exception Messages **/
-	'collection_not_found'           => 'Collection ":collection" does not exist.',
-	'collection_revision_not_found'  => 'Revison ":revision" does not exist in Collection ":collection"',
-	'no_collection_selected'         => 'No collection is selected.',
-	'collection_column_is_empty'     => ':column must not be empty.',
-	'collection_already_exists'      => 'The collection name ":name" already exists.',
-	'can_not_insert_collection_data' => 'Collection ":name" can not be update',
+	'collection_not_found'               => 'Collection ":collection" does not exist.',
+	'collection_revision_not_found'      => 'Revison ":revision" does not exist in Collection ":collection"',
+	'no_collection_selected'             => 'No collection is selected.',
+	'collection_column_is_empty'         => ':column must not be empty.',
+	'collection_already_exists'          => 'The collection name ":name" already exists.',
+	'can_not_insert_collection_data'     => 'Collection ":name" can not be update',
 	'can_not_update_collection_revision' => 'Collection ":name" can not be update',
+	'not_found_in_collection_object'     => '":field" does not exist in "collection" object.',
 
 	/** Document Exception Messages **/
-	'document_not_found'           => 'Document ":ref" does not exist in collection ":collection".',
-	'document_revision_not_found'  => 'Revison ":revision" does not exist for Document ":ref" in collection ":collection".',
-	'no_document_selected'         => 'No document is selected.',
-	'document_column_is_empty'     => ':column must not be empty.',
+	'document_not_found'                  => 'Document ":ref" does not exist in collection ":collection".',
+	'document_revision_not_found'         => 'Revison ":revision" does not exist for Document ":ref" in collection ":collection".',
+	'no_document_selected'                => 'No document is selected.',
+	'document_column_is_empty'            => ':column must not be empty.',
 	'document_failed_at_rules_validation' => 'document failed at rules validation',
+	'not_found_in_document_object'        => '":field" does not exist in "document" object.',
 
 	/** File Exception Messages **/
 	'file_already_exists'          => 'The file name ":name" already exists.',

@@ -5,7 +5,7 @@ namespace Tapioca;
 use FuelException;
 use Config;
 
-class TapiocaCallbackException extends FuelException {}
+class CallbackException extends FuelException {}
 
 class Callback
 {
@@ -14,12 +14,12 @@ class Callback
 	private static $events;
 	private static $callbacks = null;
 
-	public static function register(\Auth\Group $group, $collection)
+	public static function register(App $app, $collection)
 	{
-		if(isset($collection['callback']))
+		if( count($collection['callback']) > 0)
 		{
 			static::$callbacks = $collection['callback'];
-			static::$slug      = $group->get('slug');
+			static::$slug      = $app->get('slug');
 			static::$namespace = ucfirst($group->get('slug'));
 
 			\Module::load(static::$slug);

@@ -19,11 +19,15 @@ return array(
 	'api/user'                        => array('api/user',    'name' => 'api_user'),
 
 		// collection
-	'api/:appslug/collection/:namespace/document' => array('api/collection/document', 'name' => 'api_collection_document'),
-	'api/:appslug/collection/:namespace/empty'    => array('api/collection/empty',    'name' => 'api_collection_empty'),
+	'api/:appslug/collection/:namespace/abstract' => array('api/collection/abstract', 'name' => 'api_collection_abstract'),
 	'api/:appslug/collection/:namespace/drop'     => array('api/collection/drop',     'name' => 'api_collection_drop'),
 	'api/:appslug/collection/:namespace'          => array('api/collection',          'name' => 'api_collection_ref'),
 	'api/:appslug/collection'                     => array('api/collection',          'name' => 'api_collection'),
+
+		// document
+	'api/:appslug/document/:namespace/:ref/status'  => array('api/document/status', 'name' => 'api_document_status'),
+	'api/:appslug/document/:namespace/:ref'         => array('api/document/',       'name' => 'api_document_ref'),
+	'api/:appslug/document/:namespace'              => array('api/document/',       'name' => 'api_document'),
 
 		// app
 	'api/app'                     => array('api/app',       'name' => 'api_app_list'),
@@ -31,9 +35,7 @@ return array(
 	'api/:appslug/user/:userid'   => array('api/app/user',  'name' => 'api_app_user'),
 	'api/:appslug'                => array('api/app',       'name' => 'api_app'),
 
-	'api/:app_slug/document/:collection/:ref/status'  => array('api/document/status', 'name' => 'api_document_status'),
-	'api/:app_slug/document/:collection/:ref'         => array('api/document/', 'name' => 'api_document_ref'),
-	'api/:app_slug/document/:collection'              => array('api/document/', 'name' => 'api_document'),
+
 
 	'api/:app_slug/group/team'         => array('api/group/team', 'name' => 'api_group_team'),
 	'api/:app_slug/group'              => array('api/group/', 'name' => 'api_group'),

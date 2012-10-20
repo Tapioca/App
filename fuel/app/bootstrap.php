@@ -34,9 +34,9 @@ Autoloader::add_classes(array(
 	'Tapioca\\AppNotFoundException'       => APPPATH.'classes/tapioca/group.php',
 
 	'Tapioca\\CollectionException'        => APPPATH.'classes/tapioca/collection.php', 
-	'Tapioca\\TapiocaDocumentException'   => APPPATH.'classes/tapioca/document.php',  
+	'Tapioca\\DocumentException'          => APPPATH.'classes/tapioca/document.php',  
 	'Tapioca\\TapiocaFileException'       => APPPATH.'classes/tapioca/file.php', 
-	'Tapioca\\TapiocaCallbackException'   => APPPATH.'classes/tapioca/callback.php', 
+	'Tapioca\\CallbackException'          => APPPATH.'classes/tapioca/callback.php', 
 	'Tapioca\\TapiocaCastException'       => APPPATH.'classes/tapioca/cast.php', 
 	'Tapioca\\InstallException'           => APPPATH.'classes/tapioca/install.php', 
 

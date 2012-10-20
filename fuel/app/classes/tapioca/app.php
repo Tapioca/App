@@ -17,9 +17,9 @@ class App
 	protected static $db = null;
 
 	/**
-	 * @var  string  App collection
+	 * @var  string  MongoDb collection's name
 	 */
-	protected static $collection = '';
+	protected static $dbCollectionName = '';
 
 	/**
 	 * @var  array  App array
@@ -52,7 +52,7 @@ class App
 	 */
 	public static function _init()
 	{
-		static::$collection = strtolower(Config::get('tapioca.collections.apps'));
+		static::$dbCollectionName = strtolower(Config::get('tapioca.collections.apps'));
 
 		static::$db = Mongo_Db::instance();
 	}
@@ -101,7 +101,7 @@ class App
 	private function load( $query )
 	{
 		//query database for app
-		$app = static::$db->get_where(static::$collection, $query, 1);
+		$app = static::$db->get_where(static::$dbCollectionName, $query, 1);
 		$val = current($query);
 
 		if (count($app) == 1)
@@ -135,7 +135,7 @@ class App
 
 	public static function getAll()
 	{
-		$apps = static::$db->hash(static::$collection, true);
+		$apps = static::$db->hash(static::$dbCollectionName, true);
 
 		return $apps;
 	}
@@ -192,7 +192,7 @@ class App
 
 		$app['id'] = $app_id;
 
-		$result = static::$db->insert(static::$collection, $app);
+		$result = static::$db->insert(static::$dbCollectionName, $app);
 
 		if(count($result) > 0)
 		{
@@ -308,7 +308,7 @@ class App
 
 		$query = static::$db
 						->where( $where )
-						->update( static::$collection, $update );
+						->update( static::$dbCollectionName, $update );
 
 		if( $query )
 		{
@@ -341,7 +341,7 @@ class App
 
 		$delete_app = static::$db
 							->where( array('_id' => $this->app['_id']) )
-							->delete(static::$collection);
+							->delete(static::$dbCollectionName);
 
 		if($delete_app )
 		{
@@ -425,7 +425,7 @@ class App
 
 		$query = static::$db
 					->where($where)
-					->update(static::$collection, $update, array(), true);
+					->update(static::$dbCollectionName, $update, array(), true);
 
 		if($query)
 		{
@@ -468,7 +468,7 @@ class App
 
 		$query = static::$db
 					->where($where)
-					->update(static::$collection, $update, array(), true);
+					->update(static::$dbCollectionName, $update, array(), true);
 
 		if($query)
 		{
@@ -526,7 +526,7 @@ class App
 
 		$query = static::$db
 					->where($where)
-					->update(static::$collection, $update);
+					->update(static::$dbCollectionName, $update);
 
 		if($query)
 		{
@@ -598,7 +598,7 @@ class App
 
 		$query = static::$db
 					->where($where)
-					->update(static::$collection, $update, array(), true);
+					->update(static::$dbCollectionName, $update, array(), true);
 
 		if($query)
 		{		
@@ -646,7 +646,7 @@ class App
 
 		$query = static::$db
 					->where($where)
-					->update(static::$collection, $update, array(), true);
+					->update(static::$dbCollectionName, $update, array(), true);
 
 		if($query)
 		{

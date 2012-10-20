@@ -16,9 +16,9 @@ class Attempts
 	protected static $db = null;
 
 	/**
-	 * @var  string  Suspension collection name
+	 * @var  string  MongoDb collection's name
 	 */
-	protected static $collection = null;
+	protected static $dbCollectionName = null;
 
 	/**
 	 * @var  array  Stores suspension/limit config data
@@ -53,7 +53,7 @@ class Attempts
 		Config::load('tapioca', true);
 
 		static::$db         = \Mongo_Db::instance();
-		static::$collection = Config::get('tapioca.collections.users_suspended');
+		static::$dbCollectionName = Config::get('tapioca.collections.users_suspended');
 		static::$limit      = Config::get('tapioca.limit');
 
 		$this->login_id     = $login_id;
@@ -83,7 +83,7 @@ class Attempts
 			$query = array('ip' => $this->ip_address);
 		}
 
-		$result = static::$db->get_where(static::$collection, $query);
+		$result = static::$db->get_where(static::$dbCollectionName, $query);
 
 		foreach ($result as &$row)
 		{
@@ -169,11 +169,11 @@ class Attempts
 									'login_id' => $this->login_id,
 									'ip' => $this->ip_address
 								))
-								->update(static::$collection, $update);
+								->update(static::$dbCollectionName, $update);
 		}
 		else
 		{
-			$result = static::$db->insert(static::$collection, array(
+			$result = static::$db->insert(static::$dbCollectionName, array(
 						'login_id' => $this->login_id,
 						'ip' => $this->ip_address,
 						'attempts' => ++$this->attempts,
@@ -203,7 +203,7 @@ class Attempts
 
 		$result = static::$db
 						->where($query)
-						->delete(static::$collection);
+						->delete(static::$dbCollectionName);
 
 		$this->attempts = 0;
 	}
@@ -233,7 +233,7 @@ class Attempts
 						'unsuspend_at' => time()+(static::$limit['time'] * 60),
 					);
 
-		$result = static::$db->where($query)->update(static::$collection, $update);
+		$result = static::$db->where($query)->update(static::$dbCollectionName, $update);
 
 		throw new \UserSuspendedException(
 			__('tapioca.user_suspended', array('account' => $this->login_id, 'time' => static::$limit['time']))

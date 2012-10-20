@@ -7,7 +7,6 @@ class Controller_Api extends Controller_Rest
 	protected static $status  = 501;
 	protected static $user    = false;
 	protected static $app     = null;
-	protected static $debug   = null;
 	protected static $apiKey  = false;
 	protected static $token   = false;
 
@@ -24,8 +23,6 @@ class Controller_Api extends Controller_Rest
 		}
 		else
 		{
-			self::$debug = Input::get('debug', false);
-			
 			// TODO: add api key check
 			try
 			{

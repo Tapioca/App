@@ -134,11 +134,11 @@ return array(
 				'desc',
 				'status',
 				'preview', 
-				'summary'
+				'digest'
 			),
 			'data' => array(
 				'schema', 
-				'summary',
+				'digest',
 				'dependencies',
 				'indexes',
 				'callback',

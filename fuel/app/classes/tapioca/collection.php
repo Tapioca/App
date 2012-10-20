@@ -42,12 +42,12 @@ class Collection
 	/**
 	 * @var  string  MongoDb collection's name
 	 */
-	protected static $collection = null;
+	protected static $dbCollectionName = null;
 
 	/**
 	 * @var  array 	Cache Summary where clause
 	 */
-	protected static $summary_where = array();
+	protected static $summaryWhere = array();
 
 	/**
 	 * @var  array  Events list for callbacks
@@ -65,14 +65,14 @@ class Collection
 	protected $castablePath = array();
 
 	/**
-	 * @var  array  path and label of summary fields
+	 * @var  array  path and label of digest fields
 	 */
-	protected $summaryPath = array();
+	protected $digestPath = array();
 
 	/**
-	 * @var  array  does user alter natural summary order
+	 * @var  array  does user alter natural digest order
 	 */
-	protected $summaryEdit = 0;
+	protected $digestEdit = 0;
 
 	/**
 	 * @var  array  path and label of fieds who need validation
@@ -91,14 +91,14 @@ class Collection
 	{
 		// load and set config
 		static::$app        = $app;
-		static::$collection = strtolower(Config::get('tapioca.collections.collections'));
+		static::$dbCollectionName = strtolower(Config::get('tapioca.collections.collections'));
 		static::$db         = \Mongo_Db::instance();
 
 		// if an namespace was passed
 		if( $namespace )
 		{
 			//query database for collection's summary
-			$summary = static::$db->get_where(static::$collection, array(
+			$summary = static::$db->get_where(static::$dbCollectionName, array(
 				'namespace' => $namespace,
 				'type'      => 'summary',
 				'app_id'    => static::$app->get('slug')
@@ -117,7 +117,7 @@ class Collection
 							->order_by(array(
 								'revision'  => 'asc'
 							))
-							->get(static::$collection);
+							->get(static::$dbCollectionName);
 
 				$this->summary   = $summary[0];
 				$this->data      = $data;
@@ -149,7 +149,7 @@ class Collection
 	 */
 	private function set_summary_where()
 	{
-		static::$summary_where = array( 'app_id'    => static::$app->get('slug'),
+		static::$summaryWhere = array( 'app_id'    => static::$app->get('slug'),
 										'namespace' => $this->namespace,
 										'type'      => 'summary');		
 	}
@@ -175,7 +175,7 @@ class Collection
 	 */
 	public static function getAll( $appslug, $status = 100 )
 	{
-		static::$collection = strtolower(Config::get('tapioca.collections.collections'));
+		static::$dbCollectionName = strtolower(Config::get('tapioca.collections.collections'));
 		static::$db         = \Mongo_Db::instance();
 
 		//query database for collections's summaries
@@ -194,7 +194,7 @@ class Collection
 					'status' => array('$gte' => (int) $status)
 				))
 				->order_by( array( 'name' => 'ASC' ) )
-				->hash( static::$collection, true );
+				->hash( static::$dbCollectionName, true );
 
 		foreach( $ret->results as &$row)
 		{
@@ -212,8 +212,13 @@ class Collection
 	 * @throws  CollectionException
 	 */
 
-	public function get(int $revision = null)
+	public function get( $revision = null )
 	{
+		if( !is_null( $revision ) && is_numeric( $revision ))
+		{
+			$revision = (int) $revision;
+		}
+
 		$data       = $this->data( $revision );
 
 		// Format return
@@ -268,7 +273,7 @@ class Collection
 			}
 
 			throw new \CollectionException(
-				__('tapioca.collection_revision_not_found', array('collection' => $this->name, 'revision' => $revision))
+				__('tapioca.collection_revision_not_found', array('collection' => $this->name, 'revision' => ++$revision))
 			);
 		}
 
@@ -345,7 +350,7 @@ class Collection
 
 		$this->set_summary_where();
 
-		return static::$db->insert(static::$collection, $new_summary);
+		return static::$db->insert(static::$dbCollectionName, $new_summary);
 	}
 
 	/**
@@ -373,8 +378,8 @@ class Collection
 		}
 
 		$update =  static::$db
-						->where(static::$summary_where)
-						->update(static::$collection, $fields);
+						->where(static::$summaryWhere)
+						->update(static::$dbCollectionName, $fields);
 
 		if($update)
 		{
@@ -408,7 +413,7 @@ class Collection
 
 		static::$castable = Config::get('tapioca.cast');
 
-		$this->summaryEdit = $fields['summary']['edited'];
+		$this->digestEdit = \Arr::get($fields, 'digest.edited', false);
 
 		$this->parse($fields['schema']);
 
@@ -421,9 +426,9 @@ class Collection
 			'type'        => 'data',
 			'namespace'   => $this->namespace,
 			'revision'    => $revision,
-			'summary'     => array(
-				'fields' => ( $fields['summary']['edited'] ) ? $fields['summary']['fields'] : $this->summaryPath,
-				'edited' => $fields['summary']['edited']
+			'digest'     => array(
+				'fields' => ( $this->digestEdit ) ? $fields['digest']['fields'] : $this->digestPath,
+				'edited' => $this->digestEdit
 			),
 			'cast'         => $this->castablePath,
 			'rules'        => $this->rulesPath,
@@ -441,7 +446,7 @@ class Collection
 			'status'  => (int) 100 
 		);
 
-		$insert_data = static::$db->insert(static::$collection, $data);
+		$insert_data = static::$db->insert(static::$dbCollectionName, $data);
 
 		if($insert_data)
 		{
@@ -455,10 +460,10 @@ class Collection
 			$this->data[] = $data;
 
 			$update_summary = static::$db
-								->where(static::$summary_where)
-								->update(static::$collection, array(
+								->where(static::$summaryWhere)
+								->update(static::$dbCollectionName, array(
 									'revisions' => $this->summary['revisions'],
-									'summary'   => $data['summary']
+									'digest'    => $data['digest']
 								));
 
 			if(!$update_summary)
@@ -491,10 +496,10 @@ class Collection
 		}
 
 		$ret = static::$db->command(
-					array('findandmodify' => static::$collection,
-						  'query' => static::$summary_where,
-						  'update' => array('$inc' => array('documents' => (int) $direction)),
-						  'new' => TRUE
+					array('findandmodify' => static::$dbCollectionName,
+						  'query'         => static::$summaryWhere,
+						  'update'        => array('$inc' => array('documents' => (int) $direction)),
+						  'new'           => true
 					)
 				);
 
@@ -518,8 +523,8 @@ class Collection
 		}
 		
 		$update = static::$db
-					->where(static::$summary_where)
-					->update(static::$collection, array('$set' => array('documents' => (int) 0)), array(), true);
+					->where(static::$summaryWhere)
+					->update(static::$dbCollectionName, array('$set' => array('documents' => (int) 0)), array(), true);
 
 		if($update)
 		{
@@ -545,7 +550,7 @@ class Collection
 							'namespace' => $this->namespace,
 							'app_id'    => static::$app->get('slug')
 					))
-					->delete_all(static::$collection);
+					->delete_all(static::$dbCollectionName);
 	}
 
 	/**
@@ -557,7 +562,7 @@ class Collection
 	private function namespance_exists($namespace)
 	{
 		// query db to check for login_column
-		$result = static::$db->get_where(static::$collection, array(
+		$result = static::$db->get_where(static::$dbCollectionName, array(
 												'app_id'    => static::$app->get('slug'),
 												'namespace' => $namespace,
 												'type'      => 'summary'
@@ -611,7 +616,7 @@ class Collection
 				}
 
 				// summary
-				if(!$this->summaryEdit) // if we don't set summary mannualy
+				if(!$this->digestEdit) // if we don't set summary mannualy
 				{
 					if(isset($item['summary']) && $item['summary'])
 					{
@@ -621,7 +626,7 @@ class Collection
 						$obj->path  = $itemPath;
 						$obj->label = $item['label'];
 
-						$this->summaryPath[] = $obj;
+						$this->digestPath[] = $obj;
 
 						if(!isset( $item['rules']))
 						{

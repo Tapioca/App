@@ -197,7 +197,7 @@ class Controller_Api_Collection extends Controller_Api
 				'status'       => Input::json('status', false),
 				'preview'      => Input::json('preview', false), 
 				'schema'       => Input::json('schema', false), 
-				'summary'      => Input::json('summary', false), 
+				'digest'       => Input::json('digest', false), 
 				'dependencies' => Input::json('dependencies', false),
 				'indexes'      => Input::json('indexes', false),
 				'callback'     => Input::json('callback', false),

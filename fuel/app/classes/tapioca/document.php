@@ -6,7 +6,7 @@ use FuelException;
 use Config;
 use Set;
 
-class TapiocaDocumentException extends FuelException {}
+class DocumentException extends FuelException {}
 
 class Document
 {
@@ -18,15 +18,20 @@ class Document
 	/**
 	 * @var  string  MongoDb collection's name
 	 */
+	protected static $dbCollectionName = null;
+
+	/**
+	 * @var  object  App instance
+	 */
+	protected static $app = null;
+
+	/**
+	 * @var  object  Collection instance
+	 */
 	protected static $collection = null;
 
 	/**
-	 * @var  object  Active group
-	 */
-	protected static $group = null;
-
-	/**
-	 * @var  string  Tapioca collection's namespace
+	 * @var  string  Collection namespace
 	 */
 	protected static $namespace = null;
 
@@ -41,14 +46,14 @@ class Document
 	protected static $locale = null;
 
 	/**
-	 * @var  int  active Document version
+	 * @var  int  active Document revision
 	 */
-	protected static $active = null;
+	protected static $revisionActive = null;
 
 	/**
 	 * @var  int  last revison 
 	 */
-	protected static $last_revision = null;
+	protected static $revisionLast = null;
 
 	/**
 	 * @var  array  selected Document
@@ -56,9 +61,9 @@ class Document
 	protected $document = null;
 
 	/**
-	 * @var  array  selected Document's summary
+	 * @var  array  selected Document's abstract
 	 */
-	protected $summary = null;
+	protected $abstract = null;
 
 	/**
 	 * @var  array  document validation errors
@@ -75,86 +80,82 @@ class Document
 	 */
 	protected static $operators = array('select', 'where', 'sort', 'limit', 'skip');
 	protected $select = array();
-	protected $where  = array('_about.status' => array('$ne' => -1));
-	protected $sort   = array('_about.date' => 'desc');	
+	protected $where  = array('_tapioca.status' => array('$ne' => -1));
+	protected $sort   = array('$natural' => 1);	
 	protected $limit  = 99999;
 	protected $skip   = 0;
 
 	/**
 	 * Loads in the Document object
 	 *
-	 * @param   string  Group id
-	 * @param   string  Collection namespace
+	 * @param   object  App instance
+	 * @param   object  Collection instance
 	 * @param   string  Document ref
-	 * @param   string  locale
+	 * @param   string  Document locale
 	 * @return  void
 	 */
-	public function __construct(\Auth\Group $group, $namespace, $ref = null, $locale = null, $check_exists = false)
+	public function __construct(App $app, Collection $collection, $ref = null, $locale = null )
 	{
 		// load and set config
-		static::$group      = $group;
-		static::$collection = static::$group->get('slug').'-'.$namespace;
-		static::$namespace  = $namespace;
+		static::$app              = $app;
+		static::$collection       = $collection;
+		static::$namespace        = static::$collection->namespace;
+		static::$dbCollectionName = static::$app->get('slug').'-'.static::$namespace;
 		
 		static::$db = \Mongo_Db::instance();
 
 		// Set Locale
-		if(!is_null($locale)  
-			&& in_array($locale, static::$group->get('locales_keys')))
+		if( !is_null( $locale )  
+			&& in_array( $locale, static::$app->get('locales_keys') ) )
 		{
 			static::$locale = $locale;
 		}
 		else
 		{
-			static::$locale = static::$group->get('locale_default');
+			static::$locale = static::$app->get('locale_default');
 		}
 
 		// if a Ref was passed
-		if ($ref)
+		if( $ref )
 		{
-			self::$ref = $ref; 
+			static::$ref = $ref; 
 
-			//query database for document's summary
-			$summary = static::$db
+			//query database for document's abstract
+			$abstract = static::$db
 						->select(array(), array('_id'))
-						->get_where(static::$collection, array(
-							'_ref'  => $ref,
-							'_summary' => array( '$exists' => true )
+						->get_where( static::$dbCollectionName, array(
+							'_ref'      => $ref,
+							'_abstract' => array( '$exists' => true )
 						), 1);
 
 			// if there was a result
-			if (count($summary) == 1)
+			if( count( $abstract ) == 1 )
 			{
-				// if just a document exists check - return true, no need for additional queries
-				if ($check_exists)
-				{
-					return true;
-				}
-
-				$this->summary = $summary[0];
+				$this->abstract = $abstract[0];
 				
 				// cache data
-				self::$active        = $this->summary['revisions']['active'];
-				self::$last_revision = $this->summary['revisions']['total'];
+				static::$revisionActive = $this->abstract['revisions']['active'];
+				static::$revisionLast   = $this->abstract['revisions']['total'];
 
-				if(!isset($this->summary['revisions']['active'][static::$locale]))
+// ?? active ??
+				if( !isset($this->abstract['revisions']['active'][static::$locale]) )
 				{
-					$this->summary['revisions']['active'][static::$locale] = null;
+					$this->abstract['revisions']['active'][static::$locale] = null;
 				}
 
-				self::$active = $this->summary['revisions']['active'][static::$locale];
+				static::$revisionActive = $this->abstract['revisions']['active'][static::$locale];
 
 				$this->set('where', array(
-						'_ref'          => self::$ref,
-						'_summary'      => array( '$exists' => false ),
-						'_about.locale' => static::$locale
+						'_ref'            => static::$ref,
+						'_abstract'       => array( '$exists' => false ),
+						'_tapioca.locale' => static::$locale
 					));
 			}
 			// collection doesn't exist
 			else
 			{
-				throw new \TapiocaException(
-					__('tapioca.document_not_found', array('ref' => self::$ref, 'collection' => self::$namespace))
+				throw new \DocumentException(
+					__('tapioca.document_not_found', array('ref' => static::$ref, 'collection' => static::$namespace))
 				);
 			}
 		}
@@ -178,30 +179,30 @@ class Document
 	 */
 	public function reset()
 	{
-		static::$collection    = null;
-		static::$group         = null;
+		static::$dbCollectionName    = null;
+		static::$app           = null;
 		static::$namespace     = null;
 		static::$ref           = null;
 		static::$locale        = null;
-		static::$active        = null;
-		static::$last_revision = null;
+		static::$revisionActive        = null;
+		static::$revisionLast = null;
 		$this->document        = null;
-		$this->summary         = null;
+		$this->abstract         = null;
 		$this->errors          = array();
 
 		Callback::reset();
 	}
 
 	/**
-	 * Gets the summaries of all documents's collection
+	 * Gets the documents abstracts of the collection
 	 *
 	 * @return  array
-	 * @throws  TapiocaException
+	 * @throws  DocumentException
 	 */
-	public function all($status = null)
+	public function abstracts( $status = null )
 	{
 		$where = array(
-					'_summary' => array( '$exists' => true )
+					'_abstract' => array( '$exists' => true )
 				);
 
 		if(!is_null($status))
@@ -211,11 +212,12 @@ class Document
 
 		//query database for collections's summaries
 		return static::$db
+				->select( array(), array('_abstract'))
 				->where($where)
 				->order_by(array(
-					'date.created' => 'desc'
+					'$natural' => 1
 				))
-				->get(static::$collection);
+				->hash( static::$dbCollectionName, true);
 	}
 
 	/**
@@ -230,21 +232,21 @@ class Document
 	{	
 		if(is_string($operator))
 		{
-			self::_set($operator, $value);
+			static::_set($operator, $value);
 		}
 		
 		if(is_array($operator))
 		{
 			foreach($operator as $key => $value)
 			{
-				self::_set($key, $value);
+				static::_set($key, $value);
 			}
 		}
 	}
 	
 	private function _set($operator, $value)
 	{		
-		if(in_array($operator, self::$operators))
+		if(in_array($operator, static::$operators))
 		{
 			if(is_array($value))
 			{
@@ -277,168 +279,177 @@ class Document
 	}
 
 	/**
-	 *	Query database for active document's data
+	 *	Query database for individual document
 	 *
-	 * @params  int Revision number 
-	 * @return  array
-	 * @throws  TapiocaException
+	 * @param   int Revision number 
+	 * @return  array 
+	 * @throws  DocumentException
 	 */
-	public function get($revision = null, $mode = null)
+	public function get( $revision = null )
 	{
-		if(is_null(static::$collection))
+		if( is_null(static::$collection) )
 		{
-			throw new \TapiocaException(__('tapioca.no_collection_selected'));
-		}
-
-		if($mode == 'summary')
-		{
-			return $this->summary; 
+			throw new \DocumentException( __('tapioca.no_collection_selected') );
 		}
 
 		// check if locale exists for this document
-		if(!isset($this->summary['revisions']['active'][static::$locale]))
+		if( !isset( $this->abstract['revisions']['active'][static::$locale] ) )
 		{
 			// try default locale first
-			static::$locale = static::$group->get('locale_default');
+			static::$locale = static::$app->get('locale_default');
 
 			// if default locale doesn't exists, use first locale found
-			if(!isset($this->summary['revisions']['active'][static::$locale]))
+			if( !isset( $this->abstract['revisions']['active'][static::$locale] ) )
 			{
-				reset($this->summary['revisions']['active']);
-				static::$locale = key($this->summary['revisions']['active']);
+				reset( $this->abstract['revisions']['active'] );
+				static::$locale = key($this->abstract['revisions']['active']);
 			}
 		}
 
 		$this->set('where', array(
-			'_summary'      => array( '$exists' => false ),
-			'_about.active' => true,
-			'_about.locale' => static::$locale
+			'_abstract'       => array( '$exists' => false ),
+			'_tapioca.active' => true,
+			'_tapioca.locale' => static::$locale
 		));
 
 		// get a specific revison
-		if(!is_null($revision))
+		if( !is_null($revision) )
 		{
-			$this->_unset('where', '_about.active');
-			$this->_unset('where', '_about.status');
-			$this->_unset('where', '_about.locale');
+			$this->_unset('where', '_tapioca.active');
+			$this->_unset('where', '_tapioca.status');
+			$this->_unset('where', '_tapioca.locale');
 
-			$this->set('where', array('_about.revision' => $revision));
+			$this->set('where', array('_tapioca.revision' => $revision));
 		}
-		else if(!is_null(self::$active))
+		else if( !is_null(static::$revisionActive) )
 		{
-			$this->set('where', array('_about.revision' => self::$active));
+			$this->set('where', array('_tapioca.revision' => static::$revisionActive));
 		}
 
 		$result = static::$db
-			->select($this->select, array('_id'))
-			->where($this->where)
-			->order_by($this->sort)
-			->get(static::$collection);
-			
-		if($result)
+			->select( $this->select, array('_id') )
+			->where( $this->where )
+			->order_by( $this->sort )
+			->get( static::$dbCollectionName );
+// \Debug::dump( $this->last_query() );
+// exit;
+		if( $result )
 		{
-			if($mode == 'edit')
-			{
-				$result[0]['_about']['revisions'] = $this->set_locale_revision($revision);
-			}
-
 			// return individual document
-			if(self::$ref)
-			{
-				return $result[0];
-			}
-
-			return $result;
+			return $result[0];
 		}
 		
-		if(self::$ref)
+		if( static::$ref )
 		{
-			if(!is_null($revision))
+			if( !is_null( $revision ) )
 			{
-				throw new \TapiocaException(
-					__('tapioca.document_revision_not_found', array('ref' => self::$ref, 'collection' => self::$namespace, 'revision' => $revision))
+				throw new \DocumentException(
+					__('tapioca.document_revision_not_found', array('ref' => static::$ref, 'collection' => static::$namespace, 'revision' => $revision))
 				);
 			}
 			else
 			{
-				throw new \TapiocaException(
-					__('tapioca.document_not_found', array('ref' => self::$ref, 'collection' => self::$namespace))
+				throw new \DocumentException(
+					__('tapioca.document_not_found', array('ref' => static::$ref, 'collection' => static::$namespace))
 				);
 			}
 		}
+
 		// return no result
-		return null;
+		return array();
+	}
+
+	public function getAll()
+	{
+		if( is_null(static::$collection) )
+		{
+			throw new \DocumentException(__('tapioca.no_collection_selected'));
+		}
+
+		// always return _ref && _tapioca properties
+		if( count($this->select) > 0)
+		{
+			$this->set('select', array_merge($this->select, array('_ref', '_tapioca')) );
+		}
+
+		// if query contains more than sort $natural, remove it
+		if( count($this->sort) > 1)
+		{
+			$this->_unset('sort', '$natural');
+		}
+
+		$this->set('where', array(
+					'_abstract'       => array( '$exists' => false ),
+					'_tapioca.status' => 100,
+					'_tapioca.active' => true,
+					'_tapioca.locale' => static::$locale
+				));
+
+		$result = static::$db
+			->select( $this->select )
+			->where( $this->where )
+			->order_by( $this->sort )
+			->hash( static::$dbCollectionName, true );
+// \Debug::dump( $this->last_query() );
+// \Debug::dump( $result );
+// exit;
+		return $result;
 	}
 
 	/**
 	 * API facade for create or update a document
 	 *
-	 * @params  array document data
+	 * @param   array document data
 	 * @return  object User instance
-	 * @throws  TapiocaException
+	 * @throws  DocumentException
 	 */
-	public function save(array $document, \Auth\User $user)
+	public function save(array $document, User $user)
 	{
-		if(is_null(static::$collection))
+		if( is_null(static::$collection) )
 		{
-			throw new \TapiocaException(__('tapioca.no_collection_selected'));
+			throw new \DocumentException(__('tapioca.no_collection_selected'));
 		}
 
-		// Get Collection Definiton
-		try
-		{
-			$collection      = Tapioca::collection(static::$group, static::$namespace); 
-			$collection_data = $collection->data();
-		}
-		catch (TapiocaException $e)
-		{
-			throw new \TapiocaException( $e->getMessage() );
-		}
+		$collectionData = static::$collection->data();
 
 		// Test document rules
-		if(isset($collection_data['rules']))
+		if( count( $collectionData['rules'] ) > 0)
 		{
-			if(!$this->test_rules($collection_data['rules'], $document))
+			if(!$this->test_rules( $collectionData['rules'], $document))
 			{
 				// TODO: find a way to display $this->errors in Execption
-				throw new \TapiocaDocumentException( __('tapioca.document_failed_at_rules_validation') );
+				throw new \DocumentException( __('tapioca.document_failed_at_rules_validation') );
 			}
 		}
 
-		Callback::register(self::$group, $collection_data);
+		Callback::register(static::$app, $collectionData);
 
 		// Cast document's values
-		Cast::set($collection_data['cast'], $document);
+		Cast::set($collectionData['cast'], $document);
 
 		// Global before callback
 		Callback::trigger('before', $document);
 
-		// Set document summary
+		// Get document digest
 		try
 		{
-			$summary = $this->set_summary($collection_data['summary'], $document);
+			$digest = $this->set_digest($collectionData['digest']['fields'], $document);
 		}
-		catch (TapiocaDocumentException $e)
+		catch (DocumentException $e)
 		{
-			throw new \TapiocaException( $e->getMessage() );
+			throw new \DocumentException( $e->getMessage() );
 		}
-
-		$user_data = array(
-				'id'    => $user->get('id'),
-				'name'  => $user->get('name'),
-				'email' => $user->get('email'),
-			);
 
 		// new document
 		if(is_null(static::$ref))
 		{
 			Callback::trigger('before::new', $document);
 
-			$ret = $this->create($document, $summary, $user_data);
+			$ret = $this->create($document, $digest, $user);
 
 			if($ret)
 			{
-				$collection->inc_document();
+				static::$collection->inc_document();
 			}
 			
 			Callback::trigger('after::new', $document);
@@ -447,40 +458,35 @@ class Document
 		{
 			Callback::trigger('before::update', $document);
 
-			$this->update($document, $summary, $user_data);
+			$this->update($document, $digest, $user);
 
 			Callback::trigger('after::update', $document);
 		}
 
 		Callback::trigger('after', $document);
 
-		return $this->get(static::$last_revision, 'edit');
+		return $this->get( static::$revisionLast );
 	}
 
-	private function create($document, $summary, $user)
+	private function create($document, $digest, $user)
 	{
 		$date = new \MongoDate();
 
 		$ref = uniqid();
 
 		$data = array(
-			'_ref'   => $ref,
-			'_about' => array(
-				'date'     => $date,
+			'_ref'      => $ref,
+			'_tapioca' => array(
 				'revision' => (int) 1,
 				'status'   => (int) 1,
 				'active'   => (bool) true,
-				'locale'   => static::$locale,
-				'user'     => $user,
+				'locale'   => static::$locale
 			)
 		) + $document;
 
-		$summary = array(
+		$abstract = array(
 			'_ref'      => $ref,
-			'_summary'  => (bool) true,
-			'date'      => array(
-				'created' => $date
-			),
+			'_abstract' => (bool) true, 
 			'revisions' => array(
 				'total'   => (int) 1,
 				'active'  => array(static::$locale => (int) 1),
@@ -490,84 +496,86 @@ class Document
 									'date'     => $date,
 									'status'   => (int) 1,
 									'locale'   => static::$locale,
-									'user'     => $user,
+									'user'     => $user->get('id'),
 								)
 							)
 			)
-		) + $summary;
+		) + $digest;
 
-		$new_data = static::$db->insert(static::$collection, $data);
+		$new_data = static::$db->insert(static::$dbCollectionName, $data);
 
 		if($new_data)
 		{
-			$new_summary = static::$db->insert(static::$collection, $summary);
+			$new_abstract = static::$db->insert(static::$dbCollectionName, $abstract);
 
-			if($new_summary)
+			if($new_abstract)
 			{
-				$this->summary = $summary;
-				self::$ref     = $ref;
-				self::$active  = 1;
+				$this->abstract   = $abstract;
+				static::$ref     = $ref;
+				static::$revisionActive  = 1;
 
 				return true;
 			}
 		}
 	}
 
-	private function update($document, $summary, $user)
+	private function update($document, $digest, $user)
 	{
-		$date = new \MongoDate();
-		++self::$last_revision;
+		++static::$revisionLast;
 		
-		$is_active = $this->set_active();
+		$is_active = $this->is_active();
 
 		$data = array(
-			'_ref'   => self::$ref,
-			'_about' => array(
-				'date'     => $this->summary['date']['created'],
-				'revision' => (int) self::$last_revision,
+			'_ref'   => static::$ref,
+			'_tapioca' => array(
+				'revision' => (int) static::$revisionLast,
 				'status'   => (int) 1,
 				'active'   => (bool) $is_active,
-				'locale'   => static::$locale,
-				'user'     => $user,
+				'locale'   => static::$locale
 			)
 		) + $document;
 
+		++$this->abstract['revisions']['total'];
 
-		++$this->summary['revisions']['total'];
+		// update disgest only if revison is active
+		if( $is_active )
+		{
+			$this->abstract['digest'] = $digest['digest'];			
+		}
 
-		$this->summary['data']                = $summary['data'];
-		$this->summary['date']['updated']     = $date;
-		$this->summary['revisions']['list'][] = array(
-													'revision' => (int) self::$last_revision,
-													'date'     => $date,
+		$this->abstract['revisions']['list'][] = array(
+													'revision' => (int) static::$revisionLast,
+													'date'     => new \MongoDate(),
 													'status'   => (int) 1,
 													'locale'   => static::$locale,
-													'user'     => $user,
+													'user'     => $user->get('id'),
 												);
 
-		// update active revision
-		if($is_active)
+		// update active revision to false
+		if( $is_active )
 		{
 			$update_active = static::$db
 								->where(array(
-									'_ref'          => self::$ref,
-									'_about.locale' => static::$locale
+									'_ref'            => static::$ref,
+									'_tapioca.locale' => static::$locale
 								))
-								->update_all(static::$collection, array('_about.active' => (bool) false));
+								->update_all(static::$dbCollectionName, array('_tapioca.active' => (bool) false));
 
-			$this->summary['revisions']['active'][static::$locale] = (int) self::$last_revision;
+			$this->abstract['revisions']['active'][static::$locale] = (int) static::$revisionLast;
 		}
 
-		$new_data = static::$db->insert(static::$collection, $data);
+		// insert new revision
+		$new_data = static::$db->insert(static::$dbCollectionName, $data);
 
-		if($new_data)
+		// update document abstract
+		if( $new_data )
 		{
-			$new_summary = static::$db
+			$new_abstract = static::$db
 								->where(array(
-									'_ref'       => self::$ref,
-									'_summary'   => (bool) true
+									'_ref'      => static::$ref,
+									'_abstract' => (bool) true
 								))
-								->update(static::$collection, $this->summary);
+								->update(static::$dbCollectionName, $this->abstract);
 		}
 	}
 
@@ -575,57 +583,68 @@ class Document
 	{
 		if(is_null(static::$collection))
 		{
-			throw new \TapiocaException(__('tapioca.no_collection_selected'));
+			throw new \DocumentException(__('tapioca.no_collection_selected'));
 		}
 
 		if(is_null(static::$ref))
 		{
-			throw new \TapiocaException(__('tapioca.no_document_selected'));
+			throw new \DocumentException(__('tapioca.no_document_selected'));
 		}
 
 		$delete =  static::$db
 						->where(array(
 								'_ref' => static::$ref
 						))
-						->delete_all(static::$collection);
+						->delete_all(static::$dbCollectionName);
 
 		if($delete)
 		{
 			// Get Collection Definiton
 			try
 			{
-				$collection = Tapioca::collection(static::$group, static::$namespace); 
+				$collection = Tapioca::collection(static::$app, static::$namespace); 
 				$collection->inc_document(-1);
 			}
 			catch (TapiocaException $e)
 			{
-				throw new \TapiocaException( $e->getMessage() );
+				throw new \DocumentException( $e->getMessage() );
 			}
 
 			return true;
 		}
 	}
 
+	/**
+	 * Update document status
+	 * if no revison ID provided, update active revision
+	 * if revision Id different from active revision, update digest
+	 *
+	 * @param  int    status (-1 > 100)
+	 * @param  int    revision Id
+	 * @return array  Document abstract
+	 * @throws DocumentException
+	 */
+
 	public function update_status($status, $revision = null)
 	{
-		if(is_null(static::$collection))
+		if( is_null( static::$collection ) )
 		{
-			throw new \TapiocaException(__('tapioca.no_collection_selected'));
+			throw new \DocumentException(__('tapioca.no_collection_selected'));
 		}
 
-		if(is_null(static::$ref))
+		if( is_null( static::$ref ) )
 		{
-			throw new \TapiocaException(__('tapioca.no_document_selected'));
+			throw new \DocumentException(__('tapioca.no_document_selected'));
 		}
 
-		if(is_null($revision))
+		if( is_null( $revision ) )
 		{
-			$revision = self::$active;
+			$revision = static::$revisionActive;
 		}
 
 		$set_out_of_date = ($status == 100);
 
-		foreach ($this->summary['revisions']['list'] as &$value)
+		foreach ($this->abstract['revisions']['list'] as &$value)
 		{
 			if($value['revision'] == $revision)
 			{
@@ -640,54 +659,72 @@ class Document
 			}
 		}
 
+		// Update abstract digest
+		if($revision != static::$revisionActive && $set_out_of_date)
+		{
+			$document       = $this->get( $revision );
+			$collectionData = static::$collection->data();
+
+			try
+			{
+				$digest = $this->set_digest($collectionData['digest']['fields'], $document);
+			}
+			catch (DocumentException $e)
+			{
+				throw new \DocumentException( $e->getMessage() );
+			}
+
+			$this->abstract['digest'] = $digest['digest'];
+		}
+
 		// new revison's status
-		$update = array('_about.status' => (int) $status);
+		$update = array('_tapioca.status' => (int) $status);
 
 		// if new status is 100 (Published),
 		// we set the others revisons at -1 (out of date)
 		// and define the revision as "Active"
 		if($set_out_of_date)
 		{
-			$this->summary['revisions']['active'][static::$locale] = $revision;
+			$this->abstract['revisions']['active'][static::$locale] = $revision;
 
 			$update_no_active = static::$db
 									->where(array(
-										'_ref'            => self::$ref,
-										'_about.revision' => array('$ne' => $revision),
-										'_about.locale'   => static::$locale,
-										'_summary'        => array( '$exists' => false )
+										'_ref'              => static::$ref,
+										'_tapioca.revision' => array('$ne' => $revision),
+										'_tapioca.locale'   => static::$locale,
+										'_abstract'         => array( '$exists' => false )
 									))
-									->update_all(static::$collection, array(
-										'_about.active' => (bool) false,
-										'_about.status' => (int) -1
+									->update_all(static::$dbCollectionName, array(
+										'_tapioca.active' => (bool) false,
+										'_tapioca.status' => (int) -1
 									));
 
-			$update['_about.active'] = (bool) true;
+			$update['_tapioca.active'] = (bool) true;
 		}
 
 		// Update revision status
 		$update_doc = static::$db
 							->where(array(
-								'_ref'            => self::$ref,
-								'_about.revision' => $revision
+								'_ref'              => static::$ref,
+								'_tapioca.revision' => $revision
 							))
-							->update(static::$collection, $update);
+							->update(static::$dbCollectionName, $update);
 
 		// prevent mongodb crash
-		if(isset($this->summary['_id']))
+		if(isset($this->abstract['_id']))
 		{
-			unset($this->summary['_id']);
+			unset($this->abstract['_id']);
 		}
 
-		// Update Documant summary 
-		$new_summary = static::$db
+		// Update Documant abstract 
+		$new_abstract = static::$db
 							->where(array(
-								'_ref'       => self::$ref,
-								'_summary'   => (bool) true
+								'_ref'      => static::$ref,
+								'_abstract' => (bool) true
 							))
-							->update(static::$collection, $this->summary);
+							->update(static::$dbCollectionName, $this->abstract);
 
-		return $this->set_locale_revision($revision);
+		return $this->abstract; //$this->set_locale_revision($revision);
 	}
 
 	/**
@@ -700,7 +737,7 @@ class Document
 	{
 		if(is_null(static::$collection))
 		{
-			throw new \TapiocaException(__('tapioca.no_collection_selected'));
+			throw new \DocumentException(__('tapioca.no_collection_selected'));
 		}
 
 		$database = Config::get('db.mongo.default.database');
@@ -708,7 +745,7 @@ class Document
 
 		if($delete)
 		{
-			$collection = Tapioca::collection(static::$group, static::$namespace); 
+			$collection = Tapioca::collection(static::$app, static::$namespace); 
 			$collection->reset_document();
 
 			return true;
@@ -716,23 +753,23 @@ class Document
 	}
 
 	/**
-	 * Extract document summary 
+	 * Extract document digest 
 	 *
-	 * @params  array collection summary definition
-	 * @params  array document data
-	 * @return  array document summary
-	 * @throws  TapiocaException
+	 * @param   array collection digest definition
+	 * @param   array document content
+	 * @return  array document digest
+	 * @throws  DocumentException
 	 */
-	private function set_summary($structure, $document)
+	private function set_digest($structure, $document)
 	{
-		$locale_default = static::$group->get('locale_default');
+		$locale_default = static::$app->get('locale_default');
 
-		if(static::$locale != $locale_default && isset($this->summary['revisions']['active'][$locale_default]))
+		if(static::$locale != $locale_default && isset($this->abstract['revisions']['active'][$locale_default]))
 		{
-			return array('data' => $this->summary['data']);
+			return array('digest' => $this->abstract['digest']);
 		}
 
-		$summary = array('data' => array());
+		$summary = array('digest' => array());
 
 		foreach($structure as $v)
 		{
@@ -745,11 +782,11 @@ class Document
 				$arrK = explode('.', $v['path']);
 				$storedKey = (count($arrK) > 1) ? end($arrK) : $v['path'];
 
-				$summary['data'][$storedKey] = $value;
+				$summary['digest'][$storedKey] = $value;
 			}
 			else
 			{
-				throw new \TapiocaDocumentException(
+				throw new \DocumentException(
 					__('tapioca.document_column_is_empty', array('column' => $v))
 				);
 			}
@@ -758,12 +795,13 @@ class Document
 		return $summary;
 	}
 
+	// ??? to remove ?
 	private function set_locale_revision($revision = null)
 	{
 		$localeRevision = array();
-		$revisionActive = (!is_null($revision)) ? $revision : self::$active;
-		$totalRevision  = (count($this->summary['revisions']['list']) - 1);
-		$revisions      = $this->summary['revisions']['list'];
+		$revisionActive = (!is_null($revision)) ? $revision : static::$revisionActive;
+		$totalRevision  = (count($this->abstract['revisions']['list']) - 1);
+		$revisions      = $this->abstract['revisions']['list'];
 
 		for($r = $totalRevision; $r >= 0; --$r)
 		{
@@ -785,8 +823,8 @@ class Document
 	/**
 	 * Test each rules in the current document 
 	 *
-	 * @params  array collection rules definition
-	 * @params  array document data
+	 * @param   array collection rules definition
+	 * @param   array document data
 	 * @return  bool
 	 */
 	private function test_rules($rules_list, $document)
@@ -833,11 +871,11 @@ class Document
 	 *
 	 * @return  bool
 	 */
-	private function set_active()
+	private function is_active()
 	{
 		$higher = 1;
 		
-		foreach ($this->summary['revisions']['list'] as $revision)
+		foreach ($this->abstract['revisions']['list'] as $revision)
 		{
 			if($revision['locale'] == static::$locale)
 			{

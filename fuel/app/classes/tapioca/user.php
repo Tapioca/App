@@ -26,9 +26,9 @@ class User
 	protected $apps = array();
 
 	/**
-	 * @var  string  Collection name
+	 * @var  string  MongoDb collection's name
 	 */
-	protected static $collection = null;
+	protected static $dbCollectionName = null;
 
 	/**
 	 * @var  string  Login column string (formatted)
@@ -46,7 +46,7 @@ class User
 	{
 		// load and set config
 
-		static::$collection = strtolower(Config::get('tapioca.collections.users'));
+		static::$dbCollectionName = strtolower(Config::get('tapioca.collections.users'));
 
 		static::$db = \Mongo_Db::instance();
 
@@ -67,7 +67,7 @@ class User
 			}
 
 			//query database for user
-			$user = static::$db->get_where(static::$collection, array(
+			$user = static::$db->get_where(static::$dbCollectionName, array(
 				$field => $id
 			), 1);
 
@@ -204,7 +204,7 @@ class User
 		}
 
 		// insert new user
-		$result = static::$db->insert(static::$collection, $new_user);
+		$result = static::$db->insert(static::$dbCollectionName, $new_user);
 
 		$insert_id = (string) $result;
 		
@@ -295,7 +295,7 @@ class User
 	{
 		$users = static::$db
 					->select( array('id', 'email', 'name', 'apps', 'admin', 'activated', 'status', 'register', 'updated', 'last_login') )
-					->hash(static::$collection, true);
+					->hash(static::$dbCollectionName, true);
 
 		return $users;
 	}
@@ -432,7 +432,7 @@ class User
 
 		$update_user = self::$db
 						->where(array('_id' => $this->user['_id']))
-						->update(self::$collection, $update);
+						->update(self::$dbCollectionName, $update);
 
 		if ($update_user)
 		{
@@ -461,7 +461,7 @@ class User
 
 		$delete_user = self::$db
 						->where(array('_id' => $this->user['_id']))
-						->delete(self::$collection);
+						->delete(self::$dbCollectionName);
 
 		if($delete_user)
 		{
@@ -515,7 +515,7 @@ class User
 		$query = (is_array($id)) ? $id : array('email' => $id);
 
 		// query db to check for login_column
-		$result = static::$db->get_where(static::$collection, $query, 1);
+		$result = static::$db->get_where(static::$dbCollectionName, $query, 1);
 
 		if (count($result) == 1)
 		{
@@ -640,7 +640,7 @@ class User
 
 		$query = static::$db
 					->where($where)
-					->update(static::$collection, $update, array(), true);
+					->update(static::$dbCollectionName, $update, array(), true);
 
 		if($query)
 		{
@@ -683,7 +683,7 @@ class User
 
 		$remove = static::$db
 					->where($where)
-					->update(static::$collection, $update, array(), true);
+					->update(static::$dbCollectionName, $update, array(), true);
 
 		if($remove)
 		{
@@ -766,7 +766,7 @@ class User
 	 */
 	public function admin_set()
 	{
-		$admin = static::$db->get_where(static::$collection, array(
+		$admin = static::$db->get_where(static::$dbCollectionName, array(
 			'admin' => 1
 		), 1);
 
