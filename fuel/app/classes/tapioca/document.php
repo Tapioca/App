@@ -120,7 +120,7 @@ class Document
 		{
 			static::$ref = $ref; 
 
-			//query database for document's abstract
+			// query database for document's abstract
 			$abstract = static::$db
 						->select(array(), array('_id'))
 						->get_where( static::$dbCollectionName, array(
@@ -137,7 +137,7 @@ class Document
 				static::$revisionActive = $this->abstract['revisions']['active'];
 				static::$revisionLast   = $this->abstract['revisions']['total'];
 
-// ?? active ??
+				// ?? active ??
 				if( !isset($this->abstract['revisions']['active'][static::$locale]) )
 				{
 					$this->abstract['revisions']['active'][static::$locale] = null;
@@ -151,7 +151,7 @@ class Document
 						'_tapioca.locale' => static::$locale
 					));
 			}
-			// collection doesn't exist
+			// document doesn't exist
 			else
 			{
 				throw new \DocumentException(
@@ -173,22 +173,22 @@ class Document
 	}
 
 	/**
-	 * Clean model properties
+	 * Clean Document properties
 	 *
 	 * @return  void
 	 */
 	public function reset()
 	{
-		static::$dbCollectionName    = null;
-		static::$app           = null;
-		static::$namespace     = null;
-		static::$ref           = null;
-		static::$locale        = null;
-		static::$revisionActive        = null;
-		static::$revisionLast = null;
-		$this->document        = null;
-		$this->abstract         = null;
-		$this->errors          = array();
+		static::$dbCollectionName = null;
+		static::$app              = null;
+		static::$namespace        = null;
+		static::$ref              = null;
+		static::$locale           = null;
+		static::$revisionActive   = null;
+		static::$revisionLast     = null;
+		$this->document           = null;
+		$this->abstract           = null;
+		$this->errors             = array();
 
 		Callback::reset();
 	}
@@ -307,6 +307,7 @@ class Document
 		}
 
 		$this->set('where', array(
+			'_ref'            => static::$ref,
 			'_abstract'       => array( '$exists' => false ),
 			'_tapioca.active' => true,
 			'_tapioca.locale' => static::$locale
@@ -510,8 +511,8 @@ class Document
 
 			if($new_abstract)
 			{
-				$this->abstract   = $abstract;
-				static::$ref     = $ref;
+				$this->abstract          = $abstract;
+				static::$ref             = $ref;
 				static::$revisionActive  = 1;
 
 				return true;
@@ -581,12 +582,12 @@ class Document
 
 	public function delete()
 	{
-		if(is_null(static::$collection))
+		if( is_null( static::$collection ) )
 		{
-			throw new \DocumentException(__('tapioca.no_collection_selected'));
+			throw new \DocumentException( __('tapioca.no_collection_selected') );
 		}
 
-		if(is_null(static::$ref))
+		if( is_null( static::$ref ) )
 		{
 			throw new \DocumentException(__('tapioca.no_document_selected'));
 		}
@@ -602,8 +603,7 @@ class Document
 			// Get Collection Definiton
 			try
 			{
-				$collection = Tapioca::collection(static::$app, static::$namespace); 
-				$collection->inc_document(-1);
+				static::$collection->inc_document( -1 );
 			}
 			catch (TapiocaException $e)
 			{

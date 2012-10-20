@@ -4,6 +4,7 @@ class Controller_Api_Document extends Controller_Api
 {
 	protected static $appslug;
 	private static $collection;
+	private static $document;
 	private static $ref;
 	private static $revision;
 	private static $locale;
@@ -58,6 +59,9 @@ class Controller_Api_Document extends Controller_Api
 			static::$query = json_decode(static::$query, true);
 		}
 
+		// Document instance
+		static::$document = Tapioca::document(static::$app, static::$collection, static::$ref, static::$locale );
+
 	}
 
 	/* Data
@@ -67,29 +71,20 @@ class Controller_Api_Document extends Controller_Api
 	{
 		if( static::$granted )
 		{
-
 			try
 			{
-				$document = Tapioca::document( static::$app, static::$collection, static::$ref, static::$locale );
-
 				if( static::$query )
 				{
-					$document->set( static::$query );
+					static::$document->set( static::$query );
 				}
-
-				// Set status restriction
-				// if( !is_null(static::$doc_status) )
-				// {
-				// 	$document->set(array('where' => array('_tapioca.status' => (int) static::$doc_status)));
-				// }
 
 				if( static::$ref )
 				{
-					static::$data   = $document->get( );
+					static::$data = static::$document->get();
 				}
 				else
 				{
-					static::$data   = $document->getAll();
+					static::$data = static::$document->getAll();
 				}
 
 				static::$status = 200;
@@ -108,79 +103,46 @@ class Controller_Api_Document extends Controller_Api
 		{
 			$model = $this->clean();
 
-			if( !$model )
+			if( $model )
 			{
-				static::$data   = array('error' => __('tapioca.missing_required_params'));
-				static::$status = 500;
-			}
-			else
-			{
-				
-				$document = Tapioca::document(static::$app, static::$collection, null, static::$locale);
-
 				try
 				{
-					static::$data   = $document->save($model, static::$user);
+					static::$data   = static::$document->save( $model, static::$user );
 					static::$status = 200;
 
 				} catch (DocumentException $e)
 				{
 					static::error( $e->getMessage() );
 				}
-			}
+			} // if model
 		} // if granted
 	}
 
-	//update collection data.
 	public function put_index()
 	{
 		if( static::$granted && static::$ref)
 		{
 			$model = $this->clean();
 
-			if( !$model )
+			if( $model )
 			{
-				static::$data   = array('error' => __('tapioca.missing_required_params'));
-				static::$status = 500;
-			}
-			else
-			{
-
-				$document = Tapioca::document(static::$app, static::$collection, static::$ref, static::$locale);
-	
-				static::$data   = $document->save($model, static::$user);
+				static::$data   = static::$document->save( $model, static::$user );
 				static::$status = 200;
 			}
-		} // if granted
+		}
 	}
 
 	public function delete_index()
 	{
 		if( static::$granted )
 		{
-				$document     = Tapioca::document(static::$app, static::$namespace, static::$ref);
-				
-				static::$data   = array('status' => $document->delete());
-				static::$status = 200;
-		} // if granted
-	}
-
-	public function get_status()
-	{
-		if( static::$granted )
-		{
-			$document     = Tapioca::document(static::$app, static::$namespace, static::$ref, static::$locale);
-
-			if(is_null(static::$doc_status))
+			if( ! static::deleteToken( 'document', static::$ref ))
 			{
-				static::$data   = array('error' => __('tapioca.missing_required_params'));
-				static::$status = 500;
+				return;
 			}
-			else
-			{
-				static::$data   = array('revisions' => $document->update_status(static::$doc_status, static::$revision));
-				static::$status = 200;
-			}
+			
+			static::$data   = array('status' => static::$document->delete());
+			static::$status = 200;
 		}
 	}
 
@@ -202,6 +164,9 @@ class Controller_Api_Document extends Controller_Api
 
 			return $model;
 		}
+		
+		static::$data   = array('error' => __('tapioca.missing_required_params'));
+		static::$status = 500;
 
 		return false;
 	}
