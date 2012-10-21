@@ -17,5 +17,5 @@ return array(
             'hostname' => 'localhost',
             'database' => 'tapiocapp_dev_v2',
         ),
-    )
+    ),
 );

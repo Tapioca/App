@@ -87,7 +87,7 @@ class Collection
 	 * @return  void
 	 * @throws  CollectionException
 	 */
-	public function __construct(\Tapioca\App $app, $namespace = false )
+	public function __construct(App $app, $namespace = false )
 	{
 		// load and set config
 		static::$app        = $app;
@@ -424,6 +424,7 @@ class Collection
 		$data = array(
 			'app_id'      => static::$app->get('slug'),
 			'type'        => 'data',
+			'active'      => true,
 			'namespace'   => $this->namespace,
 			'revision'    => $revision,
 			'digest'     => array(
@@ -445,6 +446,17 @@ class Collection
 			'user'    => $user->get('id'),
 			'status'  => (int) 100 
 		);
+
+		// set previous revision as "non active"
+		$update_no_active = static::$db
+								->where(array(
+									'app_id'    => static::$app->get('slug'),
+									'namespace' => $this->namespace,
+									'type'      => 'data'
+								))
+								->update_all(static::$dbCollectionName, array(
+									'active' => (bool) false
+								));
 
 		$insert_data = static::$db->insert(static::$dbCollectionName, $data);
 

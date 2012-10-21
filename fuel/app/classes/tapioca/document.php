@@ -99,8 +99,7 @@ class Document
 		// load and set config
 		static::$app              = $app;
 		static::$collection       = $collection;
-		static::$namespace        = static::$collection->namespace;
-		static::$dbCollectionName = static::$app->get('slug').'-'.static::$namespace;
+		static::$dbCollectionName = static::$app->get('slug').'-'.static::$collection->namespace;
 		
 		static::$db = \Mongo_Db::instance();
 
@@ -155,7 +154,7 @@ class Document
 			else
 			{
 				throw new \DocumentException(
-					__('tapioca.document_not_found', array('ref' => static::$ref, 'collection' => static::$namespace))
+					__('tapioca.document_not_found', array('ref' => static::$ref, 'collection' => static::$collection->namespace))
 				);
 			}
 		}
@@ -181,7 +180,6 @@ class Document
 	{
 		static::$dbCollectionName = null;
 		static::$app              = null;
-		static::$namespace        = null;
 		static::$ref              = null;
 		static::$locale           = null;
 		static::$revisionActive   = null;
@@ -345,13 +343,13 @@ class Document
 			if( !is_null( $revision ) )
 			{
 				throw new \DocumentException(
-					__('tapioca.document_revision_not_found', array('ref' => static::$ref, 'collection' => static::$namespace, 'revision' => $revision))
+					__('tapioca.document_revision_not_found', array('ref' => static::$ref, 'collection' => static::$collection->namespace, 'revision' => $revision))
 				);
 			}
 			else
 			{
 				throw new \DocumentException(
-					__('tapioca.document_not_found', array('ref' => static::$ref, 'collection' => static::$namespace))
+					__('tapioca.document_not_found', array('ref' => static::$ref, 'collection' => static::$collection->namespace))
 				);
 			}
 		}
@@ -442,7 +440,7 @@ class Document
 		}
 
 		// new document
-		if(is_null(static::$ref))
+		if( is_null( static::$ref ) )
 		{
 			Callback::trigger('before::new', $document);
 
@@ -724,6 +722,21 @@ class Document
 							))
 							->update(static::$dbCollectionName, $this->abstract);
 
+		// if new status is 100,
+		// update dependencies
+		if($set_out_of_date)
+		{
+			$resqueArgs = array(
+				'appslug'    => static::$app->get('slug'),
+				'collection' => static::$collection->namespace,
+				'ref'        => static::$ref,
+				'locale'     => static::$locale,
+				'revision'   => $revision
+			);
+
+			\Resque::enqueue( Config::get('resque.queue'), '\\Tapioca\\Jobs\\Dependency', $resqueArgs, true);
+		}
+
 		return $this->abstract; //$this->set_locale_revision($revision);
 	}
 
@@ -735,7 +748,7 @@ class Document
 	 */
 	public function drop()
 	{
-		if(is_null(static::$collection))
+		if( is_null( static::$collection ) )
 		{
 			throw new \DocumentException(__('tapioca.no_collection_selected'));
 		}
@@ -745,8 +758,7 @@ class Document
 
 		if($delete)
 		{
-			$collection = Tapioca::collection(static::$app, static::$namespace); 
-			$collection->reset_document();
+			static::$collection->reset_document();
 
 			return true;
 		}

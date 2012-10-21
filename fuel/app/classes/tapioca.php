@@ -463,7 +463,7 @@ class Tapioca
 	{
 		if( is_null( static::$db ) )
 		{
-			static::$db = \Mongo_Db::instance();			
+			static::$db = \Mongo_Db::instance();
 		}
 
 		$collection = Config::get('tapioca.collections.delete');

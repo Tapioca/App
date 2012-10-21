@@ -16,10 +16,6 @@ return array(
 	'prefix'        => 'TapiocApp:',
 	'interval'      => 5,
 	'count'	    	=> 1,
-	'redis_backend' => '',
-	'logging'       => '',
-	'verbose'       => '', 
-	'vverbose'      => ''
 );
 
 // end of file resque.php
