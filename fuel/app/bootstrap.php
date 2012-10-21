@@ -35,9 +35,9 @@ Autoloader::add_classes(array(
 
 	'Tapioca\\CollectionException'        => APPPATH.'classes/tapioca/collection.php', 
 	'Tapioca\\DocumentException'          => APPPATH.'classes/tapioca/document.php',  
-	'Tapioca\\TapiocaFileException'       => APPPATH.'classes/tapioca/file.php', 
+	'Tapioca\\LibraryException'           => APPPATH.'classes/tapioca/library.php', 
 	'Tapioca\\CallbackException'          => APPPATH.'classes/tapioca/callback.php', 
-	'Tapioca\\TapiocaCastException'       => APPPATH.'classes/tapioca/cast.php', 
+	'Tapioca\\CastException'              => APPPATH.'classes/tapioca/cast.php', 
 	'Tapioca\\InstallException'           => APPPATH.'classes/tapioca/install.php', 
 
 	'Tapioca\\User'                       => APPPATH.'classes/tapioca/user.php',
@@ -46,7 +46,7 @@ Autoloader::add_classes(array(
 	'Tapioca\\Collection'                 => APPPATH.'classes/tapioca/collection.php',
 	'Tapioca\\Document'                   => APPPATH.'classes/tapioca/document.php',
 	'Tapioca\\Rules'                      => APPPATH.'classes/tapioca/rules.php',
-	'Tapioca\\Files'                      => APPPATH.'classes/tapioca/file.php',
+	'Tapioca\\Library'                    => APPPATH.'classes/tapioca/library.php',
 	'Tapioca\\Callback'                   => APPPATH.'classes/tapioca/callback.php',
 	'Tapioca\\Cast'                       => APPPATH.'classes/tapioca/cast.php',
 	'Tapioca\\Install'                    => APPPATH.'classes/tapioca/install.php',

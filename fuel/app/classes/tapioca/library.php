@@ -7,9 +7,9 @@ use Config;
 use Upload;
 use File;
 
-class TapiocaFileException extends FuelException {}
+class LibraryException extends FuelException {}
 
-class Files
+class Library
 {
 	/**
 	 * @var  string  Database instance
@@ -24,17 +24,17 @@ class Files
 	/**
 	 * @var  string  MongoDb collection's name
 	 */
-	protected static $collection = null;
+	protected static $dbCollectionName = null;
 
 	/**
-	 * @var  object  Active group
+	 * @var  object  Active App
 	 */
-	protected static $group = null;
+	protected static $app = null;
 
 	/**
-	 * @var  object  Active group
+	 * @var  bool  Library resume
 	 */
-	protected static $summary = null;
+	protected static $summary = false;
 
 	/**
 	 * @var  array  File's object
@@ -69,30 +69,31 @@ class Files
 	/**
 	 * Loads in the File object
 	 *
-	 * @param   string  Group id
-	 * @param   string  Collection namespace
-	 * @param   string  Document ref
+	 * @param   string  App instance
+	 * @param   string  Filename
 	 * @return  void
 	 */
-	public function __construct(\Auth\Group $group, $filename = null, $check_exists = false)
+	public function __construct(App $app, $filename = null)
 	{
 		// load and set config
-		static::$group      = $group;
-		static::$collection = static::$group->get('slug').'--files';
+		static::$app              = $app;
+		static::$dbCollectionName = static::$app->get('slug').'--library';
 
 		static::$storage    = Config::get('tapioca.upload.storage');
-		static::$appStorage = static::$storage.static::$group->get('slug');
+		static::$appStorage = static::$storage.static::$app->get('slug');
 		
 		static::$db         = \Mongo_Db::instance();
 		static::$gfs        = \GridFs::getFs(static::$db);
 
-		static::$summary    = $this->get_summary();
+		
+		$this->get_summary();
 
 		// if a Name was passed
 		if ($filename)
 		{
 			$file =  static::$db
-						->get_where(static::$collection, array(
+						->select( array(), array('_id'))
+						->get_where(static::$dbCollectionName, array(
 							'filename' => $filename
 						), 1);
 
@@ -100,6 +101,12 @@ class Files
 			{
 				$this->file     = $file[0];
 				$this->filename = $filename;
+			}
+			else
+			{
+				throw new LibraryException(
+					__('tapioca.file_not_found', array('file' => $filename) )
+				);	
 			}
 		}
 	}
@@ -115,26 +122,33 @@ class Files
 		return $this->$property;
 	}
 
+	/**
+	 * Return a summary of the library,
+	 * include total files by categories
+	 * and image resize presets
+	 *
+	 * @return  object
+	 */
 	public function get_summary()
 	{
 		$summary = static::$db
-					->get_where(static::$collection, array(
+					->get_where(static::$dbCollectionName, array(
 						'type' => 'summary'
 					), 1);
 
 		if (count($summary) == 1)
 		{
-			return $summary[0];
+			static::$summary = $summary[0];
+
+			return true;
 		}
 
-		return;
+		return false;
 	}
 
 	private function set_summary()
 	{
-		$summary = $this->get_summary();
-
-		if (count($summary) == 0)
+		if( !static::$summary )
 		{
 			$fileTypes = Config::get('tapioca.file_types');
 			$summary   = array(
@@ -149,7 +163,9 @@ class Files
 
 			static::$db
 				->where(array('type' => 'summary'))
-				->update(static::$collection, $summary, array('upsert' => true));
+				->update(static::$dbCollectionName, $summary, array('upsert' => true));
+
+			static::$summary = $this->get_summary();
 		}
 	}
 
@@ -163,7 +179,7 @@ class Files
 	public function inc_summary($category, $direction = 1)
 	{
 		$ret = static::$db->command(
-					array('findandmodify' => static::$collection,
+					array('findandmodify' => static::$dbCollectionName,
 						  'query'         => array('type' => 'summary'),
 						  'update'        => array('$inc' => array($category => (int) $direction)),
 						  'new'           => true
@@ -181,22 +197,21 @@ class Files
 	 */
 	public function preset($preset_name)
 	{
-		if(is_null($this->filename))
+		if( is_null( $this->filename ) )
 		{
-			throw new TapiocaFileException(__('tapioca.no_file_selected'));
+			throw new LibraryException(__('tapioca.no_file_selected'));
 		}
 
-		if(in_array($preset_name, $this->file['presets']))
+		if( in_array( $preset_name, $this->file['presets'] ) )
 		{
 			return true;
 		}
 
-		$summary = $this->get_summary();
-		$presets = $summary['presets'];
+		$presets = static::$summary['presets'];
 
-		if(!isset($presets[$preset_name]))
+		if( !isset( $presets[$preset_name] ) )
 		{
-			return false;
+			throw new LibraryException(__('tapioca.preset_not_define'));
 		}
 
 		$original_file = $this->get_path();
@@ -207,13 +222,13 @@ class Files
 		$resource->config('presets', $presets);
 		$resource->preset($preset_name)->save($new_file_path);
 
-		if(file_exists($new_file_path))
+		if( file_exists( $new_file_path ) )
 		{
 			$ret = static::$db
 					->where(array(
 						'filename' => $this->filename
 					))
-					->update(static::$collection, array(
+					->update(static::$dbCollectionName, array(
 						'$addToSet' => array(
 							'presets' => $preset_name
 						)
@@ -228,39 +243,47 @@ class Files
 		// exclude summary
 		$where = array('type' => array( '$exists' => false ));
 
-		if(!is_null($category))
+		$ret = new \stdClass;
+
+
+		if( !is_null( $category ) )
 		{
 			$where['category'] = $category;
+
+			if( $category == 'image' )
+			{
+				$ret->presets = static::$summary['presets'];
+			}
+		}
+		else
+		{
+			$ret->categories           = new \stdClass;
+			$ret->categories->image    = static::$summary['image'];
+			$ret->categories->video    = static::$summary['video'];
+			$ret->categories->document = static::$summary['document'];
 		}
 
-		if(!is_null($tag))
+		if( !is_null( $tag ) )
 		{
 			$where['tags.key'] = $tag;
 		}
 
-		return static::$db
+
+		$hash = static::$db
 					->where($where)
-					->get(static::$collection);
+					->hash( static::$dbCollectionName, true );
+
+		return array_merge( (array) $ret, (array) $hash );
 	}
 
 	public function read()
 	{
-		if(is_null($this->file))
+		if( is_null( $this->file ) )
 		{
-			throw new TapiocaFileException(__('tapioca.no_file_selected'));
+			throw new LibraryException(__('tapioca.no_file_selected'));
 		}
 
 		return $this->file;
-/*
-		$file =  static::$db
-					->get_where(static::$collection, array(
-						'filename' => $this->filename
-					), 1);
-
-		$this->file = $file[0];
-
-		return $this->file;
-*/
 	}
 
 	public function get_path($full_path = true, $preset = null)
@@ -285,11 +308,11 @@ class Files
 		if(is_null($this->file))
 		{
 			$this->read();
-			//throw new TapiocaFileException(__('tapioca.no_file_selected'));
+			//throw new LibraryException(__('tapioca.no_file_selected'));
 		}
 		
 		$query = array( 'filename' => $this->filename,
-						'appid'    => static::$group->get('id'));
+						'appid'    => static::$app->get('id'));
 
 		$query['preview'] = ($preview) ? true : array( '$exists' => false );
 
@@ -308,12 +331,12 @@ class Files
 	/**
 	 * Catch files from upload and save them
 	 *
-	 * @param  object User instance
-	 * @param  bool is Update 
+	 * @param   object User instance
+	 * @param   bool is Update 
 	 * @return  bool
-	 * @throws  TapiocaException
+	 * @throws  LibraryException
 	 */
-	public function save(\Auth\User $user, $update = false)
+	public function save(User $user, $update = false)
 	{
 		$files  = $this->upload();
 
@@ -323,15 +346,99 @@ class Files
 	}
 
 	/**
+	 * Update file's metadata
+	 *
+	 * @param   object User instance
+	 * @param   array files metadata
+	 * @return  array
+	 * @throws  LibraryException
+	 */
+	public function update(User $user, $fields)
+	{
+		// init update array
+		$update = array();
+
+		// if updating basename
+		if( array_key_exists('basename', $fields) and
+			$fields['basename'] != $this->file['basename'] and
+			$this->filenameAvalaible( $fields['basename'].'.'.$this->file['extension'] ))
+		{
+			throw new \LibraryException(
+				__( 'tapioca.file_already_exists', array('name' => $fields['basename(path)']) )
+			);
+		}
+		elseif (array_key_exists('basename', $fields) and
+				empty( $fields['basename'] ) )
+		{
+			throw new \LibraryException(__('tapioca.file_basename_empty'));
+		}
+		elseif (array_key_exists('basename', $fields))
+		{
+			$update['basename'] = $fields['basename'];
+			$update['filename'] = $update['basename'].'.'.$this->file['extension'];
+
+			unset($fields['basename']);
+
+			// update files name on filesystem
+
+			$file_path = static::$appStorage.DIRECTORY_SEPARATOR.$this->file['category'].DIRECTORY_SEPARATOR;
+
+			$prefix    = array_merge( static::$presets, $this->file['presets'] );
+
+			foreach( $prefix as $p)
+			{
+				if( !empty( $p))
+					$p = $p.'-';
+
+				$old = $file_path.$p.$this->file['filename'];
+				$new = $file_path.$p.$update['filename'];
+
+				File::rename( $old, $new );
+			}
+		}
+
+		// if updating tags
+		if( array_key_exists('tags', $fields) )
+		{
+			$update['tags']     = static::setTags( $fields['tags'] );			
+		}
+
+
+		if (empty($update))
+		{
+			return true;
+		}
+
+		// add update time
+		$update['updated'] = new \MongoDate();
+		$update['user']    = $user->get('id');
+
+		$ret = static::$db
+				->where(array('ref' => $this->file['ref']))
+				->update(static::$dbCollectionName, $update);
+
+		if( $ret )
+		{
+			// TODO: worker update dependencies
+
+			return array_merge( $this->file, $update );
+		}
+		else
+		{
+			throw new \LibraryException( __('tapioca.internal_server_error') );	
+		}
+	}
+
+	/**
 	 * Import file from the filesystem to tapioca
 	 *
-	 * @param  object User instance
-	 * @param  array files list
-	 * @param  array tags
+	 * @param   object User instance
+	 * @param   array files list
+	 * @param   array tags
 	 * @return  array
-	 * @throws  TapiocaException
+	 * @throws  LibraryException
 	 */
-	public function import(\Auth\User $user, array $files, array $tags = array())
+	public function import(User $user, array $files, array $tags = array())
 	{
 		$fileTypes = \Config::get('tapioca.file_types');
 		$finfo     = new \finfo(FILEINFO_MIME);
@@ -349,16 +456,16 @@ class Files
 			$category   = static::getFileCategory($minetype[0]);
 
 			$new_file = array(
-				'saved_as' => $fileinfo['basename'],
-				'path' => $file['path'],
-				'mimetype' => $minetype[0],
+				'saved_as'  => $fileinfo['basename'],
+				'path'      => $file['path'],
+				'mimetype'  => $minetype[0],
 				'extension' => $fileinfo['extension'],
-				'basename' => $filename->filename,
-				'filename' => $filename->basename,
-				'length' => filesize($file['path']),
-				'md5' => md5_file($file['path']),
-				'tags' => $file['tags'],
-				'category' => $category,
+				'basename'  => $filename->filename,
+				'filename'  => $filename->basename,
+				'length'    => filesize($file['path']),
+				'md5'       => md5_file($file['path']),
+				'tags'      => $file['tags'],
+				'category'  => $category,
 			);
 
 			// if file is an image, we get width/height
@@ -377,12 +484,12 @@ class Files
 	/**
 	 * List of files to create/update
 	 *
-	 * @param  object User instance
-	 * @param  bool is Update 
+	 * @param   object User instance
+	 * @param   bool is Update 
 	 * @return  bool
-	 * @throws  TapiocaException
+	 * @throws  LibraryException
 	 */
-	private function doIt(\Auth\User $user, array $files, $update = false, $import = false)
+	private function doIt(User $user, array $files, $update = false, $import = false)
 	{
 		$result = array();
 
@@ -400,25 +507,26 @@ class Files
 						$file['filename'] = strtolower($file['basename'].'.'.$file['extension']);
 					}
 
-					$ret = $this->create($file, $user, $update, $import);
-					
-					$file_api    = '/api/'.static::$group->get('slug').'/file/'.$file['filename'];
-					$file_url    = '/files/'.static::$group->get('slug').'/'.$file['category'].'/'.$file['filename'];
-					// preview
+					$ret         = $this->create($file, $user, $update, $import);
+					$appslug     = static::$app->get('slug');
+					$file_uri    = array('appslug' => $appslug, 'category' => $file['category'], 'filename' => $file['filename']);
+
+					$api_url     = \Router::get('api_library_filename', $file_uri  );
+					$file_url    = \Uri::create('files/:appslug/:category/:filename', $file_uri );
+
 					$preview_url = (strpos($file['mimetype'], 'image') !== false) ?
-							'/files/'.static::$group->get('slug').'/'.$file['category'].'/preview-'.$file['filename'] : '';
+							\Uri::create('files/:appslug/:category/preview-:filename', $file_uri ) : '';
 
 					$result[] = array(
 						'name'          => $file['filename'],
 						'size'          => $file['length'],
 						'url'           => $file_url,
 						'thumbnail_url' => $preview_url,
-						'delete_url'    => $file_api,
+						'delete_url'    => $api_url,
 						'delete_type'   => 'DELETE'
 					);
-
 				}
-				catch(TapiocaFileException $e)
+				catch(LibraryException $e)
 				{
 					$result[] = array(
 						'error'         => $e->getMessage(),
@@ -459,9 +567,9 @@ class Files
 	 * @param   array  File description
 	 * @return  object User instance
 	 * @return  bool
-	 * @throws  TapiocaException
+	 * @throws  LibraryException
 	 */
-	public function create(array &$fields, \Auth\User $user, $update = false, $import = false)
+	public function create(array &$fields, User $user, $update = false, $import = false)
 	{
 		$file_path = $fields['path'];
 		$saved_as  = $fields['saved_as'];
@@ -492,13 +600,13 @@ class Files
 			$fields['uid'] = (string) static::$gfs
 										->storeFile($file_path, array(
 											'filename' => $fields['filename'],
-											'appid'    => static::$group->get('id'),
+											'appid'    => static::$app->get('id'),
 											'category' => $fields['category']
 										));
 		}
 		catch(\MongoGridFSException $e)
 		{
-			throw new \TapiocaFileException(
+			throw new \LibraryException(
 				__('tapioca.fail_to_store_file', array('filename' => $fields['filename'], 'error' => $e->getMessage()))
 			);
 		}
@@ -507,11 +615,7 @@ class Files
 			'ref'     => uniqid(),
 			'created' => new \MongoDate(),
 			'presets' => $presets,
-			'user'    => array(
-				'id'    => $user->get('id'),
-				'name'  => $user->get('name'),
-				'email' => $user->get('email'),
-			)
+			'user'    => $user->get('id'),
 		) + $fields;
 
 		// do not work when upload multiple files
@@ -522,7 +626,7 @@ class Files
 				->where(array(
 					'filename' => $new_file['filename']
 				))
-				->update(static::$collection, $new_file, array('upsert' => true));
+				->update(static::$dbCollectionName, $new_file, array('upsert' => true));
 
 		// if first file upload, create collection's summary
 		$this->set_summary();
@@ -564,7 +668,7 @@ class Files
 	 * @param   string file name
 	 * @return  string file md5
 	 * @return  bool
-	 * @throws  TapiocaFileException
+	 * @throws  LibraryException
 	 */
 	private function exists($filename, $md5)
 	{
@@ -574,7 +678,7 @@ class Files
 							'filename' => $filename,
 							'md5'      => $md5
 						))
-						->get(static::$collection);
+						->get(static::$dbCollectionName);
 
 		if (count($result) > 0)
 		{
@@ -582,11 +686,40 @@ class Files
 			{
 				if($file['md5'] == $md5)
 				{
-					throw new TapiocaFileException(
+					throw new LibraryException(
 						__('tapioca.file_already_exists', array('name' => $filename))
 					);
 				}
 
+				if($file['filename'] == $filename)
+				{
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Check if a filename is avalaible
+	 *
+	 * @param   string file name
+	 * @return  bool
+	 */
+	private function filenameAvalaible($filename)
+	{
+		// query db to check for filename
+		$result = static::$db
+						->where(array(
+							'filename' => $filename
+						))
+						->get(static::$dbCollectionName);
+
+		if (count($result) > 0)
+		{
+			foreach ($result as $file)
+			{
 				if($file['filename'] == $filename)
 				{
 					return true;
@@ -604,7 +737,7 @@ class Files
 
 		if(!is_dir(static::$appStorage))
 		{
-			File::create_dir(static::$storage, static::$group->get('slug'), 0755);			
+			File::create_dir(static::$storage, static::$app->get('slug'), 0755);			
 		}
 
 		if(!is_dir($cat_path))
@@ -625,13 +758,13 @@ class Files
 		}
 	}
 
-	public function delete_all(\Auth\User $user)
+	public function delete_all(User $user)
 	{
 		$files = static::$db
-					->get_where(static::$collection, array(
+					->get_where(static::$dbCollectionName, array(
 						'type'   => array('$ne' => 'summary')
 					));
-		\Debug::show($files);
+
 		foreach($files as $file)
 		{
 			$this->file     = $file;
@@ -645,12 +778,12 @@ class Files
 
 	public function delete($soft = false)
 	{
-		if(is_null($this->filename))
+		if( is_null( $this->filename ) )
 		{
-			throw new TapiocaFileException(__('tapioca.no_file_selected'));
+			throw new LibraryException(__('tapioca.no_file_selected'));
 		}
 
-		if(isset($this->file['presets']))
+		if( isset( $this->file['presets'] ) )
 		{
 			static::$presets = array_merge(static::$presets, $this->file['presets']); 
 		}
@@ -658,7 +791,7 @@ class Files
 		$fileGfs  = static::$gfs
 						->findOne(array(
 							'filename' => $this->filename,
-							'appid'    => static::$group->get('id')
+							'appid'    => static::$app->get('id')
 						));
 
 		if(count($fileGfs) > 0)
@@ -692,7 +825,7 @@ class Files
 							->where(array(
 									'ref' => $this->file['ref']
 							))
-							->delete_all(static::$collection);
+							->delete_all(static::$dbCollectionName);
 
 				if($delete)
 				{
@@ -719,6 +852,34 @@ class Files
 		}
 
 		return $category;
+	}
+
+	public static function setTags( $tags )
+	{
+		if(!is_array($tags))
+		{
+			$tags = trim($tags);
+
+			if(substr($tags, -1) == ',')
+			{
+				$tags = rtrim($tags, ',');
+			}
+			
+			$tags = array_filter(explode(',', $tags));
+		}
+
+		$file_tags = array();
+
+		foreach ($tags as $value)
+		{
+			$key         = \Inflector::friendly_title(trim($value));
+			$file_tags[] = array(
+				'key'   => $key,
+				'value' => trim($value)
+			);
+		}
+
+		return $file_tags;
 	}
 
 	public static function setFileName($path, $name = false)
@@ -766,28 +927,7 @@ class Files
 
 		$tags = \Input::post('tags', null);
 
-		if(!is_array($tags))
-		{
-			$tags = trim($tags);
-
-			if(substr($tags, -1) == ',')
-			{
-				$tags = rtrim($tags, ',');
-			}
-			
-			$tags = array_filter(explode(',', $tags));
-		}
-
-		$file_tags = array();
-
-		foreach ($tags as $value)
-		{
-			$key         = \Inflector::friendly_title(trim($value));
-			$file_tags[] = array(
-				'key'   => $key,
-				'value' => trim($value)
-			);
-		}
+		$file_tags = static::setTags( $tags );
 
 		// if there are any valid files
 		if (Upload::is_valid())

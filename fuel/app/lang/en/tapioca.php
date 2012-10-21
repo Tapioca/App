@@ -69,6 +69,10 @@ return array(
 	'file_already_exists'          => 'The file name ":name" already exists.',
 	'no_file_selected'             => 'No file is selected.',
 	'fail_to_store_file'           => 'Tapioca can not store :filename into GridFs, error: :error',
+	'file_not_found'               => 'file ":file" does not exist.',
+	'file_basename_empty'          => 'You must specify a filename.',
+	'preset_not_define'            => 'Preset nor define',
+	
 	/** API Execption Messages **/
 	'missing_required_params'      => 'Some required params are missing',
 	'no_collections'               => 'No collections define yet',

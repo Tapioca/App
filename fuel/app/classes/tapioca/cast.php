@@ -5,7 +5,7 @@ namespace Tapioca;
 use FuelException;
 use Set;
 
-class TapiocaCastException extends FuelException {}
+class CastException extends FuelException {}
 
 class Cast
 {

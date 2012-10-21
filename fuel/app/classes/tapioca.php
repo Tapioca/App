@@ -71,7 +71,7 @@ class Tapioca
 	 * @param   string app slug
 	 * @param   string Collection namespace.
 	 * @throws  TapiocaException
-	 * @return  Collection
+	 * @return  Collection object
 	 */
 	public static function collection( $appslug, $namespace = null )
 	{
@@ -91,7 +91,7 @@ class Tapioca
 	 * @param   string Document reference.
 	 * @param   string Document locale.
 	 * @throws  TapiocaException
-	 * @return  Document
+	 * @return  Document object
 	 */
 	public static function document( App $app, $namespace, $ref = null, $locale = null)
 	{
@@ -110,19 +110,19 @@ class Tapioca
 
 	/**
 	 * @param   string app slug
-	 * @param   string document reference.
+	 * @param   string Filename
 	 * @throws  TapiocaException
-	 * @return  Document
+	 * @return  File object
 	 */
-	public static function file($appslug, $filename = null)
+	public static function library($appslug, $filename = null)
 	{
 		try
 		{
-			return new \Files($appslug, $filename);
+			return new \Library($appslug, $filename);
 		}
-		catch (TapiocaFileException $e)
+		catch ( LibraryException $e )
 		{
-			throw new \TapiocaException($e->getMessage());
+			throw new \TapiocaException( $e->getMessage() );
 		}
 	}
 
@@ -148,11 +148,11 @@ class Tapioca
 
 	/**
 	 * Get's either the currently logged in user's app object or the
-	 * specified app by id or slug.
+	 * specified app by slug.
 	 *
-	 * @param   int|string  App id or slug
+	 * @param   string  App name url friendly
 	 * @throws  AuthException
-	 * @return  App
+	 * @return  App object
 	 */
 	public static function app( $id = null )
 	{
