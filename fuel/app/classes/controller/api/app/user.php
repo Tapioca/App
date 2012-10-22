@@ -39,8 +39,7 @@ class Controller_Api_App_User extends Controller_Api
 	{
 		if( static::$granted )
 		{
-			// fixtures
-			$level  = 100;
+			$level  = Input::json('level', 1);
 
 			try
 			{
@@ -71,8 +70,7 @@ class Controller_Api_App_User extends Controller_Api
 	{
 		if( static::$granted )
 		{
-			// fixtures
-			$level  = 50;
+			$level  = Input::json('level', 1);
 
 			try
 			{

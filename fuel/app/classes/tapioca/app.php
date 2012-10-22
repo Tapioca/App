@@ -455,14 +455,25 @@ class App
 
 		try
 		{
-			$user = new User($userId);
+			$user = new User( $userId );
 		}
 		catch (UserNotFoundException $e)
 		{
 			throw new \AppException($e->getMessage());
 		}
 
-		$update = array('$pull' => array('team' => array('id' => $userId) ) );
+		// $update = array('$pull' => array('team' => array('id' => $userId) ) );
+
+		foreach ($this->team as $key => $row)
+		{
+			if ($row['id'] == $userId)
+			{
+				$this->team[ $key ]['level'] = -1;
+				break;
+			}
+		}
+
+		$update = array('$set' => array('team' => $this->team ) );
 
 		$where = array('_id' => $this->app['_id']);
 
@@ -472,14 +483,6 @@ class App
 
 		if($query)
 		{
-			foreach ($this->team as $key => $row)
-			{
-				if ($row['id'] == $userId)
-				{
-					unset($this->team[ $key ]);
-				}
-			}
-
 			return true;
 		}
 

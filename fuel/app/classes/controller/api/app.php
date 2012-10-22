@@ -53,15 +53,28 @@ class Controller_Api_App extends Controller_Api
 		if( static::$granted )
 		{
 			// fixture
-			$fields = array(
-				'name'  => 'Group Test API v2',
-				'slug'  => 'gtapiv2',
-			);
+			// $fields = array(
+			// 	'name'  => 'Group Test API v2',
+			// 	'slug'  => 'gtapiv2',
+			// );
 
-			// user Id provided by form
+			$fields = Input::json();
+
+			if( isset( $fields['user'] ) )
+			{
+				$userId = $fields['user'];
+				unset( $fields['user'] );
+			}
+			else
+			{
+				static::error( __('tapioca.missing_required_params') );
+				return;
+			}
+
+			// make sure user exists
 			try
 			{
-				$user = Tapioca::user( '5079459507a7d' );
+				$user = Tapioca::user( $userId );
 			}
 			catch (AuthException $e)
 			{
@@ -74,17 +87,15 @@ class Controller_Api_App extends Controller_Api
 			{
 				$appId = Tapioca::app()->create($fields);
 				
-				if($appId)
+				if( $appId )
 				{
 					static::$app = Tapioca::app($appId);
 
 					// Create app's admin
-					$adminId = $user->get('id');
+					static::$app->add_to_app( $userId, 100 );
+					static::$app->add_admin( $userId );
 
-					static::$app->add_to_app( $adminId, 100 );
-					static::$app->add_admin( $adminId );
-
-					static::$user->add_to_app( $appId );
+					$user->add_to_app( $appId );
 
 					static::$data   = static::$app->get();
 					static::$status = 200;
@@ -104,10 +115,12 @@ class Controller_Api_App extends Controller_Api
 			try
 			{
 				// fixture
-				$fields = array(
-					'name'  => 'Les Bouffes du Nord',
-					'slug'  => 'gtapiv2test',
-				);
+				// $fields = array(
+				// 	'name'  => 'Les Bouffes du Nord',
+				// 	'slug'  => 'gtapiv2test',
+				// );
+
+				$fields = Input::json();
 
 				$action = static::$app->update( $fields );
 				

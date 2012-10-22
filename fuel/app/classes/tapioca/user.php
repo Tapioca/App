@@ -608,33 +608,32 @@ class User
 	/**
 	 * Adds this user to the app.
 	 *
-	 * @param   string|int  app ID or app name
+	 * @param   string  App ID
 	 * @return  bool
 	 * @throws  UserException
 	 */
-	public function add_to_app($id)
+	public function add_to_app( $appId )
 	{
-		if ($this->in_app($id))
+		if( $this->in_app( $appId ) )
 		{
 			throw new \UserException(__('tapioca.user_already_in_app'));
 		}
 
 		try
 		{
-			$app = new App($id);
+			$app = new App( $appId );
 		}
 		catch (AppNotFoundException $e)
 		{
 			throw new \UserException($e->getMessage());
 		}
 
-		$app_info = array(
-				'id'       => $app->get('id'),   // usefull ?
+		$appInfo = array(
 				'name'     => $app->get('name'),
 				'slug'     => $app->get('slug'),
 			);
 
-		$update = array('$push' => array('apps' => $app_info));
+		$update = array('$push' => array('apps' => $appInfo));
 
 		$where = array('_id' => $this->user['_id']);
 
@@ -644,7 +643,7 @@ class User
 
 		if($query)
 		{
-			$this->apps[] = $app_info;
+			$this->apps[] = $appInfo;
 
 			return true;
 		}
