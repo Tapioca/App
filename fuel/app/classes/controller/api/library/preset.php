@@ -49,7 +49,7 @@ class Controller_Api_Library_Preset extends Controller_Api
 
 				if( $ret )
 				{
-					static::$data   = static::$file->read();
+					static::$data   = static::$file->get();
 					static::$status = 200;				
 				}
 				else

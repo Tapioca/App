@@ -55,11 +55,11 @@ class Controller_Api_Library extends Controller_Api
 				$category = Input::get('category', null);
 				$tag      = Input::get('tag', null);
 
-				$ret  = static::$file->listing( $category, $tag );				
+				$ret  = static::$file->getAll( $category, $tag );				
 			}
 			else
 			{
-				$ret  = static::$file->read();
+				$ret  = static::$file->get();
 			}
 
 			static::$data   = $ret;

@@ -238,7 +238,7 @@ class Library
 		}
 	}
 
-	public function listing($category = null, $tag = null)
+	public function getAll($category = null, $tag = null)
 	{
 		// exclude summary
 		$where = array('type' => array( '$exists' => false ));
@@ -276,7 +276,7 @@ class Library
 		return array_merge( (array) $ret, (array) $hash );
 	}
 
-	public function read()
+	public function get()
 	{
 		if( is_null( $this->file ) )
 		{
@@ -307,7 +307,7 @@ class Library
 	{
 		if(is_null($this->file))
 		{
-			$this->read();
+			$this->get();
 			//throw new LibraryException(__('tapioca.no_file_selected'));
 		}
 		
@@ -582,7 +582,7 @@ class Library
 		if(!is_null($this->filename) && $update)
 		{
 			// get previous file's data
-			$previous = $this->read();
+			$previous = $this->get();
 
 			// remove mongoID
 			unset($previous['_id']);
