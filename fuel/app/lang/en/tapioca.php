@@ -80,7 +80,11 @@ return array(
 	/** UI Texts **/
 	'ui' => array(
 		'user_account' => 'Account',
-		'user_logout' => 'Logout'
+		'user_logout' => 'Logout',
+		'label' => array(
+			'submit' => 'Submit',
+			'cancel' => 'Cancel'
+		)
 	),
 
 	'doc_status' => array(
