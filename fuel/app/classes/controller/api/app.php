@@ -42,7 +42,9 @@ class Controller_Api_App extends Controller_Api
 			}
 			else
 			{
-				static::$data   = App::getAll();
+				$set = Input::get('set', null);
+
+				static::$data   = App::getAll( $set );
 				static::$status = 200;
 			}
 		}

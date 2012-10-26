@@ -133,9 +133,14 @@ class App
 		}
 	}
 
-	public static function getAll()
+	public static function getAll( $set = null)
 	{
-		$apps = static::$db->hash(static::$dbCollectionName, true);
+		if( !is_null( $set ))
+		{
+			static::$db->where_in( 'slug', explode(';', $set) );
+		}
+
+		$apps = static::$db->hash( static::$dbCollectionName, true );
 
 		return $apps;
 	}
