@@ -49,12 +49,7 @@ class Controller_Api_User extends Controller_Api
 	{
 		if( static::$granted && !static::$userId && static::isAdmin() )
 		{
-			// fixtures
-			$fields = array(
-				'email'    => 'jc@jcs.com',
-				'password' => '2bNE75',
-				'name'     => 'JC',
-			);
+			$fields = Input::json(null, false);
 
 			try
 			{
@@ -87,12 +82,7 @@ class Controller_Api_User extends Controller_Api
 		{
 			try
 			{
-				// fixtures
-				$fields  = array(
-					'email'    => 'jcs@jcs.com',
-					'password' => '3cD45A',
-					'name'     => 'JC',
-					);
+				$fields = Input::json(null, false);
 
 				$user   = Tapioca::user( static::$userId );
 				$action = $user->update( $fields );
