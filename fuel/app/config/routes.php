@@ -1,13 +1,16 @@
 <?php
 return array(
-	'_root_'     => 'app/index',   // The default route
+	'_root_'     => 'welcome/index',   // The default route
 	'_404_'      => 'welcome/404', // The main 404 route
 
 	// FRONT	
-	'app/(:any)' => 'app/index',
-	'app'        => 'app/index',
+	'app/(:any)' => 'welcome/index',
+	'app'        => 'welcome/index',
 
 	// API REST 
+
+		// void
+	'api/void'                                      => array('api/void',                'name' => 'api_void'),
 
 		// log
 	'api/log/out'                                   => array('api/log/out',             'name' => 'api_log_out'),

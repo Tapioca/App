@@ -4,6 +4,11 @@
 
 class Controller_Api_Void extends Controller_Rest
 {
+	public function before()
+	{
+		parent::before();
+	}
+
 	public function get_index()
 	{
 		return;
