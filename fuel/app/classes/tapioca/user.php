@@ -130,6 +130,8 @@ class User
 		unset( $this->user['status'] );
 		unset( $this->user['remember_me'] );
 		unset( $this->user['password_reset_hash'] );
+		
+		$this->user['avatar'] = \Gravy::from_email( $this->user['email'], 37, 'g', null, true);
 	}
 
 
@@ -296,6 +298,11 @@ class User
 		$users = static::$db
 					->select( array('id', 'email', 'name', 'apps', 'admin', 'activated', 'status', 'register', 'updated', 'last_login') )
 					->hash(static::$dbCollectionName, true);
+
+		foreach( $users->results as &$user )
+		{
+			$user['avatar'] = \Gravy::from_email( $user['email'], 37, 'g', null, true);
+		}
 
 		return $users;
 	}
