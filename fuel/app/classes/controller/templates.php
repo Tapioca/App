@@ -10,6 +10,9 @@ class Controller_Templates extends Controller
 {
 	public function action_index()
 	{
+		// Load Tapioca language file
+		Tapioca::base();
+		
 		$path    = APPPATH.'views/tpl';		
 		$files	 = File::read_dir($path);
 		$arr	 = static::parse( $files, $path );
