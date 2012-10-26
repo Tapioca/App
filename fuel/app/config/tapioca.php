@@ -2,6 +2,11 @@
 
 return array(
 
+	'date' => array(
+		'timezone' => 'Europe/Paris',
+		'format'   => '%d/%m/%G'
+	),
+
 	/*
 	 * Collections Names
 	 */

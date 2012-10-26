@@ -1,10 +1,6 @@
 <?php
 
 /**
- * The Welcome Controller.
- *
- * A basic controller example.  Has examples of how to set the
- * response body and status.
  * 
  * @package  app
  * @extends  Controller
@@ -12,37 +8,53 @@
 class Controller_Welcome extends Controller
 {
 
-	/**
-	 * The basic welcome message
-	 * 
-	 * @access  public
-	 * @return  Response
-	 */
-	public function action_index()
-	{
-		return Response::forge(View::forge('welcome/index'));
-	}
+    /**
+     * App index
+     * 
+     * @access  public
+     * @return  Response
+     */
+    public function action_index()
+    {
+        // load Tapioca config
+        Tapioca::base();
 
-	/**
-	 * A typical "Hello, Bob!" type example.  This uses a ViewModel to
-	 * show how to use them.
-	 * 
-	 * @access  public
-	 * @return  Response
-	 */
-	public function action_hello()
-	{
-		return Response::forge(ViewModel::forge('welcome/hello'));
-	}
+        $timezone = Config::get('tapioca.date.timezone');
 
-	/**
-	 * The 404 action for the application.
-	 * 
-	 * @access  public
-	 * @return  Response
-	 */
-	public function action_404()
-	{
-		return Response::forge(ViewModel::forge('welcome/404'), 404);
-	}
+        date_default_timezone_set( $timezone );
+        // OR
+        // Date::display_timezone( $timezone );
+
+        $host   = parse_url( Uri::base() );
+        $domain = $host['scheme'].'://'.$host['host'];
+
+        if(!empty($host['port']))
+        {
+            $domain .= ':'.$host['port'];
+        }
+        
+        $domain .= '/';
+
+        $settings = array(
+            'host'      => $domain,
+            'rootUrl'   => Uri::base(),
+            'bbRootUrl' => str_replace($domain, '', Uri::base()),
+            'apiUrl'    => Uri::create('api/'),
+            'appUrl'    => Uri::create('app')
+        );
+
+
+        return View::forge('templates/front', array('settings' => $settings ) );
+    }
+    
+    /**
+     * The 404 action for the application.
+     * 
+     * @access  public
+     * @return  Response
+     */
+    public function action_404()
+    {
+        return Response::forge(ViewModel::forge('templates/404'), 404);
+    }
 }
