@@ -75,6 +75,7 @@ return array(
     'internal_server_error'        => 'Internal Server Error',
     'no_valid_token'               => 'Not valid token for delete',
     'token_expire'                 => 'token has expired',
+    'permissions_denied'           => 'Permission denied to :capability',
     
 
     'doc_status' => array(

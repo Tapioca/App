@@ -2,220 +2,421 @@
 
 return array(
 
-	'date' => array(
-		'timezone' => 'Europe/Paris',
-		'format'   => '%d/%m/%G'
-	),
-
-	/*
-	 * Collections Names
-	 */
-	'collections' => array(
-		'users'           => 'users',
-		'apps'            => 'apps',
-		'users_suspended' => 'users_suspended',
-		'collections'     => 'collections',
-		'documents'       => 'documents',
-		'files'           => 'files',
-		'delete'          => 'delete',
-		'preview'         => 'preview',
-	),
-
-	/*
-	 * Session keys
-	 */
-	'session' => array(
-		'user'     => 'tapioca_user',
-		'provider' => 'tapioca_provider',
-	),
-
-	/*
-	 * Delete token
-	 */
-
-	'deleteToken' => 600, // 10 minutes
-	
-	/*
-	 * Remember Me settings
-	 */
-	'remember_me' => array(
-
-		/**
-		 * Cookie name credentials are stored in
-		 */
-		'cookie_name' => 'tapioca_rm',
-
-		/**
-		 * How long the cookie should last. (seconds)
-		 */
-		'expire' => 1209600, // 2 weeks
-	),
-
-	/**
-	 * Limit Number of Failed Attempts
-	 * Suspends a login/ip combo after a # of failed attempts for a set amount of time
-	 */
-	'limit' => array(
-
-		/**
-		 * enable limit - true/false
-		 */
-		'enabled' => true,
-
-		/**
-		 * number of attempts before suspensions
-		 */
-		'attempts' => 3,
-
-		/**
-		 * suspension length - minutes
-		 */
-		'time' => 3,
-	),
-
-	/*
-	 * Locales
-	 */
-	'locales' => array(
-		'default' => array(
-			'key'     => 'fr_FR',
-			'label'   => 'français / France',
-			'default' => true
-		)
+    'date' => array(
+        'timezone' => 'Europe/Paris',
+        'format'   => '%d/%m/%G'
     ),
 
-	/*
-	 * Default documents/collections status
-	 */
-	'status' => array(
-		array(
-			-2,
-			'not_translated',
-			'label-warning'
-		),
-		array(
-			-1,
-			'out_of_date',
-			''
-		),
-		array(
-			0,
-			'offline',
-			'label-important'
-		),
-		array(
-			1,
-			'draft',
-			'label-info'
-		),
-		array(
-			100,
-			'published',
-			'label-success'
-		)
-	),
+    /*
+     * Collections Names
+     */
+    'collections' => array(
+        'users'           => 'users',
+        'apps'            => 'apps',
+        'users_suspended' => 'users_suspended',
+        'collections'     => 'collections',
+        'documents'       => 'documents',
+        'files'           => 'files',
+        'delete'          => 'delete',
+        'preview'         => 'preview',
+    ),
 
-	/*
-	 * required fileds
-	 */
-	'validation' => array(
-		'collection' => array(
-			'summary' => array(
-				'namespace',
-				'name',
-				'status'
-			),
-			'data' => array(
-				'schema'
-			)
-		)
-	),
+    /*
+     * Session keys
+     */
+    'session' => array(
+        'user'     => 'tapioca_user',
+        'provider' => 'tapioca_provider',
+    ),
 
-	'collection' => array(
-		'dispatch' => array(
-			'summary' => array(
-				'namespace',
-				'name',
-				'desc',
-				'status',
-				'preview', 
-				'digest'
-			),
-			'data' => array(
-				'schema', 
-				'digest',
-				'dependencies',
-				'indexes',
-				'callback',
-				'template'
-			)
-		)
-	),
+    /*
+     * Delete token
+     */
 
-	/*
-	 * Cast
-	 * fields type that needs to cast for mongodb
-	 */
+    'deleteToken' => 600, // 10 minutes
+    
+    /*
+     * Remember Me settings
+     */
+    'remember_me' => array(
 
-	'cast' => array(
-		'date',
-		'number'
-	),
+        /**
+         * Cookie name credentials are stored in
+         */
+        'cookie_name' => 'tapioca_rm',
 
-	/*
-	 * Upload
-	 */
+        /**
+         * How long the cookie should last. (seconds)
+         */
+        'expire' => 1209600, // 2 weeks
+    ),
 
-	'upload' => array(
-		'path'                => APPPATH.'tmp',
-		'storage'             => DOCROOT.'files'.DIRECTORY_SEPARATOR,
-		'public'              => Config::get('base_url').'files'.DIRECTORY_SEPARATOR,
-		'field'               => 'tappfile',
-		'randomize'           => true,
-		'fileinfo_magic_path' => '',
-		'ext_whitelist'	      => array('jpg', 'jpeg', 'gif', 'png', 'flv', 'mp4', 'ogv', 'doc', 'pdf', 'zip')
-	),
+    /**
+     * Limit Number of Failed Attempts
+     * Suspends a login/ip combo after a # of failed attempts for a set amount of time
+     */
+    'limit' => array(
 
-	/*
-	 * File by minetype
-	 */
+        /**
+         * enable limit - true/false
+         */
+        'enabled' => true,
 
-	'file_types' => array(
-		'image' => array(
-			'image/bmp', 
-			'image/x-windows-bmp',
-			'image/gif',
-			'image/jpeg',
-			'image/pjpeg',
-			'image/png',
-			'image/x-png',
-			'image/tiff',	
-		),
-		'video' => array(
-			'video/mpeg',
-			'video/mp4',
-			'application/ogg',
-			'video/x-flv',
-			'video/quicktime',
-			'video/x-msvideo',
-			'video/x-sgi-movie',
-			'video/vnd.rn-realvideo' // LOL
-		),
-		'document' => array(
-			'application/pdf',
-			'application/msword',
-			'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-			'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-			'application/msword',
-			'application/excel',
-			'application/vnd.ms-excel',
-			'application/msexcel',
-			'application/powerpoint',
-			'application/vnd.ms-powerpoint',
-			'text/richtext',
-			'text/rtf'
-		)
+        /**
+         * number of attempts before suspensions
+         */
+        'attempts' => 3,
 
-	)
+        /**
+         * suspension length - minutes
+         */
+        'time' => 3,
+    ),
+
+    /*
+     * Locales
+     */
+    'locales' => array(
+        'default' => array(
+            'key'     => 'fr_FR',
+            'label'   => 'français / France',
+            'default' => true
+        )
+    ),
+
+    /*
+     * Default documents/collections status
+     */
+    'status' => array(
+        array(
+            -2,
+            'not_translated',
+            'label-warning'
+        ),
+        array(
+            -1,
+            'out_of_date',
+            ''
+        ),
+        array(
+            0,
+            'offline',
+            'label-important'
+        ),
+        array(
+            1,
+            'draft',
+            'label-info'
+        ),
+        array(
+            100,
+            'published',
+            'label-success'
+        )
+    ),
+
+    /*
+     * required fileds
+     */
+    'validation' => array(
+        'collection' => array(
+            'summary' => array(
+                'namespace',
+                'name',
+                'status'
+            ),
+            'data' => array(
+                'schema'
+            )
+        )
+    ),
+
+    'collection' => array(
+        'dispatch' => array(
+            'summary' => array(
+                'namespace',
+                'name',
+                'desc',
+                'status',
+                'preview', 
+                'digest'
+            ),
+            'data' => array(
+                'schema', 
+                'digest',
+                'dependencies',
+                'indexes',
+                'callback',
+                'template'
+            )
+        )
+    ),
+
+    /*
+     * Cast
+     * fields type that needs to cast for mongodb
+     */
+
+    'cast' => array(
+        'date',
+        'number'
+    ),
+
+    /*
+     * Upload
+     */
+
+    'upload' => array(
+        'path'                => APPPATH.'tmp',
+        'storage'             => DOCROOT.'files'.DIRECTORY_SEPARATOR,
+        'public'              => Config::get('base_url').'files'.DIRECTORY_SEPARATOR,
+        'field'               => 'tappfile',
+        'randomize'           => true,
+        'fileinfo_magic_path' => '',
+        'ext_whitelist'       => array('jpg', 'jpeg', 'gif', 'png', 'flv', 'mp4', 'ogv', 'doc', 'pdf', 'zip')
+    ),
+
+    /*
+     * File by minetype
+     */
+
+    'file_types' => array(
+        'image' => array(
+            'image/bmp', 
+            'image/x-windows-bmp',
+            'image/gif',
+            'image/jpeg',
+            'image/pjpeg',
+            'image/png',
+            'image/x-png',
+            'image/tiff',   
+        ),
+        'video' => array(
+            'video/mpeg',
+            'video/mp4',
+            'application/ogg',
+            'video/x-flv',
+            'video/quicktime',
+            'video/x-msvideo',
+            'video/x-sgi-movie',
+            'video/vnd.rn-realvideo' // LOL
+        ),
+        'document' => array(
+            'application/pdf',
+            'application/msword',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'application/msword',
+            'application/excel',
+            'application/vnd.ms-excel',
+            'application/msexcel',
+            'application/powerpoint',
+            'application/vnd.ms-powerpoint',
+            'text/richtext',
+            'text/rtf'
+        )
+
+    ),
+
+    /*
+     * Capabilities and Roles
+     * wordpress inspired permissions
+     */
+
+    'capabilities' => array(
+        // instance admin capabilities
+        'list_users',
+        'create_users',
+        'edit_users',
+        'delete_users',
+        'disable_users',
+        'promote_users',
+        'read_users',
+
+        'list_apps',
+        'create_apps',
+        'delete_apps',
+        'disable_apps',
+
+        'manage_settings',
+        'update_core',
+
+        'export',
+        'import',
+
+        // app specific capabilities
+        'app_edit_settings',
+
+        'app_invite_users',
+        'app_remove_users',
+        'app_promote_users',
+
+        'app_list_collections',
+        'app_create_collections',
+        'app_delete_collections',
+        'app_empty_collections',
+        'app_edit_collections',
+        'app_edit_published_collections',
+        'app_publish_collections',
+
+        'app_list_documents',
+        'app_read_documents',
+        'app_create_documents',
+        'app_edit_documents',
+        'app_publish_documents',
+        'app_delete_documents',
+        'app_delete_published_documents',
+
+        'app_edit_others_documents',
+        'app_publish_others_documents',
+        'app_delete_others_documents',
+        'app_delete_others_published_documents',
+
+        'list_files',
+        'upload_files',
+        'delete_files',
+        'edit_files',
+        'delete_others_files',
+        'edit_others_files',
+
+    ),
+
+    'roles' => array(
+        'master',
+        'super_admin',
+        'admin',
+        'editor',
+        'author',
+        'guest'
+    ),
+
+    'default_premissions' => array(
+        'master' => '*',
+        'super_admin' => array(
+            'list_users',
+            'read_users',
+            'create_users',
+            'delete_users',
+            'disable_users',
+            'promote_users',
+            'read_users',
+
+            'list_apps',
+            'read_apps',
+            'create_apps',
+            'edit_apps',
+            'delete_apps',
+            'disable_apps',
+        ),
+        'admin' => array(
+            'list_users',
+            'read_users',
+
+            'list_apps',
+            'read_apps',
+
+            'app_edit_settings',
+
+            'app_invite_users',
+            'app_remove_users',
+            'app_promote_users',
+
+            'app_list_collections',
+            'app_create_collections',
+            'app_delete_collections',
+            'app_empty_collections',
+            'app_edit_collections',
+            'app_edit_published_collections',
+            'app_publish_collections',
+
+            'app_list_documents',
+            'app_read_documents',
+            'app_create_documents',
+            'app_edit_documents',
+            'app_publish_documents',
+            'app_delete_documents',
+            'app_delete_published_documents',
+
+            'app_edit_others_documents',
+            'app_publish_others_documents',
+            'app_delete_others_documents',
+            'app_delete_others_published_documents',
+
+            'list_files',
+            'upload_files',
+            'delete_files',
+            'edit_files',
+            'delete_others_files',
+            'edit_others_files',
+        ),
+        'editor' => array(
+            'list_users',
+            'read_users',
+
+            'list_apps',
+            'read_apps',
+
+            'app_list_collections',
+            'app_create_collections',
+            'app_delete_collections',
+            'app_empty_collections',
+            'app_edit_collections',
+            'app_edit_published_collections',
+            'app_publish_collections',
+
+            'app_list_documents',
+            'app_read_documents',
+            'app_create_documents',
+            'app_edit_documents',
+            'app_publish_documents',
+            'app_delete_documents',
+            'app_delete_published_documents',
+
+            'app_edit_others_documents',
+            'app_publish_others_documents',
+            'app_delete_others_documents',
+            'app_delete_others_published_documents',
+
+            'list_files',
+            'upload_files',
+            'delete_files',
+            'edit_files',
+            'delete_others_files',
+            'edit_others_files',
+        ),
+        'author' => array(
+            'list_users',
+            'read_users',
+
+            'list_apps',
+            'read_apps',
+
+            'app_list_collections',
+        
+            'app_list_documents',
+            'app_read_documents',
+            'app_create_documents',
+            'app_edit_documents',
+
+            'list_files',
+            'upload_files',
+            'delete_files',
+            'edit_files',
+            'edit_others_files',
+        ),
+        'guest' => array(
+            'list_users',
+            'read_users',
+
+            'list_apps',
+            'read_apps',
+
+            'app_list_collections',
+        
+            'app_list_documents',
+            'app_read_documents',
+            'list_files',
+        )
+    )
 
 );

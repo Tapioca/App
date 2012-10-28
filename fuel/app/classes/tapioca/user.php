@@ -132,6 +132,7 @@ class User
 		unset( $this->user['password_reset_hash'] );
 		
 		$this->user['avatar'] = \Gravy::from_email( $this->user['email'], 100, 'g', null, true);
+		$this->user['admin']  = (bool) $this->user['admin'];
 	}
 
 
@@ -615,7 +616,7 @@ class User
 	/**
 	 * Adds this user to the app.
 	 *
-	 * @param   string  App ID
+	 * @param   string  App slug
 	 * @return  bool
 	 * @throws  UserException
 	 */
@@ -661,29 +662,20 @@ class User
 	/**
 	 * Removes this user from the app.
 	 *
-	 * @param   string app ID
+	 * @param   object App instance
 	 * @return  bool
 	 * @throws  UserException
 	 */
-	public function remove_from_app($id)
+	public function remove_from_app( $appslug, $appName )
 	{
-		if ( ! $this->in_app($id))
+		if ( ! $this->in_app( $appslug ) )
 		{
-			throw new \UserException( __('tapioca.user_not_in_app') );
+			throw new \UserException( 
+				__('tapioca.user_not_in_app', array('app' => $appName ) ) 
+			);
 		}
 
-		try
-		{
-			$app = new App($id);
-		}
-		catch (AppNotFoundException $e)
-		{
-			throw new \UserException( $e->getMessage() );
-		}
-
-		$query = (is_array($id)) ? $id : array('id' => $id);
-
-		$update = array('$pull' => array('apps' => $query));
+		$update = array('$pull' => array('apps' => array('slug' => $appslug) ));
 
 		$where = array('_id' => $this->user['_id']);
 
@@ -693,14 +685,11 @@ class User
 
 		if($remove)
 		{
-			$val = current($query);
-			$key = key($query);
-
-			foreach ($this->apps as $app)
+			foreach ($this->apps as $key => $app)
 			{
-				if ($app[$key] == $val)
+				if ($app['slug'] == $appslug)
 				{
-					unset($app);
+					unset( $this->apps[ $key ] );
 				}
 			}
 
@@ -713,18 +702,14 @@ class User
 	/**
 	 * Checks if the current user is part of the given app.
 	 *
-	 * @param   string|array  app ID or specific filed
+	 * @param   string app ID
 	 * @return  bool
 	 */
-	public function in_app($query)
+	public function in_app( $appslug )
 	{
-		$query = (is_array($query)) ? $query : array('id' => $query);
-		$val   = current($query);
-		$key   = key($query);
-
 		foreach ($this->apps as $app)
 		{
-			if ($app[$key] == $val)
+			if ($app['slug'] == $appslug)
 			{
 				return true;
 			}

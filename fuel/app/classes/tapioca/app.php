@@ -341,7 +341,14 @@ class App
 
 		foreach ($this->team as $team)
 		{
-			Tapioca::user( $team['id'] )->remove_from_app( $this->get('id') );
+			try
+			{
+				Tapioca::user( $team['id'] )->remove_from_app( $this->get('slug'), $this->get('name') );
+			}
+			catch( UserException $e )
+			{
+				throw new \AppException( $e->getMessage() );
+			}
 		}
 
 		$delete_app = static::$db

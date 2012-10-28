@@ -1,7 +1,18 @@
 <?php
 
-class Controller_Api_Log extends Controller_Api
+class Controller_Api_Log extends Controller_Rest
 {
+	protected static $data    = array('message' => 'Method Not Implemented');
+	protected static $status  = 501;
+
+	public function before()
+	{
+		parent::before();
+		
+		// set default format
+		$this->format = 'json';
+	}
+
 	public function get_out()
 	{
 		// log the user out
@@ -51,7 +62,8 @@ class Controller_Api_Log extends Controller_Api
 			{
 				// issue logging in via Tapioca - lets catch the sentry error thrown
 				// store/set and display caught exceptions such as a suspended user with limit attempts feature.
-				static::error( $e->getMessage());
+				static::$data   = array('message' => $e->getMessage() );
+				static::$status = 401;
 			}
 		}
 		else
@@ -65,7 +77,16 @@ class Controller_Api_Log extends Controller_Api
 				$msg[$key] = $error->get_message();
 			}
 
-			static::error( array('message' => 'Access not allowed', 'errors' => $msg) );
+			static::$data   = array('message' => 'Access not allowed', 'errors' => $msg);
+			static::$status = 401;
 		}
+	}
+
+	public function after( $response )
+	{
+		$this->response->set_header('Content-Type', 'application/json; charset=UTF-8');
+		$this->response(static::$data, static::$status);
+
+		return $this->response;
 	}
 }

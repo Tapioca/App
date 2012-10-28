@@ -14,11 +14,14 @@ class Controller_Api extends Controller_Rest
 	{
 		parent::before();
 
+		Config::load('rest', true);
+
 		self::$apiKey = Input::get('apikey', false);
 		self::$token  = Input::get('token', false);
 
 		if ( !Tapioca::check() && !static::$apiKey )
 		{
+			Config::set('rest.auth', 'locked');
 			self::restricted();
 		}
 		else
@@ -30,7 +33,7 @@ class Controller_Api extends Controller_Rest
 			}
 			catch ( UserException $e )
 			{
-				self::$granted = false;
+				Config::set('rest.auth', 'locked');
 				self::error( $e->getMessage() );
 			}
 		} // Auth
@@ -82,6 +85,8 @@ class Controller_Api extends Controller_Rest
 
 	protected static function restricted()
 	{
+		Config::set('rest.auth', 'locked');
+
 		self::$granted = false;
 		self::$status  = 401;
 		self::$data    = array(
@@ -99,6 +104,8 @@ class Controller_Api extends Controller_Rest
 
 	protected static function error( $message, $status = 501, $debug = null )
 	{
+		Config::set('rest.auth', 'locked');
+		
 		if( !is_array( $message ) )
 		{
 			$message = array('error' => $message);

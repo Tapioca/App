@@ -38,9 +38,9 @@ return array(
 	'api/:appslug/library'                          => array('api/library',             'name' => 'api_library'),
 
 		// app
-	'api/app'                                       => array('api/app',                 'name' => 'api_app_list'),
+	'api/app'                                       => array('api/app',                 'name' => 'api_app'),
 	'api/:appslug/admin/:userid'                    => array('api/app/admin',           'name' => 'api_app_admin'),
 	'api/:appslug/user/:userid'                     => array('api/app/user',            'name' => 'api_app_user'),
-	'api/:appslug'                                  => array('api/app',                 'name' => 'api_app'),
+	'api/:appslug'                                  => array('api/app/defined',         'name' => 'api_app_defined'),
 
 );

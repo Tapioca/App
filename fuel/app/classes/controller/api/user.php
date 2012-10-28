@@ -10,44 +10,58 @@ class Controller_Api_User extends Controller_Api
         parent::before();
 
         static::$userId = $this->param('userid', false);
+
+        Permissions::set( static::$user );
     }
 
     public function get_index()
     {
-        if( static::$granted )
+        try
         {
-            if( static::$userId )
-            {
-                try
-                {
-                    static::$data   = Tapioca::user( static::$userId )->get();
-                    static::$status = 200;
-                }
-                catch ( AuthException $e )
-                {
-                    // catch errors such as user doesn't exists
-                    static::error( $e->getMessage() );
-                }
+            $ask = ( static::$userId ) ? 'read_users' : 'list_users';
 
-            }
-            else
+            Permissions::isGranted( $ask );
+        }
+        catch( PermissionsException $e)
+        {
+            static::error( $e->getMessage() , 500 );
+            return;
+        }
+
+        if( static::$userId )
+        {
+            try
             {
-                if( static::isAdmin() )
-                {
-                    static::$data   = User::getAll();
-                    static::$status = 200;
-                }
-                else
-                {
-                    static::restricted();
-                }
+                static::$data   = Tapioca::user( static::$userId )->get();
+                static::$status = 200;
             }
+            catch ( AuthException $e )
+            {
+                // catch errors such as user doesn't exists
+                static::error( $e->getMessage() );
+            }
+
+        }
+        else
+        {
+            static::$data   = User::getAll();
+            static::$status = 200;
         }
     }
 
     public function post_index()
     {
-        if( static::$granted && !static::$userId && static::isAdmin() )
+        try
+        {
+            Permissions::isGranted( 'create_users' );
+        }
+        catch( PermissionsException $e)
+        {
+            static::error( $e->getMessage() , 500 );
+            return;
+        }
+
+        if( !static::$userId )
         {
             $fields = Input::json(null, false);
             
@@ -78,62 +92,81 @@ class Controller_Api_User extends Controller_Api
 
     public function put_index()
     {
-        if( static::$granted && static::isAdmin() && static::$userId )
+        try
         {
-            try
-            {
-                $fields = Input::json(null, false);
+            Permissions::isGranted( 'edit_users' );
+        }
+        catch( PermissionsException $e)
+        {
+            static::error( $e->getMessage() , 500 );
+            return;
+        }
 
-                $user   = Tapioca::user( static::$userId );
-                $action = $user->update( $fields );
+        try
+        {
+            $fields = Input::json(null, false);
 
-                if( $action )
-                {
-                    static::$data   = $user->get();
-                    static::$status = 200;                  
-                }
-                else
-                {
-                    static::error( __('tapioca.internal_server_error'), 500 );
-                }
-            }
-            catch (UserException $e)
+            $user   = Tapioca::user( static::$userId );
+            $action = $user->update( $fields );
+
+            if( $action )
             {
-                // catch errors such as user doesn't exists
-                static::error( $e->getMessage() );
+                static::$data   = $user->get();
+                static::$status = 200;                  
             }
+            else
+            {
+                static::error( __('tapioca.internal_server_error'), 500 );
+            }
+        }
+        catch (UserException $e)
+        {
+            // catch errors such as user doesn't exists
+            static::error( $e->getMessage() );
         }
     }
 
     public function delete_index()
     {
-        if( static::$granted && static::isAdmin() && static::$userId )
+        try
         {
-            if( ! static::deleteToken( 'user', static::$userId ))
+            Permissions::isGranted( 'delete_users' );
+        }
+        catch( PermissionsException $e)
+        {
+            static::error( $e->getMessage() , 500 );
+            return;
+        }
+
+        if( !static::$userId )
+        {
+            return;
+        }
+
+        if( ! static::deleteToken( 'user', static::$userId ))
+        {
+            return;
+        }
+
+        try
+        {
+            $action = Tapioca::user( static::$userId )->delete();
+
+            if( $action )
             {
-                return;
+                static::$data   = array('message' => __('tapioca.user_deleted') );
+                static::$status = 200;
+            }
+            else
+            {
+                static::error( __('tapioca.internal_server_error'), 500 );
             }
 
-            try
-            {
-                $action = Tapioca::user( static::$userId )->delete();
-
-                if( $action )
-                {
-                    static::$data   = array('message' => __('tapioca.user_deleted') );
-                    static::$status = 200;
-                }
-                else
-                {
-                    static::error( __('tapioca.internal_server_error'), 500 );
-                }
-
-            }
-            catch (UserException $e)
-            {
-                // catch errors such as user doesn't exists
-                static::error( $e->getMessage() );
-            }
+        }
+        catch (UserException $e)
+        {
+            // catch errors such as user doesn't exists
+            static::error( $e->getMessage() );
         }
     }
 }
