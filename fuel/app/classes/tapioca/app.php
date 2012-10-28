@@ -387,13 +387,13 @@ class App
 	 * @param   string user ID
 	 * @return  bool
 	 */
-	public function in_app($id)
+	public function in_app($id, $strict = false)
 	{
 		foreach ($this->team as $team)
 		{
 			if ($team['id'] == $id)
 			{
-				return true;
+				return ( $strict ? true : ( $team['role'] != '_REVOKED_ACCESS_' ) );
 			}
 		}
 
@@ -404,11 +404,11 @@ class App
 	 * Adds auser user to the app.
 	 *
 	 * @param   string User ID 
-	 * @param   array  User's level right in app
+	 * @param   string  User role in app
 	 * @return  bool
 	 * @throws  AppException
 	 */
-	public function add_to_app($userId, $level = 0)
+	public function add_to_app($userId, $role = null)
 	{
 		if ($this->in_app($userId))
 		{
@@ -426,23 +426,37 @@ class App
 			throw new \AppException($e->getMessage());
 		}
 
-		$user_info = array(
-				'id'       => $userId,
-				'level'    => $level,
-			);
+		$roles = Config::get('tapioca.roles');
 
-		$update = array('$push' => array('team' => $user_info));
+		if( is_null( $role ) || !in_array($role, $roles))
+		{
+			$role  = end($roles);
+		}
 
-		$where = array('_id' => $this->app['_id']);
+		if ( $this->in_app($userId, true) )
+		{
+			$query = $this->user_role( $userId, $role );
+		}
+		else
+		{
+			$user_info = array(
+					'id'   => $userId,
+					'role' => $role,
+				);
 
-		$query = static::$db
-					->where($where)
-					->update(static::$dbCollectionName, $update, array(), true);
+			$update = array('$push' => array('team' => $user_info));			
+
+			$where = array('_id' => $this->app['_id']);
+
+			$query = static::$db
+						->where($where)
+						->update(static::$dbCollectionName, $update, array(), true);
+
+			$this->team[] = $user_info;
+		}
 
 		if($query)
 		{
-			$this->team[] = $user_info;
-
 			return true;
 		}
 
@@ -480,7 +494,7 @@ class App
 		{
 			if ($row['id'] == $userId)
 			{
-				$this->team[ $key ]['level'] = -1;
+				$this->team[ $key ]['role'] = '_REVOKED_ACCESS_';
 				break;
 			}
 		}
@@ -505,13 +519,13 @@ class App
 	 * Set user level
 	 *
 	 * @param   string User ID
-	 * @param   int    User level
+	 * @param   string User role
 	 * @return  bool
 	 * @throws  AppException
 	 */
-	public function user_level( $userId, $level )
+	public function user_role( $userId, $role = null )
 	{
-		if ( ! $this->in_app( $userId ))
+		if ( ! $this->in_app( $userId, true ))
 		{
 			throw new \AppException(
 				__('tapioca.user_not_in_app', array('app' => $this->get('name')))
@@ -527,11 +541,18 @@ class App
 			throw new \AppException($e->getMessage());
 		}
 
+		$roles = Config::get('tapioca.roles');
+
+		if( is_null( $role ) || !in_array($role, $roles))
+		{
+			$role  = end($roles);
+		}
+
 		foreach ($this->team as &$team)
 		{
 			if ($team['id'] == $userId)
 			{
-				$team['level'] = $level;
+				$team['role'] = $role;
 			}
 		}
 
@@ -561,9 +582,18 @@ class App
 	 */
 	public function is_admin( $userId )
 	{
-		$admins = $this->get('admins');
+		foreach ($this->team as $team)
+		{
+			if ($team['id'] == $userId)
+			{
+				return ($team['role'] == 'admin');
+			}
+		}
+		return false;
+
+		// $admins = $this->get('admins');
 		
-		return in_array($userId, $admins);
+		// return in_array($userId, $admins);
 	}
 
 	/**
@@ -600,12 +630,12 @@ class App
 		{
 			if($member['id'] == $userId)
 			{
-				$member['level'] = 100;
+				$member['role'] = 'admin';
 			}
 		}
 
 		$update = array(
-						'$addToSet' => array('admins' => $userId),
+						// '$addToSet' => array('admins' => $userId),
 						'$set' => array('team' => $this->team)
 					);
 
@@ -655,7 +685,18 @@ class App
 			throw new \AppException($e->getMessage());
 		}
 
-		$update = array('$pull' => array('admins' => $userId ));
+		foreach ($this->admins as $key => $row)
+		{
+			if ($row == $userId)
+			{
+				unset( $this->admins[ $key ] );
+			}
+		}
+
+		$update = array(
+			'$pull' => array('admins' => $userId ),
+			'$set'  => array('team' => $this->team)
+		);
 
 		$where = array('_id' => $this->app['_id']);
 
@@ -665,14 +706,6 @@ class App
 
 		if($query)
 		{
-			foreach ($this->admins as $key => $row)
-			{
-				if ($row == $userId)
-				{
-					unset( $this->admins[ $key ] );
-				}
-			}
-
 			return true;
 		}
 

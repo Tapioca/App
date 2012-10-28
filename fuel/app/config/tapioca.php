@@ -252,6 +252,7 @@ return array(
         'app_promote_users',
 
         'app_list_collections',
+        'app_read_collections',
         'app_create_collections',
         'app_delete_collections',
         'app_empty_collections',
@@ -287,7 +288,7 @@ return array(
         'admin',
         'editor',
         'author',
-        'guest'
+        'guest',
     ),
 
     'default_premissions' => array(
@@ -322,6 +323,7 @@ return array(
             'app_promote_users',
 
             'app_list_collections',
+            'app_read_collections',
             'app_create_collections',
             'app_delete_collections',
             'app_empty_collections',
@@ -357,6 +359,7 @@ return array(
             'read_apps',
 
             'app_list_collections',
+            'app_read_collections',
             'app_create_collections',
             'app_delete_collections',
             'app_empty_collections',
@@ -392,6 +395,7 @@ return array(
             'read_apps',
 
             'app_list_collections',
+            'app_read_collections',
         
             'app_list_documents',
             'app_read_documents',
@@ -412,9 +416,11 @@ return array(
             'read_apps',
 
             'app_list_collections',
+            'app_read_collections',
         
             'app_list_documents',
             'app_read_documents',
+            
             'list_files',
         )
     )
