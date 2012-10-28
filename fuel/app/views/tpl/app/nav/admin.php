@@ -7,7 +7,7 @@
                         <ul>
                             <li>
                                 <a href="<?= Uri::create('app/admin/app'); ?>">
-                                    <?= __('tapioca.ui.label.app_settings'); ?>
+                                    <?= __('tapioca.ui.label.app_apps'); ?>
                                 </a>
                             </li>
                             <li>

@@ -1,18 +1,34 @@
 $.Tapioca.Models.App = $.Tapioca.Models.Tapioca.extend(
 {
-    id: 'slug',
+    idAttribute: 'slug',
+    urlString: 'app',
     
-    urlString: function()
+    url: function()
     {
-        return this.get('slug');
+        var base = $.Tapioca.config.apiUrl + this.urlString;
+        if (this.isNew()) return base;
+
+        var base = $.Tapioca.config.apiUrl;
+        var url = base + (base.charAt(base.length - 1) == '/' ? '' : '/') + this.id;
+
+        if( this.deleteToken )
+        {
+            url += '?token=' + this.deleteToken.token;
+            
+            // reset deleteToken
+            this.deleteToken = false;
+        }
+
+        return url;
     },
 
     confirmDelete: function()
     {
-        var type = __('delete.app');
-        var text = $.Tapioca.I18n.get('delete.question', this.get('name'), type);
-        console.log( text )
-        console.log( this.deleteToken )
+        var type = __('delete.app'),
+            text = $.Tapioca.I18n.get('delete.question', this.get('name'), type),
+            self = this;
+
+        $.Tapioca.Dialog.open( _.bind( this.delete, this ), { text: text });
     },
 
     getDefaultLanguage: function()

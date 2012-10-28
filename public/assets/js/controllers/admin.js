@@ -6,6 +6,41 @@ $.Tapioca.Controllers.Admin = {
         $.Tapioca.view = new $.Tapioca.Views.AdminIndex().render();
     },
 
+    Apps: function()
+    {
+        $.Tapioca.view = new $.Tapioca.Views.AdminAppList({
+            collection: $.Tapioca.Apps
+        }).render();
+    },
+
+    App: function( _slug )
+    {
+        var isNew = false;
+
+        if( _slug != 'new' )
+        {
+            var app = $.Tapioca.Apps.get( _slug );
+
+            if( _.isUndefined( app ))
+            {
+                // TODO: 404
+                return;
+            }
+        }
+
+        if(_slug == 'new')
+        {
+            var app = new $.Tapioca.Models.App();
+
+            isNew   = true;
+        }
+
+        $.Tapioca.view = new $.Tapioca.Views.AdminAppEdit({
+            model: app,
+            isNew: isNew
+        }).render();
+    },
+
     Users: function()
     {
         $.Tapioca.view = new $.Tapioca.Views.AdminUserList({

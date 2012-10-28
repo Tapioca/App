@@ -18,8 +18,6 @@ $.Tapioca.I18n = (function()
 
 		if( args.length )
 		{
-			console.log(str)
-			console.log(args)
 			str = _.vsprintf( str, args );
 		}
 

@@ -65,7 +65,8 @@
             'app/admin'                             : 'admin',
             'app/admin/user'                        : 'adminUser',
             'app/admin/user/:uid'                   : 'adminUserEdit',
-            // 'app/admin/app/:uid'                    : 'adminApp',
+            'app/admin/app'                         : 'adminApp',
+            'app/admin/app/:slug'                   : 'adminAppEdit',
             // 'app/:appslug'                          : 'appHome',
             // 'app/:appslug/admin'                    : 'appAdmin',
             // 'app/:appslug/:namespace'               : 'appCollection',
@@ -84,11 +85,11 @@
         {
             $.Tapioca.Apps = new $.Tapioca.Collections.Apps();
 
-            $.Tapioca.Apps.fetch();
+            $.Tapioca.Apps.fetch({async: false});
 
             $.Tapioca.Users = new $.Tapioca.Collections.Users();
 
-            $.Tapioca.Users.fetch();
+            $.Tapioca.Users.fetch({async: false});
         }
 
         var apps   = $.Tapioca.Session.get('apps'),
