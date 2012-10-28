@@ -12,6 +12,10 @@
  */
 
 return array(
+
+	/**
+	 * Whether to minify files.
+	 */
 	'min' => false,
 
 	/**

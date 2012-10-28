@@ -22,10 +22,7 @@ class Controller_Api_User_Me extends Controller_Api
 		{
 			try
 			{
-				// fixtures
-				$fields  = array(
-					'name'     => 'Michael',
-					);
+				$fields = Input::json(null, false);
 
 				$user   = Tapioca::user();
 				$action = $user->update( $fields );

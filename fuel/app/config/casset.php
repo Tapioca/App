@@ -13,39 +13,147 @@
  */
 
 return array(
-	'groups' => array(
-		'css' => array(
-			'app' => array(
-				'files' => array(
-					'class.css',
-					'layout.css',
-					'font-awesome.css',
-					'bootstrap.css',
-					'bootstrap-overload.css',
-					'colorpicker.css',
-					'datepicker.css',
-					'redactor.css',
+    'paths' => array(
+        'core' => 'assets/',
+        'library' => array(
+            'path' => 'assets/lib/',
+            'js_dir' => '',
+        ),
+        'fuel' => array(
+            'path' => Config::get('base_url'),
+            'js_dir' => '',
+        ),
+    ),
 
-					'wtwui/Crit.css',
-					'wtwui/Dialog.css',
-					'wtwui/Overlay.css',
+    'groups' => array(
+        'css' => array(
+            'app' => array(
+                'files' => array(
+                    'class.css',
+                    'layout.css',
+                    'font-awesome.css',
+                    'bootstrap.css',
+                    'bootstrap-overload.css',
+                )
+            ),
+            'install' => array(
+                'files' => array(
+                    'bootstrap.css',
+                    'class.css',
+                    'install.css'
+                )
+            )
+        ),
+        'js' => array(
+            'app' => array(
+                'files' => array(
+                    'library::jquery/jquery-1.7.2.js',
+                    'library::jquery/jquery-ui-1.8.21.custom.min.js',
+                    'library::nanoscroller/jquery.nanoscroller.js',
+                    'library::bootstrap/bootstrap-button.js',
+                    'library::bootstrap/bootstrap-tooltip.js',
+                    'library::bootstrap/bootstrap-tab.js',
 
-					'jquery.fileupload-ui.css',
-				),
-				'combine' => true,
-				'enabled' => true,
-				'inline' => false
-			),
-			'install' => array(
-				'files' => array(
-					'bootstrap.css',
-					'class.css',
-					'install.css'
-				),
-				'combine' => true,
-				'enabled' => true,
-				'inline' => false
-			),
-		)
-	)
+                    'library::underscore/underscore.js',
+                    'library::underscore/underscore.string.js',
+                    'library::underscore/underscore.date.js',
+                    'library::underscore/underscore.fr.js',
+
+                    'library::backbone/backbone.js',
+                    'library::backbone/backbone-approuter.js',
+                    'library::backbone/backbone.routefilter.js',
+                    'library::backbone/backbone-appready.js',
+                    'library::backbone/backbone-relational.js',
+                    'library::backbone/backbone-nested.js',
+                    'library::backbone/backbone.queryparams.js',
+
+                    'library::handlebars/handlebars-1.0.rc.1.js',
+
+                    'library::fileupload/jquery.ui.widget.js',
+                    'library::fileupload/jquery.iframe-transport.js',
+                    'library::fileupload/jquery.fileupload.js',
+
+                    'tapioca.js',
+
+                    'modules/mediator.js',
+                    'modules/dialog.js',
+                    'modules/beforeUnload.js',
+                    // 'modules/padlock.js',
+                    'modules/i18n.js',
+                    
+                    'models/tapioca.js',
+                    'models/user.js',
+                    'models/session.js',
+                    'models/app.js',
+                    // 'models/collection.js',
+                    // 'models/abstract.js',
+                    // 'models/document.js',
+                    // 'models/library.js',
+
+                    'collections/users.js',
+                    'collections/apps.js',
+                    // 'collections/collections.js',
+                    // 'collections/abstracts.js',
+                    // 'collections/documents.js',
+                    // 'collections/libraries.js',
+                    
+                    'views/app.js',
+                    // 'views/app-nav.js',
+                    'views/app/nav/user-shortcuts.js',
+                    'views/app/nav/admin-nav.js',
+                    'views/content.js',
+                    'views/form-view.js',
+                    'views/login.js',
+                    'views/user-profile.js',
+                    'views/admin/index.js',
+                    'views/admin/user/list.js',
+                    'views/admin/user/list-row.js',
+                    'views/admin/user/edit.js',
+                    // 'views/admin-users.js',
+                    // 'views/admin-customers.js',
+                    // 'views/admin-projects.js',
+                    // 'views/user-profile.js',
+                    // 'views/project-manager.js',
+                    // 'views/project-manager-customer.js',
+                    // 'views/project-manager-description.js',
+                    // 'views/project-manager-rates.js',
+                    // 'views/project-manager-rates-row.js',
+                    // 'views/project-manager-tasks.js',
+                    // 'views/project-manager-tasks-row.js',
+                    // 'views/project-manager-allotment.js',
+                    // 'views/project-manager-allotment-row.js',
+                    // 'views/project-list.js',
+                    // 'views/overview.js',
+                    // 'views/overview-planning.js',
+                    // 'views/overview-planning-projects.js',
+                    // 'views/overview-planning-projects-entry.js',
+                    // 'views/overview-planing-calendar.js',
+                    // 'views/overview-projects.js',
+                    // 'views/overview-projects-row.js',
+                    // 'views/overview-projects-row-task.js',
+                    // 'views/calendar.js',
+
+                    'controllers/session.js',
+                    'controllers/admin.js',
+                    // 'controllers/project.js',
+                    // 'controllers/overview.js',
+                    // 'controllers/calendar.js',
+
+                    'components/form.js',
+                    // 'components/file-upload.js',
+                    // 'components/string.js',
+                    // 'components/date.js',
+                    // 'components/display.js',
+
+                    'router.js',
+
+                    'fuel::templates',
+                    'fuel::i18n'
+                )
+            )
+        )
+    ),
+    'combine' => true,
+    'enabled' => true,
+    'inline' => false
 );
