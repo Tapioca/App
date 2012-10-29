@@ -31,7 +31,7 @@ class Permissions
                 if( !$app->in_app( $userId ) )
                 {
                     throw new \PermissionsException(
-                         __('tapioca.user_not_in_app', array('app' => $app->get('name')))
+                        __('tapioca.user_not_in_app', array('app' => $app->get('name')))
                     );
                 }
 

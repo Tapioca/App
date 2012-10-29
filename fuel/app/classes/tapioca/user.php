@@ -132,7 +132,7 @@ class User
 		unset( $this->user['password_reset_hash'] );
 		
 		$this->user['avatar'] = \Gravy::from_email( $this->user['email'], 100, 'g', null, true);
-		$this->user['admin']  = (bool) $this->user['admin'];
+		// $this->user['admin']  = (bool) $this->user['admin'];
 	}
 
 
@@ -303,6 +303,7 @@ class User
 		foreach( $users->results as &$user )
 		{
 			$user['avatar'] = \Gravy::from_email( $user['email'], 100, 'g', null, true);
+			$user['admin']  = (bool) $user['admin'];
 		}
 
 		return $users;
@@ -426,6 +427,22 @@ class User
 		{
 			$update['status'] = $fields['status'];
 			unset($fields['status']);
+		}
+
+		if (array_key_exists('admin', $fields))
+		{
+			$roles = Config::get('tapioca.roles');
+
+			if( $this->user['admin'] === reset( $roles ) )
+			{
+				unset($fields['admin']);
+			}
+			else
+			{
+				$update['admin'] = ($fields['admin']) ? 'super_admin' : 0;
+
+				unset($fields['admin']);
+			}
 		}
 
 		$update = $update + $fields;

@@ -17,7 +17,6 @@ $.Tapioca.Views.AdminUserEdit = $.Tapioca.Views.FormView.extend(
         this.$el.appendTo('#app-content');
 
         var tpl  = Handlebars.compile( $.Tapioca.Tpl.admin.user.edit ),
-            self = this,
             html = tpl( this.model.toJSON() );
 
         this.html( html, 'app-form');

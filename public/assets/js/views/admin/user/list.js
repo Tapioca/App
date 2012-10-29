@@ -11,7 +11,14 @@ $.Tapioca.Views.AdminUserList = $.Tapioca.Views.Content.extend(
         
         this.$table = this.$el.find('tbody');
 
-        _.each( this.collection.models, this.display, this);
+        // do not display current user
+        var userId = $.Tapioca.Session.get('id'),
+            users  = _.filter( this.collection.models, function(user)
+            {
+                return (user.get('id') != userId)
+            }, this);
+
+        _.each( users, this.display, this);
 
         return this;
     },

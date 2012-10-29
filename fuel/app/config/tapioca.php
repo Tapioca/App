@@ -282,6 +282,7 @@ return array(
 
     ),
 
+    // order is important!!
     'roles' => array(
         'master',
         'super_admin',
@@ -295,17 +296,15 @@ return array(
         'master' => '*',
         'super_admin' => array(
             'list_users',
-            'read_users',
             'create_users',
+            'edit_users',
             'delete_users',
             'disable_users',
             'promote_users',
             'read_users',
 
             'list_apps',
-            'read_apps',
             'create_apps',
-            'edit_apps',
             'delete_apps',
             'disable_apps',
         ),

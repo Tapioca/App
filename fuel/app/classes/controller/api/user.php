@@ -102,10 +102,23 @@ class Controller_Api_User extends Controller_Api
             return;
         }
 
+        $fields = Input::json(null, false);
+
+        if( isset( $fields['admin'] ) )
+        {
+            try
+            {
+                Permissions::isGranted( 'promote_users' );
+            }
+            catch( PermissionsException $e)
+            {
+                static::error( $e->getMessage() , 500 );
+                return;
+            }   
+        }
+
         try
         {
-            $fields = Input::json(null, false);
-
             $user   = Tapioca::user( static::$userId );
             $action = $user->update( $fields );
 
