@@ -9,9 +9,6 @@
                             <a href="#users-form" data-toggle="tab" data-bypass="true"><?= __('tapioca.ui.label.edit_app_user'); ?></a>
                         </li>
                         <li>
-                            <a href="#admins-form" data-toggle="tab" data-bypass="true"><?= __('tapioca.ui.label.edit_app_admin'); ?></a>
-                        </li>
-                        <li>
                             <a href="#locales-form" data-toggle="tab" data-bypass="true"><?= __('tapioca.ui.label.edit_app_locale'); ?></a>
                         </li>
                     </ul>
@@ -40,18 +37,41 @@
                                     <input type="text" id="new-user">
                                 </div>
                             </div>
-                            <ul>
+
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th width="60"></th>
+                                        <th><?= __('tapioca.ui.label.user_name'); ?></th>
+                                        <th><?= __('tapioca.ui.label.user_role'); ?></th>
+                                        <th width="100"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
                                 {{#team}}
-                                <li>{{ name }} / {{ level }}</li>
+                                    <tr{{#disabled}} class="warning"{{/disabled}}>
+                                        <td>
+                                            <a href="<?= Uri::create('app/admin/user/'); ?>{{ id }}">
+                                                <img src="{{ avatar }}" alt="" width="50">
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <a href="<?= Uri::create('app/admin/user/'); ?>{{ id }}">
+                                                {{ name }}
+                                            </a>
+                                        </td>
+                                        <td>
+                                            {{{roleSelector ../slug id  ../operator}}}
+                                        </td>
+                                        <td>
+                                            <a href="javascript:;" class="btn btn-mini btn-danger btn-delete-trigger">
+                                                <i class="icon-trash"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
                                 {{/team}}
-                            </ul>
-                        </fieldset>
-                        <fieldset id="admins-form" class="tab-pane">
-                            <ul>
-                                {{#each admins}}
-                                <li>{{ name }}</li>
-                                {{/each}}
-                            </ul>
+                                </tbody>
+                            </table>
                         </fieldset>
                         <fieldset id="locales-form" class="tab-pane">
                             <ul>
@@ -70,5 +90,5 @@
                     <button type="reset" class="btn"><?= __('tapioca.ui.label.cancel'); ?></button>
                 </div><!-- /.form-actions -->
                 <div id="dialog-confirm" class="hide">
-                    <p><?= __('tapioca.ui.dialog.beforeunload'); ?></p>
+                    <p id="dialog-confirm-question"><?= __('tapioca.ui.dialog.beforeunload'); ?></p>
                 </div>

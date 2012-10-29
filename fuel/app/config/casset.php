@@ -53,6 +53,7 @@ return array(
                     'library::bootstrap/bootstrap-button.js',
                     'library::bootstrap/bootstrap-tooltip.js',
                     'library::bootstrap/bootstrap-tab.js',
+                    'library::bootstrap/bootstrap-dropdown.js',
 
                     'library::underscore/underscore.js',
                     'library::underscore/underscore.string.js',
@@ -113,7 +114,7 @@ return array(
                     // 'components/file-upload.js',
                     // 'components/string.js',
                     // 'components/date.js',
-                    // 'components/display.js',
+                    'components/display.js',
 
                     'router.js',
 

@@ -40,7 +40,8 @@ class Controller_Welcome extends Controller
             'rootUrl'   => Uri::base(),
             'bbRootUrl' => str_replace($domain, '', Uri::base()),
             'apiUrl'    => Uri::create('api/'),
-            'appUrl'    => Uri::create('app')
+            'appUrl'    => Uri::create('app'),
+            'roles'     => Config::get('tapioca.roles')
         );
 
 

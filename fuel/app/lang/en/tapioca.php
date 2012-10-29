@@ -102,6 +102,7 @@ return array(
             'user_name'        => 'Username',
             'user_email'       => 'Email',
             'user_status'      => 'Status',
+            'user_role'        => 'Role',
             'new_password'     => 'New password',
             'conf_password'    => 'Confirm',
             'send_password'    => 'Send password',
@@ -145,6 +146,15 @@ return array(
             'old_password'    => 'Old password',
             'new_password'    => 'New password',
             'conf_password'   => 'Confirm'
+        ),
+        'roles' => array(
+            'master'           => 'Instance Admin',
+            'super_admin'      => 'Super Admin',
+            'admin'            => 'App Admin',
+            'editor'           => 'Editor',
+            'author'           => 'Author',
+            'guest'            => 'Guest',
+            '_REVOKED_ACCESS_' => 'Revoked user',
         )
     ),
 );

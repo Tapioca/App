@@ -19,6 +19,7 @@ $.Tapioca.Views.AdminAppEdit = $.Tapioca.Views.FormView.extend(
 
         var model = this.model.toJSON();
 
+        model.operator  = $.Tapioca.Session.get('id');
         model.isNew     = this.isNew;
         model.pageTitle = ( this.isNew ) ?
                             __('label.add_app') :
@@ -29,25 +30,14 @@ $.Tapioca.Views.AdminAppEdit = $.Tapioca.Views.FormView.extend(
         {
             var userModel = $.Tapioca.Users.get( user.id );
 
-            user.name = userModel.get('name');
+            if( user.role == '_REVOKED_ACCESS_' )
+            {
+                user.disabled = true;
+            }
 
-        }, this);
-
-        // Admin users's name
-        var admins = model.admins;
-
-        model.admins = [];
-
-        _.each( admins, function( user )
-        {
-            var userModel = $.Tapioca.Users.get( user );
-
-            user = {
-                id: user,
-                name: userModel.get('name')
-            };
-
-            model.admins.push( user );
+            user.avatar      = userModel.get('avatar');
+            user.name        = userModel.get('name');
+            user.roleDisplay = __('roles.'+ user.role);
 
         }, this);
 
@@ -83,6 +73,8 @@ $.Tapioca.Views.AdminAppEdit = $.Tapioca.Views.FormView.extend(
                     // view.render();
                 }
             });
+
+        this.$el.find('.dropdown-toggle').dropdown();
 
         return this;
     },
