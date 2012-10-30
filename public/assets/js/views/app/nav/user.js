@@ -1,5 +1,5 @@
 
-$.Tapioca.Views.UserShortcuts = Backbone.View.extend({
+$.Tapioca.Views.NavUser = Backbone.View.extend({
 
     id: 'user-shortcuts',
     tagName: 'div',

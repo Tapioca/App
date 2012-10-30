@@ -75,6 +75,7 @@ return array(
                     'library::fileupload/jquery.fileupload.js',
 
                     'tapioca.js',
+                    'bootstrap.js',
 
                     'modules/mediator.js',
                     'modules/dialog.js',
@@ -86,14 +87,17 @@ return array(
                     'models/user.js',
                     'models/session.js',
                     'models/app.js',
+                    'models/collection.js',
 
                     'collections/users.js',
                     'collections/apps.js',
+                    'collections/collections.js',
                     
                     'views/app.js',
-                    // 'views/app-nav.js',
-                    'views/app/nav/user-shortcuts.js',
-                    'views/app/nav/admin-nav.js',
+                    'views/app/nav/index.js',
+                    'views/app/nav/user.js',
+                    'views/app/nav/admin.js',
+                    'views/app/nav/app.js',
                     'views/content.js',
                     'views/form-view.js',
                     'views/login.js',

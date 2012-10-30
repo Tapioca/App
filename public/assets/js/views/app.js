@@ -23,9 +23,9 @@ $.Tapioca.Views.App = Backbone.View.extend({
             }
         });
 
-        $.Tapioca.Mediator.subscribe('user::loggedIn',    _.bind( this.loggedIn, this ) );
+        $.Tapioca.Mediator.subscribe('user::loggedIn',    _.bind( this.loggedIn,    this ) );
         $.Tapioca.Mediator.subscribe('user::notLoggedIn', _.bind( this.notLoggedIn, this ) );
-        // $.Tapioca.Mediator.subscribe('data:loaded',       this.dataLoaded);
+        $.Tapioca.Mediator.subscribe('data::loaded',      _.bind( this.dataLoaded,  this ) );
         // $.Tapioca.Mediator.subscribe('section:highlight', this.highlight);
     },
 
@@ -36,12 +36,11 @@ $.Tapioca.Views.App = Backbone.View.extend({
 
     dataLoaded: function()
     {
-        this.appNav = new $.Tapioca.Views.AppNav();
-        this.appNav.render();
-
         $.Tapioca.app.ready();
 
-        this.highlight(document.location.href);
+        this.appNav.renderApps();
+
+        // this.highlight(document.location.href);
 
         $.Tapioca.Nanoscroller();
     },
@@ -53,18 +52,9 @@ $.Tapioca.Views.App = Backbone.View.extend({
 
         this.$el.html( $.Tapioca.Tpl.index );
 
-        this.userShortcuts = new $.Tapioca.Views.UserShortcuts({
-            model: $.Tapioca.Session
-        });
+        this.appNav = new $.Tapioca.Views.Nav();
 
-        $('<div class="pane-content pane-content-one-app" />').appendTo('#apps-nav');
-
-        if( $.Tapioca.Session.isAdmin() )
-        {
-            this.adminNav = new $.Tapioca.Views.AdminNav();
-        }
-
-        $.Tapioca.FetchModels();
+        $.Tapioca.Bootstrap();
 
         if(document.location.href == $.Tapioca.config.rootUrl)
             Backbone.history.navigate($.Tapioca.config.appUrl, true);
@@ -72,9 +62,6 @@ $.Tapioca.Views.App = Backbone.View.extend({
 
     notLoggedIn: function()
     {
-        if(this.userShortcuts)
-            this.userShortcuts.close();
-
         if(this.appNav)
             this.appNav.close();
 
@@ -84,17 +71,6 @@ $.Tapioca.Views.App = Backbone.View.extend({
         this.$el.html('')
 
         $.Tapioca.view = new $.Tapioca.Views.Login();
-    },
-
-    highlight: function(href)
-    {
-        // As main nav is not public
-        // this function wrapp the true
-        // function as a black box
-
-        // TODO: don't depend on URL but a section
-
-        // this.appNav.highlight(href);
     }
 });
     

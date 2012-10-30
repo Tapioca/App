@@ -1,7 +1,7 @@
 
-$.Tapioca.Views.AdminNav = Backbone.View.extend(
+$.Tapioca.Views.NavAdmin = Backbone.View.extend(
 {
-	className: 'app-nav app-nav-active',
+	className: 'app-nav',
 
 	initialize: function()
 	{

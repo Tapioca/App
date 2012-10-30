@@ -46,7 +46,7 @@
         Session      : false,              // logged in user's model
         Apps         : false,              // admin's Apps collection
         Users        : false,              // admin's Users collection
-        UserApps     : false,              // logged in user's Apps collection  
+        UserApps     : [],                 // logged in user's Apps collection  
         Collections  : {}, 
         Models       : {}, 
         Views        : {}, 
@@ -76,52 +76,6 @@
             '*path'                                 : 'notFound'
         }
     }
-
-    // once user loggued in, we fetch every collections
-    // and store all entries. They will be sync on model update
-    $.Tapioca.FetchModels = function()
-    {
-        if( $.Tapioca.Session.isAdmin() )
-        {
-            $.Tapioca.Apps = new $.Tapioca.Collections.Apps();
-
-            $.Tapioca.Apps.fetch({async: false});
-
-            $.Tapioca.Users = new $.Tapioca.Collections.Users();
-
-            $.Tapioca.Users.fetch({async: false});
-        }
-
-        var apps   = $.Tapioca.Session.get('apps'),
-            appsId = [];
-
-        for( var i = -1, l = apps.length; ++i < l; )
-        {
-            appsId.push( apps[i].slug );
-        }
-
-        appsId = appsId.join(';')
-
-        $.Tapioca.UserApps = new $.Tapioca.Collections.Apps();
-
-        $.Tapioca.UserApps.fetch({
-            data: { 
-                set: appsId 
-            }, 
-            success: function( collection, response)
-            {
-                // console.log( collection )
-
-                // to move to app view
-                $.Tapioca.app.ready();
-            },
-            error: function( collection, response )
-            {
-                // TODO: display error
-                console.log( response.message );
-            }
-        })
-    };
 
     // UI components
 

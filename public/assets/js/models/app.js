@@ -1,7 +1,8 @@
 $.Tapioca.Models.App = $.Tapioca.Models.Tapioca.extend(
 {
     idAttribute: 'slug',
-    urlString: 'app',
+    urlString:   'app',
+    admins:      null,
     
     url: function()
     {
@@ -38,6 +39,21 @@ $.Tapioca.Models.App = $.Tapioca.Models.Tapioca.extend(
             if( locale.default )
                 return true;
         }, this);
+    },
+
+    isAppAdmin: function()
+    {
+        if( _.isNull( this.admins ) )
+        {
+            var admins = _.filter( this.get('team'), function( member )
+            {
+                return (member.role == 'admin');
+            })
+
+            this.admins = _.pluck( admins, 'id' );
+        }
+        
+        return _.contains( this.admins, $.Tapioca.Session.get('id') );
     }
 
 });
