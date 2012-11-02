@@ -56,6 +56,12 @@ $.Tapioca.Router = Backbone.Router.extend({
 
     appUsers: $.Tapioca.Controllers.AppAdmin.Users,
 
+    appCollectionHome: $.Tapioca.Controllers.Collection.Home,
+
+    appCollectionRef: $.Tapioca.Controllers.Collection.Ref,
+
+    appCollectionEdit: $.Tapioca.Controllers.Collection.Edit,
+
     notFound: function( path )
     {
         // TODO: display a 404 page

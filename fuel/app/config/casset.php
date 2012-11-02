@@ -88,10 +88,12 @@ return array(
                     'models/session.js',
                     'models/app.js',
                     'models/collection.js',
+                    'models/abstract.js',
 
                     'collections/users.js',
                     'collections/apps.js',
                     'collections/collections.js',
+                    'collections/abstracts.js',
                     
                     'views/app/index.js',
                     'views/app/nav/index.js',
@@ -117,10 +119,14 @@ return array(
                     'views/app/container/user/index.js',
                     'views/app/container/user/index-row.js',
 
+                    'views/app/container/collection/index.js',
+                    'views/app/container/collection/index-row.js',
+
                     'controllers/session.js',
                     'controllers/admin.js',
                     'controllers/app.js',
                     'controllers/app-admin.js',
+                    'controllers/collection.js',
 
                     'components/form.js',
                     // 'components/file-upload.js',

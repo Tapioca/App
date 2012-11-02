@@ -69,6 +69,22 @@ $.Tapioca.Bootstrap = function()
         $.Tapioca.UserApps[ appslug ].collections.fetch({
             success: function( collection, response )
             {
+                $.Tapioca.UserApps[ appslug ].data = {};
+
+                _.each( collection.models, function( model )
+                {
+                    var _namespace = model.get('namespace'),
+                        _abstracts = new $.Tapioca.Collections.Abstracts({
+                            appslug:   appslug,
+                            namespace: _namespace
+                        });
+
+                    $.Tapioca.UserApps[ appslug ].data[ _namespace ] = {
+                        schema:    false,
+                        abstracts: _abstracts
+                    };
+                }, this)
+
                 ++loaded;
                 
                 if( loaded == total )

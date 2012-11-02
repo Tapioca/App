@@ -112,6 +112,7 @@ return array(
             'not_activated'    => 'not activated',
             'activated'        => 'activated',
             'edit'             => 'edit',
+            'clone'            => 'clone',
             'edit_app_profile' => 'Profile',
             'edit_app_user'    => 'Users',
             'edit_app_admin'   => 'Admins',
@@ -122,7 +123,11 @@ return array(
             'add_collections'  => 'Add a collection',
             'app_library'      => 'Library',
             'add_file'         => 'Upload a file',
-            'app_documents'    => 'Documents'
+            'app_documents'    => 'Documents',
+            'add_document'     => 'Add a new document',
+            'document_status'  => 'Status',
+            'collection_edit'  => 'Edit collection schema',
+            'collection_empty' => 'Empty collection'
         ),
         'dialog' => array(
             'beforeunload' => 'Are you sure you want to leave with out save?',

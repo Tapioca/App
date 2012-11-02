@@ -1,1 +1,1 @@
-<a href="<?= Uri::create('app/'); ?>{{ appslug }}/collections/{{ namespace }}">{{ name }}</a>
+<a href="<?= Uri::create('app/'); ?>{{ appslug }}/{{ namespace }}">{{ name }}</a>

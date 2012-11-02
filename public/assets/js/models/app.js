@@ -1,8 +1,9 @@
 $.Tapioca.Models.App = $.Tapioca.Models.Tapioca.extend(
 {
-    idAttribute: 'slug',
-    urlString:   'app',
-    admins:      null,
+    idAttribute:   'slug',
+    urlString:     'app',
+    admins:        null,
+    workingLocale: false,
     
     url: function()
     {
@@ -32,13 +33,39 @@ $.Tapioca.Models.App = $.Tapioca.Models.Tapioca.extend(
         $.Tapioca.Dialog.open( _.bind( this.delete, this ), { text: text });
     },
 
-    getDefaultLanguage: function()
+    getWorkingLocale: function()
     {
-        return _.filter( this.get('locales'), function( locale )
+        if( !this.workingLocale )
+        {
+            this.workingLocale = this.getDefaultLocale();
+        }
+
+        return this.workingLocale;
+    },
+
+    setWorkingLocale: function( key )
+    {
+        var locale = _.filter( this.get('locales'), function( locale )
+        {
+            if( locale.key == key )
+            {
+                this.workingLocale = locale;
+                return true;
+            }
+        }, this);
+
+        return locale[0];
+    },
+
+    getDefaultLocale: function()
+    {
+        var locale = _.filter( this.get('locales'), function( locale )
         {
             if( locale.default )
                 return true;
         }, this);
+
+        return locale[0];
     },
 
     isAppAdmin: function()

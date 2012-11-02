@@ -35,13 +35,39 @@ class Controller_Welcome extends Controller
         
         $domain .= '/';
 
+        // status translation, to move somewhere else
+        $statusArray  = Config::get('tapioca.status');
+        $statusTech   = array();
+        $statusPublic = array();
+        
+        foreach ($statusArray as $row)
+        {
+            $statusTech[$row[0]] = array(
+                'label' => __('tapioca.doc_status.'.$row[1]),
+                'class' => $row[2]
+            );
+
+            if($row[0] >= 0)
+            {
+                $statusPublic[] = array(
+                    'value' => $row[0],
+                    'label' => $row[1],
+                    'class' => $row[2]
+                );
+            }
+        }
+
         $settings = array(
             'host'      => $domain,
             'rootUrl'   => Uri::base(),
             'bbRootUrl' => str_replace($domain, '', Uri::base()),
             'apiUrl'    => Uri::create('api/'),
             'appUrl'    => Uri::create('app'),
-            'roles'     => Config::get('tapioca.roles')
+            'roles'     => Config::get('tapioca.roles'),
+            'status'    => array(
+                'public' => $statusPublic,
+                'tech'   => $statusTech
+            )
         );
 
 
