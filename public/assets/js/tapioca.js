@@ -70,11 +70,12 @@
             'app/admin/app/:slug'                   : 'adminAppEdit',
             'app/:appslug'                          : 'appHome',
             'app/:appslug/user'                     : 'appUsers',
-            // 'app/:appslug/admin'                    : 'appAdmin',
-            // 'app/:appslug/:namespace'               : 'appCollection',
-            // 'app/:appslug/:namespace/document/:ref' : 'appCollection',
+            // 'app/:appslug/settings'                 : 'appSettings',
             // 'app/:appslug/library'                  : 'appLibrary',
             // 'app/:appslug/library/:filename'        : 'appLibraryRef',
+            'app/:appslug/:namespace/edit'          : 'appCollectionEdit',
+            'app/:appslug/:namespace/:ref'          : 'appCollectionRef',
+            'app/:appslug/:namespace'               : 'appCollectionHome',
             '*path'                                 : 'notFound'
         }
     }
