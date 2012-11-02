@@ -13,7 +13,7 @@ class Controller_Api_App_User extends Controller_Api
         static::$appslug = $this->param('appslug', false);
         static::$userId  = $this->param('userid', false);
 
-        if( !static::$appslug || !static::$userId )
+        if( !static::$appslug )
         {
             static::error( __('tapioca.missing_required_params') );
             return;
@@ -46,8 +46,28 @@ class Controller_Api_App_User extends Controller_Api
         }
     }
 
+    public function get_index()
+    {
+        $team = static::$app->get('team');
+        $set  = array();
+
+        foreach( $team as $member)
+        {
+            $set[] = $member['id'];
+        }
+        
+        static::$data   = User::getAll( $set );
+        static::$status = 200;
+    }
+
     public function post_index()
     {
+        if( !static::$userId )
+        {
+            static::error( __('tapioca.missing_required_params') );
+            return;
+        }
+
         try
         {
             Permissions::isGranted( 'app_invite_users' );
@@ -86,6 +106,12 @@ class Controller_Api_App_User extends Controller_Api
 
     public function put_index()
     {
+        if( !static::$userId )
+        {
+            static::error( __('tapioca.missing_required_params') );
+            return;
+        }
+
         try
         {
             Permissions::isGranted( 'app_promote_users' );
@@ -103,7 +129,7 @@ class Controller_Api_App_User extends Controller_Api
             // user Id provided by JSON
             static::$app->user_role( static::$userId, $role );
 
-            static::$data   = static::$app->get();
+            static::$data   = static::$app->get('team');
             static::$status = 200;
         }
         catch (AppException $e)
@@ -114,6 +140,12 @@ class Controller_Api_App_User extends Controller_Api
 
     public function delete_index()
     {
+        if( !static::$userId )
+        {
+            static::error( __('tapioca.missing_required_params') );
+            return;
+        }
+
         try
         {
             Permissions::isGranted( 'app_remove_users' );
@@ -149,7 +181,7 @@ class Controller_Api_App_User extends Controller_Api
             return;
         }
 
-        static::$data   = static::$app->get();
+        static::$data   = static::$app->get('team');
         static::$status = 200;
     }
 }

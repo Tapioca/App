@@ -53,6 +53,7 @@
         Controllers  : {}, 
         Components   : {},
         view         : false,              // reference to the current view, allow a clean close
+        appslug      : false,              // reference to the current app
         Tpl          : {},                 // Templates list array
         Data         : {},                 // Collections data
         appView      : false,              // reference to the app view when user is loggin
@@ -67,7 +68,8 @@
             'app/admin/user/:uid'                   : 'adminUserEdit',
             'app/admin/app'                         : 'adminApp',
             'app/admin/app/:slug'                   : 'adminAppEdit',
-            // 'app/:appslug'                          : 'appHome',
+            'app/:appslug'                          : 'appHome',
+            'app/:appslug/user'                     : 'appUsers',
             // 'app/:appslug/admin'                    : 'appAdmin',
             // 'app/:appslug/:namespace'               : 'appCollection',
             // 'app/:appslug/:namespace/document/:ref' : 'appCollection',

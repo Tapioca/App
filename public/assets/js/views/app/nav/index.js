@@ -5,6 +5,7 @@ $.Tapioca.Views.Nav = Backbone.View.extend(
     className:   'pane nano',
     tagName:     'div',
     viewpointer: [],
+    $navItems:   false,
 
     initialize: function()
     {
@@ -27,6 +28,10 @@ $.Tapioca.Views.Nav = Backbone.View.extend(
 
         this.$paneContent = this.$el.find('div.pane-content');
 
+        this.$el.TapiocaNano();
+
+        $.Tapioca.Mediator.subscribe( 'section::highlight', _.bind( this.clearHighlight,  this ) );
+        
         return this;
     },
 
@@ -49,6 +54,10 @@ $.Tapioca.Views.Nav = Backbone.View.extend(
 
     renderApps: function()
     {
+        // collections links tpl
+        // compile once for all Apps
+        var tplRow = Handlebars.compile( $.Tapioca.Tpl.app.nav['app-collection'] );
+
         for( var appslug in $.Tapioca.UserApps )
         {
             var app      = $.Tapioca.UserApps[ appslug ],
@@ -56,7 +65,7 @@ $.Tapioca.Views.Nav = Backbone.View.extend(
                     appslug:     appslug,
                     parent:      this.$paneContent,
                     model:       app.app,
-                    collections: app.collections
+                    tplRow:      tplRow
                 };
 
             this.viewpointer[ appslug ] = new $.Tapioca.Views.NavApp( _options ).render();
@@ -70,17 +79,14 @@ $.Tapioca.Views.Nav = Backbone.View.extend(
         }
 
         $appNav.eq(0).addClass('app-nav-active');
+
+        this.$navItems = this.$el.find('li a');
     },
 
-    highlight: function(href)
+    clearHighlight: function()
     {
-        // As main nav is not public
-        // this function wrapp the true
-        // function as a black box
-
-        // TODO: don't depend on URL but a section
-
-        // this.appNav.highlight(href);
+        if( this.$navItems )
+            this.$navItems.removeClass('active');
     },
 
     onClose: function()

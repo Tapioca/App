@@ -294,8 +294,16 @@ class User
 		}
 	}
 
-	public static function getAll()
+	public static function getAll( $set = null )
 	{
+		if( !is_null( $set ))
+		{
+			if( !is_array( $set) )
+				$set = explode(';', $set);
+			
+			static::$db->where_in( 'id', $set );
+		}
+
 		$users = static::$db
 					->select( array('id', 'email', 'name', 'apps', 'admin', 'activated', 'status', 'register', 'updated', 'last_login') )
 					->hash(static::$dbCollectionName, true);

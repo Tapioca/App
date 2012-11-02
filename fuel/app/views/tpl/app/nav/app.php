@@ -1,5 +1,5 @@
 
-					<a href="javascript:void(0)" class="app-nav-header" data-app-id="{{ id }}" data-app-slug="{{ slug }}">
+					<a href="<?= Uri::create('app/'); ?>{{ slug }}" class="app-nav-header" data-app-id="{{ id }}" data-app-slug="{{ slug }}">
 						<!--span class="avatar">
 							<img src="/dynamic/apps/dior-logo.jpg" alt="" />
 						</span-->
@@ -10,40 +10,40 @@
 						<h6>Admin</h6>
 						<ul>
 							<li>
-								<a href="#">application</a>
+								<a href="<?= Uri::create('app/'); ?>{{ slug }}/settings"><?= __('tapioca.ui.label.app_settings'); ?></a>
 							</li>
 							<li>
-								<a href="#">utilisateurs</a>
+								<a href="<?= Uri::create('app/'); ?>{{ slug }}/user"><?= __('tapioca.ui.label.app_users'); ?></a>
 							</li>
 						</ul>
 						{{/if}}
 
-						<h6>Documents</h6>
+						<h6><?= __('tapioca.ui.label.app_documents'); ?></h6>
 						<ul id="app-nav-collections-{{ slug }}">
 							<li class="app-nav-collections-empty">
-								<span class="no-collection">Pas de collections</span>
+								<span class="no-collection"><?= __('tapioca.ui.label.no_collections'); ?></span>
 							</li>
 							{{#if isAppAdmin}}
 							<li class="divider"></li>
 							<li>
 								<a href="app/{{ slug }}/collections/new" class="admin-action">
 									<i class="icon-plus"></i>
-									Ajouter une collection
+									<?= __('tapioca.ui.label.add_collections'); ?>
 								</a>
 							</li>
 							{{/if}}
 						</ul>
 
-						<h6>Fichiers</h6>
+						<h6><?= __('tapioca.ui.label.app_library'); ?></h6>
 						<ul id="app-nav-files-{{ slug }}">
 							<li data-namespace="library">
-								<a href="app/{{ slug }}/file">Library</a>
+								<a href="<?= Uri::create('app/'); ?>{{ slug }}/library"><?= __('tapioca.ui.label.app_library'); ?></a>
 							</li>
 							<li class="divider"></li>
 							<li>
-								<a href="app/{{ slug }}/file/upload" class="admin-action">
+								<a href="<?= Uri::create('app/'); ?>{{ slug }}/library/upload" class="admin-action">
 									<i class="icon-plus"></i>
-									Ajouter un fichier
+									<?= __('tapioca.ui.label.add_file'); ?>
 								</a>
 							</li>
 						</ul>

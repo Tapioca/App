@@ -93,15 +93,18 @@ return array(
                     'collections/apps.js',
                     'collections/collections.js',
                     
-                    'views/app.js',
+                    'views/app/index.js',
                     'views/app/nav/index.js',
                     'views/app/nav/user.js',
                     'views/app/nav/admin.js',
                     'views/app/nav/app.js',
+                    'views/app/nav/app-collection.js',
+
                     'views/content.js',
                     'views/form-view.js',
                     'views/login.js',
                     'views/user-profile.js',
+                    
                     'views/admin/index.js',
                     'views/admin/user/list.js',
                     'views/admin/user/list-row.js',
@@ -110,9 +113,14 @@ return array(
                     'views/admin/app/list-row.js',
                     'views/admin/app/edit.js',
 
+                    'views/app/container/home/index.js',
+                    'views/app/container/user/index.js',
+                    'views/app/container/user/index-row.js',
 
                     'controllers/session.js',
                     'controllers/admin.js',
+                    'controllers/app.js',
+                    'controllers/app-admin.js',
 
                     'components/form.js',
                     // 'components/file-upload.js',

@@ -44,7 +44,9 @@ class Controller_Api_User extends Controller_Api
         }
         else
         {
-            static::$data   = User::getAll();
+            $set = Input::get('set', null);
+
+            static::$data   = User::getAll( $set );
             static::$status = 200;
         }
     }

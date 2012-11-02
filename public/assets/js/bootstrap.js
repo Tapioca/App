@@ -30,7 +30,9 @@ $.Tapioca.Bootstrap = function()
 
     appsId = appsId.join(';')
 
-    var userApps = new $.Tapioca.Collections.Apps();
+    var userApps = new $.Tapioca.Collections.Apps(),
+        loaded   = 0,
+        total;
 
     userApps.fetch({
         data: { 
@@ -38,23 +40,17 @@ $.Tapioca.Bootstrap = function()
         }, 
         success: function( collection, response)
         {
-            var total = collection.length,
-                inc   = 0;
+            total = collection.length;
 
             _.each( collection.models, function( app )
             {
-                ++inc;
+                var appslug = app.get('slug'),
+                    appTeam = app.get('team');
 
-                var appslug = app.get('slug');
-
-                $.Tapioca.UserApps[ appslug ].app = app;
+                $.Tapioca.UserApps[ appslug ].app   = app;
+                $.Tapioca.UserApps[ appslug ].users = new $.Tapioca.Collections.Users( appTeam );
                 
                 loadCollection( appslug );
-                
-                if( inc == total )
-                {
-                    $.Tapioca.Mediator.publish('data::loaded');
-                }
             });
         },
         error: function( collection, response )
@@ -73,7 +69,12 @@ $.Tapioca.Bootstrap = function()
         $.Tapioca.UserApps[ appslug ].collections.fetch({
             success: function( collection, response )
             {
-                // console.log(collection)
+                ++loaded;
+                
+                if( loaded == total )
+                {
+                    $.Tapioca.Mediator.publish('data::loaded');
+                }
             },
             error: function(){}
         });

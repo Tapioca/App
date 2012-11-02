@@ -48,10 +48,17 @@ $.Tapioca.Mediator = (function()
 		}
 	};
 
+	// DEBUG
+	var mediator = function()
+	{
+		return channels;
+	};
+
 	return {
 		'publish':     publish,
 		'subscribe':   subscribe,
-		'unsubscribe': unsubscribe
+		'unsubscribe': unsubscribe,
+		'mediator':    mediator
 	};
 
 })();

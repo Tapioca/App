@@ -399,7 +399,7 @@ header#tapp {
 	color: #fff;
 }
 
-.app-nav-lists .active a,
+.app-nav-lists a.active,
 .app-nav-lists a:hover {
     background-color: #3C8DDE;
     background-image: -moz-linear-gradient(#599BDC, #3072B3);

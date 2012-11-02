@@ -8,9 +8,17 @@ $.Tapioca.Components.Display = {
 		return user.get('name');
 	},
 
+	// WARNING: work only with user apps
 	role: function( slug, uid, operator )
 	{
-		var app  = $.Tapioca.Apps.get( slug ),
+
+		if( uid == operator )
+		{
+			// TODO: user can not edit this own role
+			return '<span class="label"> YOUR OWN ROLE</span>';
+		}
+
+		var app  = $.Tapioca.UserApps[ slug ].app,
 			team = app.get('team'),
 			roles = $.Tapioca.config.roles,
 			target,

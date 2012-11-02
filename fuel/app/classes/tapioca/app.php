@@ -507,8 +507,11 @@ class App
 					->where($where)
 					->update(static::$dbCollectionName, $update, array(), true);
 
+
 		if($query)
 		{
+			$this->load( $where );
+
 			return true;
 		}
 

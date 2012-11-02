@@ -117,7 +117,12 @@ return array(
             'edit_app_admin'   => 'Admins',
             'edit_app_locale'  => 'Locales',
             'app_slug'         => 'App slug',
-            'app_name'         => 'Name'
+            'app_name'         => 'Name',
+            'no_collections'   => 'No collections define yet',
+            'add_collections'  => 'Add a collection',
+            'app_library'      => 'Library',
+            'add_file'         => 'Upload a file',
+            'app_documents'    => 'Documents'
         ),
         'dialog' => array(
             'beforeunload' => 'Are you sure you want to leave with out save?',
@@ -125,8 +130,9 @@ return array(
             'btn_no'       => 'Cancel',
         ),
         'delete' => array(
-            'question' => 'Are you sure you want to delete %1$s from %2$s',
-            'user'     => 'the users',
+            'question'        => 'Are you sure you want to delete %1$s from %2$s ?',
+            'user'            => 'the users',
+            'question_remove' => 'Are you sure you want to remove %1$s from group ?',
         ),
         'title' => array(
             'edit_account' => 'Edit user account',
@@ -134,6 +140,8 @@ return array(
             'admin'        => 'Tapioca Admin',
             'admin_user'   => 'Tapioca Users',
             'admin_app'    => 'Tapioca Apps',
+            'dashbord'     => 'Dashboard',
+            'app_users'    => '%1s users'
         ),
         'session' => array(
             'user-profile'    => 'My Account',

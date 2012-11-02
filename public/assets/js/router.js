@@ -28,7 +28,10 @@ $.Tapioca.Router = Backbone.Router.extend({
         $.Tapioca.Nanoscroller();
 
         // highlight active navigation tab
-        //$.Tapioca.Mediator.publish('section:highlight', document.location.href);
+        var _channel = $.Tapioca.appslug + 'section::highlight';
+
+        $.Tapioca.Mediator.publish( 'section::highlight' );
+        $.Tapioca.Mediator.publish( _channel , document.location.href);
     },
 
     logout: $.Tapioca.Controllers.Session.Logout,
@@ -48,6 +51,10 @@ $.Tapioca.Router = Backbone.Router.extend({
     adminApp: $.Tapioca.Controllers.Admin.Apps,
 
     adminAppEdit: $.Tapioca.Controllers.Admin.App,
+
+    appHome: $.Tapioca.Controllers.App.Home,
+
+    appUsers: $.Tapioca.Controllers.AppAdmin.Users,
 
     notFound: function( path )
     {

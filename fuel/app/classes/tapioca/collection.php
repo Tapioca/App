@@ -184,7 +184,8 @@ class Collection
 						'name',
 						'namespace',
 						'documents',
-						'status'
+						'status',
+						'digest'
 					), array(
 					'revisions'
 				))
@@ -198,7 +199,8 @@ class Collection
 
 		foreach( $ret->results as &$row)
 		{
-			$row['url'] = \Router::get('api_collection_ref', array('appslug' => $appslug, 'namespace' => $row['namespace']));
+			$row['url']    = \Router::get('api_collection_ref', array('appslug' => $appslug, 'namespace' => $row['namespace']));
+			$row['digest'] = $row['digest']['fields'];
 		}
 
 		return $ret;
