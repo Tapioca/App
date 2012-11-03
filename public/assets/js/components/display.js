@@ -64,7 +64,7 @@ $.Tapioca.Components.Display = {
 
             for(var i = -1, l = _public.length; ++i < l;)
             {
-                html += '<li><a href="javascript:void(0)" data-document="' + _public[i].value + '" data-label="' + _public[i].label + '" data-class="' + _public[i].class + '">' + _public[i].label + '</a></li>';
+                html += '<li><a href="javascript:void(0)" data-status="' + _public[i].value + '">' + _public[i].label + '</a></li>';
             }
             html += '</ul>';
         }

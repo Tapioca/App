@@ -76,6 +76,7 @@ return array(
     'no_valid_token'               => 'Not valid token for delete',
     'token_expire'                 => 'token has expired',
     'permissions_denied'           => 'Permission denied to :capability',
+    'access_not_allowed'           => 'Access not allowed',
     
 
     'doc_status' => array(

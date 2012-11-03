@@ -12,11 +12,18 @@ $.Tapioca.Views.CollectionRow = Backbone.View.extend(
 
         this.$el.appendTo( options.parent );
 
+        this.model.bind('change', this.render, this);
+        this.model.bind('destroy', this.close, this);
+        
         this.render();
 
         return this;
     },
 
+    events: {
+        'click ul.dropdown-menu a':   'setStatus',
+        'click a.btn-delete-trigger': 'delete'
+    },
 
     render: function()
     {
@@ -32,5 +39,42 @@ $.Tapioca.Views.CollectionRow = Backbone.View.extend(
         this.$el.html( this.tpl( model ) );
 
         return this;
+    },
+
+    setStatus: function( event )
+    {
+        var _status = parseInt( $( event.target ).attr('data-status')),
+            _self   = this;
+
+        var put = $.ajax({
+            url:      this.model.url(),
+            data:     JSON.stringify({status: _status}),
+            dataType: 'json',
+            type:     'PUT'
+        });
+
+        put.done( function( p )
+        {
+            _self.model.set( p );
+        });
+
+        put.fail( this.error );
+    },
+
+    delete: function()
+    {
+        this.model.delete();
+    },
+
+    error: function( p )
+    {
+        var response = $.parseJSON( p.responseText )
+        alert( response.error )
+    },
+
+    onClose: function()
+    {
+        this.model.unbind('destroy', this.close);
+        this.model.unbind('change', this.render);
     }
 });
