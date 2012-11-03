@@ -55,7 +55,10 @@ class Controller_Api_Log extends Controller_Rest
 				}
 				else
 				{
-					static::restricted();
+					static::$status  = 401;
+					static::$data    = array(
+						'message' => __('tapioca.access_not_allowed')
+					);
 				}
 			}
 			catch (AuthException $e)
