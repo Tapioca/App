@@ -136,7 +136,7 @@ class Document
 				static::$revisionActive = $this->abstract['revisions']['active'];
 				static::$revisionLast   = $this->abstract['revisions']['total'];
 
-				// ?? active ??
+				// define if document exists in selected locale
 				if( !isset($this->abstract['revisions']['active'][static::$locale]) )
 				{
 					$this->abstract['revisions']['active'][static::$locale] = null;
@@ -318,7 +318,7 @@ class Document
 			$this->_unset('where', '_tapioca.status');
 			$this->_unset('where', '_tapioca.locale');
 
-			$this->set('where', array('_tapioca.revision' => $revision));
+			$this->set('where', array('_tapioca.revision' => (int) $revision));
 		}
 		else if( !is_null(static::$revisionActive) )
 		{
@@ -738,6 +738,41 @@ class Document
 		}
 
 		return $this->abstract; //$this->set_locale_revision($revision);
+	}
+
+	/**
+	 * Define witch capability is required to edit status document
+	 *
+	 * @param    string  User Id
+	 */
+	public function status_premission( $userId )
+	{
+		$owner = $this->abstract['revisions']['list'][0]['user'];
+
+		return ( $userId != $owner ) ? 'app_publish_others_documents' : 'app_publish_documents';
+	}
+
+	/**
+	 * Define witch capability is required to delete the document
+	 *
+	 * @param    string  User Id
+	 */
+	public function delete_premission( $userId )
+	{
+		$highest = -1;
+
+		foreach ($this->abstract['revisions']['list'] as &$value)
+		{
+			if($value['status'] > $highest)
+			{
+				$highest = $value['status'];
+			}
+		}
+
+		$status = ( $highest == 100 ) ? 'published_' : '';
+		$owner  = ( $this->abstract['revisions']['list'][0]['user'] != $userId) ? 'others_' : '';
+
+		return 'app_delete_'. $owner . $status .'documents';
 	}
 
 	/**

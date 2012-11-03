@@ -2,52 +2,126 @@
 
 class Controller_Api_Collection_Abstract extends Controller_Api
 {
-	protected static $appslug;
-	private static $namespace;
+    protected static $appslug;
+    private static $namespace;
+    private static $collection;
+    private static $ref;
+    private static $locale;
+    private static $revision;
 
-	public function before()
-	{
-		parent::before();
+    public function before()
+    {
+        parent::before();
 
-		static::$appslug   = $this->param('appslug', false);
-		static::$namespace = $this->param('namespace', false);
+        static::$appslug   = $this->param('appslug', false);
+        static::$namespace = $this->param('namespace', false);
+        static::$ref       = $this->param('ref', null);
 
-		// check collection's namespace 
-		// and app exists
-		if( static::$appslug && !static::assignApp())
-		{
-			return;
-		}
+        if( !static::$appslug )
+        {
+            static::error( __('tapioca.missing_required_params') );
+            return;
+        }
 
-		// check if user is allowed
-		// for this app
-		static::isInApp();
-	}
+        // app instance
+        if( !static::assignApp() )
+        {
+            return;
+        }
 
-	public function get_index()
-	{
-		if( static::$granted )
-		{
-			try
-			{
-				$collection = Tapioca::collection( static::$app, static::$namespace );
-			}
-			catch( TapiocaException $e )
-			{
-				static::error($e->getMessage());
-				return;
-			}
+        try
+        {
+            static::$collection = Tapioca::collection( static::$app, static::$namespace );
+        }
+        catch( TapiocaException $e )
+        {
+            static::error( $e->getMessage() );
+            return;
+        }
 
-			try
-			{
-				$documents      = Tapioca::document( static::$app, $collection );
-				static::$data   = $documents->abstracts();
-				static::$status = 200;
-			}
-			catch ( TapiocaException $e)
-			{
-				static::error($e->getMessage());
-			}
-		}
-	}
+        static::$locale     = Input::get('l', null);
+        static::$revision   = Input::get('r', null);
+
+        // check if user is allowed
+        // for this app
+        static::isInApp();
+
+        Permissions::set( static::$user, static::$app );
+    }
+
+    public function get_index()
+    {
+        try
+        {
+            $collection = Tapioca::collection( static::$app, static::$namespace );
+        }
+        catch( TapiocaException $e )
+        {
+            static::error($e->getMessage());
+            return;
+        }
+
+        try
+        {
+            $documents      = Tapioca::document( static::$app, $collection );
+            static::$data   = $documents->abstracts();
+            static::$status = 200;
+        }
+        catch ( TapiocaException $e)
+        {
+            static::error($e->getMessage());
+        }
+    }
+
+    //update document status.
+    public function put_index()
+    {
+        $docStatus  = Input::json('status', null);
+
+        if( !static::$ref || is_null( $docStatus ))
+        {
+            static::error( __('tapioca.missing_required_params') );
+            return;
+        }
+
+        $document   = Tapioca::document(static::$app, static::$collection, static::$ref, static::$locale);
+        $permission = $document->status_premission( static::$user->get('id') );
+
+        try
+        {
+            Permissions::isGranted( $permission );
+        }
+        catch( PermissionsException $e)
+        {
+            static::error( $e->getMessage() , 500 );
+            return;
+        }
+        
+        static::$data   = $document->update_status( $docStatus, static::$revision ) ;
+        static::$status = 200;
+    }
+
+    public function delete_index()
+    {
+        $document   = Tapioca::document(static::$app, static::$collection, static::$ref, static::$locale);
+        $permission = $document->delete_premission( static::$user->get('id') );
+
+        try
+        {
+            Permissions::isGranted( $permission );
+        }
+        catch( PermissionsException $e)
+        {
+            static::error( $e->getMessage() , 500 );
+            return;
+        }
+
+        if( ! static::deleteToken( 'document', static::$ref ))
+        {
+            return;
+        }
+        
+        static::$data   = array('status' => $document->delete() );
+        static::$status = 200;
+    }
 }
