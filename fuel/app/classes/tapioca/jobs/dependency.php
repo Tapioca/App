@@ -6,92 +6,90 @@ use Tapioca;
 
 class Dependency
 {
-	public function perform()
-	{
-		// \Cli::write(print_r($this->args, true));
+    public function perform()
+    {
+        // \Cli::write(print_r($this->args, true));
 
-		Tapioca::base();
+        Tapioca::base();
 
-		$db = \Mongo_Db::instance();
+        $db = \Mongo_Db::instance();
 
-		$dbCollectionName = $this->args['appslug'].'-'.$this->args['collection'];
-		$where = array(
-						'_ref'              => $this->args['ref'],
-						'_tapioca.revision' => $this->args['revision'],
-					);
+        $dbCollectionName = $this->args['appslug'].'-'.$this->args['collection'];
+        $where = array(
+                        '_ref'              => $this->args['ref'],
+                        '_tapioca.revision' => $this->args['revision'],
+                    );
 
-		// source document
-		$originDoc   = $db
-						->where( $where )
-						->get( $dbCollectionName );
+        // list all collections with dependencies
+        $collections = $db
+                        ->select( array('namespace', 'dependencies') )
+                        ->where(array(
+                            'app_id'                  => $this->args['appslug'],
+                            'active'                  => true,
+                            'dependencies.collection' => $this->args['collection']
+                        ))
+                        ->get( \Config::get('tapioca.collections.collections') );
 
-		// \Cli::write($dbCollectionName);
-		// \Cli::write(print_r($where, true));		
-		// \Cli::write(print_r($originDoc, true));
+        // \Cli::write(print_r($collections, true));
 
+        if( count( $collections ) == 0)
+        {
+            return;
+        }
 
-		if( count( $originDoc ) != 1 )
-		{
-			return;
-		}
+        // source document
+        $originDoc   = $db
+                        ->where( $where )
+                        ->get( $dbCollectionName );
 
-		$originDoc = $originDoc[0];
+        // \Cli::write($dbCollectionName);
+        // \Cli::write(print_r($where, true));      
+        // \Cli::write(print_r($originDoc, true));
+        // \Cli::write( print_r($originDoc, true) );
 
-		// \Cli::write( print_r($originDoc, true) );
+        if( count( $originDoc ) != 1 )
+        {
+            return;
+        }
 
-		// list all collections with dependencies
-		$collections = $db
-						->select( array('namespace', 'dependencies') )
-						->where(array(
-							'app_id'                  => $this->args['appslug'],
-							'active'                  => true,
-							'dependencies.collection' => $this->args['collection']
-						))
-						->get( \Config::get('tapioca.collections.collections') );
+        $originDoc = $originDoc[0];
 
-		// \Cli::write(print_r($collections, true));
+        foreach( $collections as $collection)
+        {
+            foreach( $collection['dependencies'] as $dependency )
+            {
+                if( $dependency['collection'] == $this->args['collection'] )
+                {
+                    $path             = $dependency['path'].'.ref';
+                    $dbCollectionName = $this->args['appslug'].'-'.$collection['namespace'];
 
-		if( count( $collections) == 0)
-		{
-			return;
-		}
+                    $set = array();
 
-		foreach( $collections as $collection)
-		{
-			foreach( $collection['dependencies'] as $dependency )
-			{
-				if( $dependency['collection'] == $this->args['collection'] )
-				{
-					$path             = $dependency['path'].'.ref';
-					$dbCollectionName = $this->args['appslug'].'-'.$collection['namespace'];
-
-					$set = array();
-
-					foreach( $dependency['fields'] as $field )
-					{
-						$set[ $field ] = \Arr::get( $originDoc, $field, null);
-					}
+                    foreach( $dependency['fields'] as $field )
+                    {
+                        $set[ $field ] = \Arr::get( $originDoc, $field, null);
+                    }
 
 
-					$update = array('$set' => array($dependency['path'].'.embedded' => $set) );
+                    $update = array('$set' => array($dependency['path'].'.embedded' => $set) );
 
-					$where = array( $path             => $this->args['ref'],
-									'_tapioca.locale' => $this->args['locale'],
-									'_tapioca.status' => 100
-								);
+                    $where = array( $path             => $this->args['ref'],
+                                    '_tapioca.locale' => $this->args['locale'],
+                                    '_tapioca.status' => 100
+                                );
 
-					// \Cli::write( $dbCollectionName );
-					// \Cli::write(print_r($where, true));
-					// \Cli::write(print_r($update, true));
+                    // \Cli::write( $dbCollectionName );
+                    // \Cli::write(print_r($where, true));
+                    // \Cli::write(print_r($update, true));
 
-					$documents = $db
-									->where( $where )
-									->update_all( $dbCollectionName, $update, true );
+                    $documents = $db
+                                    ->where( $where )
+                                    ->update_all( $dbCollectionName, $update, true );
 
-				}
-			}
+                }
+            }
 
-		}
+        }
 
-	}
+    }
 }
