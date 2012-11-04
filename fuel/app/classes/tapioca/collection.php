@@ -167,16 +167,15 @@ class Collection
 
 	/**
 	 * Gets the summaries of all collections,
-	 * only admins can see non published Collection (status lower than 100)
 	 *
 	 * @param   string    app slug
-	 * @param   int       min collection status
+	 * @param   array     collection status that user can read
 	 * @return  array
 	 */
-	public static function getAll( $appslug, $status = 100 )
+	public static function getAll( $appslug, $status = array('public') )
 	{
 		static::$dbCollectionName = strtolower(Config::get('tapioca.collections.collections'));
-		static::$db         = \Mongo_Db::instance();
+		static::$db               = \Mongo_Db::instance();
 
 		//query database for collections's summaries
 		$ret = static::$db
@@ -191,15 +190,15 @@ class Collection
 				))
 				->where(array(
 					'app_id' => $appslug,
-					'type'   => 'summary',
-					'status' => array('$gte' => (int) $status)
+					'type'   => 'summary'
 				))
+				->where_in('status', $status)
 				->order_by( array( 'name' => 'ASC' ) )
 				->hash( static::$dbCollectionName, true );
 
 		foreach( $ret->results as &$row)
 		{
-			$row['url']    = \Router::get('api_collection_ref', array('appslug' => $appslug, 'namespace' => $row['namespace']));
+			$row['url']    = \Router::get('api_collection_defined', array('appslug' => $appslug, 'namespace' => $row['namespace']));
 			$row['digest'] = $row['digest']['fields'];
 		}
 
@@ -329,12 +328,12 @@ class Collection
 		
 		self::validation($fields, $check_list);
 
-		$status = (int) 1;
+		$status = 'draft';
 
-		if(isset($fields['status']))
+		if( isset( $fields['status'] ) )
 		{
-			$status = (int) $fields['status'];
-			unset($fields['status']);
+			$status = $fields['status'];
+			unset( $fields['status'] );
 		}
 
 		$new_summary = array(
@@ -376,7 +375,7 @@ class Collection
 
 		if(isset($fields['status']))
 		{
-			$fields['status'] = (int) $fields['status'];
+			$fields['status'] = $fields['status'];
 		}
 
 		$update =  static::$db
@@ -446,7 +445,7 @@ class Collection
 			'revison' => $revision,
 			'date'    => new \MongoDate(),
 			'user'    => $user->get('id'),
-			'status'  => (int) 100 
+			// 'status'  => (int) 100 
 		);
 
 		// set previous revision as "non active"
@@ -465,10 +464,10 @@ class Collection
 		if($insert_data)
 		{
 			//update previous revisions status
-			foreach($this->summary['revisions'] as &$r)
-			{
-				$r['status'] = -1;
-			}
+			// foreach($this->summary['revisions'] as &$r)
+			// {
+			// 	$r['status'] = -1;
+			// }
 			
 			$this->summary['revisions'][] = $revision;
 			$this->data[] = $data;

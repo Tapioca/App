@@ -60,6 +60,8 @@ class Controller_Api extends Controller_Rest
 		return true;
 	}
 
+	// TODO: to remove
+	// done in permission settings
 	protected static function isInApp()
 	{
 		if( self::$granted )
@@ -158,6 +160,27 @@ class Controller_Api extends Controller_Rest
 				return false;
 			}
 		}
+	}
+
+	protected function dispatch(&$summary, &$schema, $values)
+	{
+		$arrSummary = Config::get('tapioca.collection.dispatch.summary');
+		$arrData    = Config::get('tapioca.collection.dispatch.data');
+
+		foreach($values as $key => $value)
+		{
+			if(in_array($key, $arrSummary))
+			{
+				$summary[$key] = $value;
+			}
+
+			if(in_array($key, $arrData))
+			{
+				$schema[$key] = $value;
+			}
+		}
+
+		return;
 	}
 
 	public function after( $response )

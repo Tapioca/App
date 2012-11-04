@@ -42,10 +42,6 @@ class Controller_Api_Collection_Abstract extends Controller_Api
         static::$locale     = Input::get('l', null);
         static::$revision   = Input::get('r', null);
 
-        // check if user is allowed
-        // for this app
-        static::isInApp();
-
         Permissions::set( static::$user, static::$app );
     }
 

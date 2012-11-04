@@ -789,7 +789,7 @@ class Document
 		}
 
 		$database = Config::get('db.mongo.default.database');
-		$delete   = static::$db->drop_collection($database, static::$collection);
+		$delete   = static::$db->drop_collection($database, static::$dbCollectionName);
 
 		if($delete)
 		{

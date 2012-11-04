@@ -150,6 +150,11 @@ return array(
                 'callback',
                 'template'
             )
+        ),
+        'status' => array(
+            'public',
+            'private',
+            'draft'
         )
     ),
 
@@ -253,13 +258,13 @@ return array(
         'app_promote_users',
 
         'app_list_collections',
-        'app_read_collections',
+        'app_read_collections_public',
+        'app_read_collections_private',
+        'app_read_collections_draft',
         'app_create_collections',
         'app_delete_collections',
         'app_empty_collections',
         'app_edit_collections',
-        'app_edit_published_collections',
-        'app_publish_collections',
 
         'app_list_documents',
         'app_read_documents',
@@ -323,13 +328,13 @@ return array(
             'app_promote_users',
 
             'app_list_collections',
-            'app_read_collections',
+            'app_read_collections_public',
+            'app_read_collections_private',
+            'app_read_collections_draft',
             'app_create_collections',
             'app_delete_collections',
             'app_empty_collections',
             'app_edit_collections',
-            'app_edit_published_collections',
-            'app_publish_collections',
 
             'app_list_documents',
             'app_read_documents',
@@ -359,13 +364,12 @@ return array(
             'read_apps',
 
             'app_list_collections',
-            'app_read_collections',
-            'app_create_collections',
-            'app_delete_collections',
+            'app_read_collections_public',
+            'app_read_collections_private',
+            // 'app_create_collections',
+            // 'app_delete_collections',
             'app_empty_collections',
-            'app_edit_collections',
-            'app_edit_published_collections',
-            'app_publish_collections',
+            // 'app_edit_collections',
 
             'app_list_documents',
             'app_read_documents',
@@ -395,7 +399,7 @@ return array(
             'read_apps',
 
             'app_list_collections',
-            'app_read_collections',
+            'app_read_collections_public',
         
             'app_list_documents',
             'app_read_documents',
@@ -416,7 +420,7 @@ return array(
             'read_apps',
 
             'app_list_collections',
-            'app_read_collections',
+            'app_read_collections_public',
         
             'app_list_documents',
             'app_read_documents',

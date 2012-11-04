@@ -26,7 +26,7 @@ class Permissions
             $isAdmin = $user->get('admin');
             $userId  = $user->get('id');
 
-            if( !is_null( $app ) && !$isAdmin )
+            if( !is_null( $app ) )// && !$isAdmin )
             {
                 if( !$app->in_app( $userId ) )
                 {

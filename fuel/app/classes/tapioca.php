@@ -466,7 +466,7 @@ class Tapioca
 			static::$db = \Mongo_Db::instance();
 		}
 
-		$collection = Config::get('tapioca.collections.delete');
+		$collection = Config::get('tapioca.collections.deletes');
 
 		$token = \Str::random('alnum', 16);
 
@@ -504,7 +504,7 @@ class Tapioca
 			static::$db = \Mongo_Db::instance();			
 		}
 
-		$collection = Config::get('tapioca.collections.delete');
+		$collection = Config::get('tapioca.collections.deletes');
 		$limitDate  = ( time() - Config::get('tapioca.deleteToken') );
 
 		$object = static::$db->get_where( $collection, array(
