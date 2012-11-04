@@ -80,11 +80,23 @@ class Controller_Api extends Controller_Rest
 		}
 	}
 
+	// TODO: to remove
+	// done in permission settings
 	protected static function isAppAdmin()
 	{
 		return static::$app->is_admin( static::$user->get('id') );
 	}
 
+	// TODO: to remove
+	// done in permission settings
+	protected static function isAdmin()
+	{
+		if( self::$user )
+			return self::$user->is_admin();
+
+		return false;
+	}
+	
 	protected static function restricted()
 	{
 		Config::set('rest.auth', 'locked');
@@ -94,14 +106,6 @@ class Controller_Api extends Controller_Rest
 		self::$data    = array(
 			'message' => 'Access not allowed'
 		);
-	}
-
-	protected static function isAdmin()
-	{
-		if( self::$user )
-			return self::$user->is_admin();
-
-		return false;
 	}
 
 	protected static function error( $message, $status = 501, $debug = null )
