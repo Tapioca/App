@@ -1,0 +1,181 @@
+
+#form-elements,
+#form {
+  display: block;
+  float: left;
+  height: 100%;
+}
+
+#form {
+  margin-left: 20px;
+  width: 800px;
+}
+
+#form ul.sortable {
+  background: #eee;
+  list-style: none;
+  min-height: 20px;
+  padding: 4px;
+}
+
+#form ul.empty {
+  border: 1px dashed #999;
+}
+
+#form ul.sortable.empty:after {
+  color: #888;
+  content: 'drop element here';
+  display: block;
+  font-weight: bold;
+  padding-top: 3px;
+  text-align: center;
+}
+
+#form li[data-type] {
+  background: #fff;
+  margin: 4px 4px 8px;
+  min-height: 17px;
+  padding: 4px;
+}
+
+#form li.warning {
+  background: rgba(255, 0, 0, .25);
+}
+
+#form li:last-child {
+  margin-bottom: 4px;
+}
+
+#form .element-name {
+  display: none;
+}
+
+#form .element-required {
+  display: block;
+}
+
+#form .element-required input {
+  background: none;
+  border: 0;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+  border-radius: 0
+}
+
+#form .element-required input:focus {
+  border-bottom: 1px solid #ccc;
+}
+
+#form .input-id-wrapper {
+  display: none
+}
+
+#form .input-id-wrapper,
+#form .input-id-wrapper input {
+  color: #aaa;
+}
+
+#form .element-required:before {
+  content: ':: ';
+  cursor: move;
+  display: inline-block;
+  font-size: 10px;
+  font-weight: normal;
+  margin-right: 5px;
+}
+
+#form .element-required.defined .options-trigger {
+  cursor: pointer;
+}
+
+#form .element-required.defined .options-trigger:after {
+  content: '▼';
+  display: inline-block;
+  font-size:7px;
+  left:4px;
+  position: relative;
+  top:-1px;
+}
+
+#form .remove {
+  cursor: pointer;
+  float: right;
+}
+
+#form .remove:hover {
+  color: #f00;
+}
+
+.element-options {
+  display: block;
+  padding: 8px 4px 0;
+}
+
+ul.options-attributes {
+  list-style: none;
+  overflow: hidden;
+  padding: 8px 0 8px;
+}
+
+ul.options-attributes:last-child {
+  padding-bottom: 0;
+}
+
+ul.options-attributes li {
+  float: left;
+  height: 17px;
+  margin-bottom: 8px;
+  width: 50%;
+}
+
+ul.options-attributes label {
+  display: inline-block;
+  width: 30%;
+}
+
+ul.options-attributes input[size="3"] { 
+  width: 10%;
+}
+
+#form li.ui-placeholder {
+  border: 1px dashed #ccc;
+  min-height: 27px;
+}
+
+#form-elements {
+  list-style: none;
+  padding: 0;
+  width: 155px;
+}
+
+#form-elements li {
+  background: #fff;
+  border: 1px solid #999;
+  cursor: move;
+  margin-bottom: 5px;
+  padding: 5px;
+}
+
+.element-options,
+#form-elements ul.sortable,
+#form-elements .element-required,
+#form-elements .remove  {
+  display: none;
+}
+
+.dp-b {
+  display: block;
+}
+
+.ov-h {
+  overflow: hidden;
+}
+
+.cr-l {
+  clear: left;
+}
+
+.tto {
+  border-bottom: 1px solid #ccc; 
+  font-weight: bold;
+}

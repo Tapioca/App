@@ -60,6 +60,8 @@ $.Tapioca.Router = Backbone.Router.extend({
 
     appCollectionRef: $.Tapioca.Controllers.Collection.Ref,
 
+    appCollectionNew: $.Tapioca.Controllers.Collection.New,
+
     appCollectionEdit: $.Tapioca.Controllers.Collection.Edit,
 
     notFound: function( path )

@@ -17,8 +17,9 @@ return array(
         'collections'     => 'collections',
         'documents'       => 'documents',
         'files'           => 'files',
-        'delete'          => 'delete',
-        'preview'         => 'preview',
+        'deletes'         => 'deletes',
+        'previews'        => 'previews',
+        'invitaions'      => 'invitaions'
     ),
 
     /*

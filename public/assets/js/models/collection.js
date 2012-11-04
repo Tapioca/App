@@ -1,14 +1,12 @@
 $.Tapioca.Models.Collection = $.Tapioca.Models.Tapioca.extend(
 {
     idAttribute: 'namespace',
-    urlString: 'collection',
     
     url: function()
     {
-        var base = $.Tapioca.config.apiUrl + this.urlString;
+        var base = this.collection.url();
         if (this.isNew()) return base;
 
-        var base = $.Tapioca.config.apiUrl;
         var url = base + (base.charAt(base.length - 1) == '/' ? '' : '/') + this.id;
 
         if( this.deleteToken )
@@ -29,5 +27,10 @@ $.Tapioca.Models.Collection = $.Tapioca.Models.Tapioca.extend(
             self = this;
 
         $.Tapioca.Dialog.open( _.bind( this.delete, this ), { text: text });
+    },
+
+    hasSchema: function()
+    {
+        return _.isUndefined( this.attributes.schema );
     }
 });

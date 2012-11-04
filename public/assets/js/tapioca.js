@@ -73,8 +73,9 @@
             // 'app/:appslug/settings'                 : 'appSettings',
             // 'app/:appslug/library'                  : 'appLibrary',
             // 'app/:appslug/library/:filename'        : 'appLibraryRef',
+            'app/:appslug/collection/new'           : 'appCollectionNew',
             'app/:appslug/:namespace/edit'          : 'appCollectionEdit',
-            'app/:appslug/:namespace/:ref'          : 'appCollectionRef',
+            // 'app/:appslug/:namespace/:ref'          : 'appCollectionRef',
             'app/:appslug/:namespace'               : 'appCollectionHome',
             '*path'                                 : 'notFound'
         }

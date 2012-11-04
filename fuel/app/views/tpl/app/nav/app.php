@@ -26,7 +26,7 @@
 							{{#if isAppAdmin}}
 							<li class="divider"></li>
 							<li>
-								<a href="app/{{ slug }}/collections/new" class="admin-action">
+								<a href="<?= Uri::create('app/'); ?>{{ slug }}/collection/new" class="admin-action">
 									<i class="icon-plus"></i>
 									<?= __('tapioca.ui.label.add_collections'); ?>
 								</a>
