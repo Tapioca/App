@@ -6,6 +6,8 @@ $.Tapioca.Views.CollectionEdit = $.Tapioca.Views.FormView.extend(
         this.isNew = options.isNew;
 
         this.$el.appendTo('#app-content');
+
+        this.model.bind('reset', this.render, this);
         
         return this;
     },

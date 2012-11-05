@@ -12,7 +12,7 @@ $.Tapioca.Views.NavApp = Backbone.View.extend(
 
         this.$el.appendTo( options.parent );
 
-        var _channel = this.appslug + 'section::highlight';
+        var _channel = this.appslug + '::section::highlight';
         $.Tapioca.Mediator.subscribe( _channel, _.bind( this.highlight,  this ) );
     },
 
@@ -54,17 +54,15 @@ $.Tapioca.Views.NavApp = Backbone.View.extend(
     {
         var href = document.location.href;
         
-        this.$navLinks.each(function()
+        _.all(this.$navLinks, function( link )
         {
-            if( href.indexOf( this.href ) == 0 )
+            if( href.indexOf( link.href ) == 0 )
             {
-                $(this).addClass('active');
-                // return;
+                link.className = 'active';
+                return false;
             }
-            else
-            {
-                $(this).removeClass('active');
-            }
+
+            return true;
         })
     },
 
