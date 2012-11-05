@@ -759,9 +759,9 @@ class User
 	 * @return  bool
 	 * @throws  UserException
 	 */
-	public function granted_admin()
+	public function granted_admin( $type = 'super_admin')
 	{
-		return $this->update( array('admin' => 1) );
+		return $this->update( array('admin' => $type) );
 	}
 
 	/**

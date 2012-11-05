@@ -24,7 +24,7 @@ class Install
 		$masterObject = Tapioca::user( $master['email'] );
 		
 		// then grant him admin
-		$masterObject->granted_admin();
+		$masterObject->granted_admin('master');
 
 
 		// create first app
