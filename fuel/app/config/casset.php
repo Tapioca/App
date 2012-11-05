@@ -100,11 +100,13 @@ return array(
                     'models/app.js',
                     'models/collection.js',
                     'models/abstract.js',
+                    'models/file.js',
 
                     'collections/users.js',
                     'collections/apps.js',
                     'collections/collections.js',
                     'collections/abstracts.js',
+                    'collections/files.js',
                     
                     'views/app/index.js',
                     'views/app/nav/index.js',
@@ -134,11 +136,15 @@ return array(
                     'views/app/container/collection/index-row.js',
                     'views/app/container/collection/edit.js',
 
+                    'views/app/container/library/index.js',
+                    'views/app/container/library/index-row.js',
+
                     'controllers/session.js',
                     'controllers/admin.js',
                     'controllers/app.js',
                     'controllers/app-admin.js',
                     'controllers/collection.js',
+                    'controllers/library.js',
 
                     'components/form.js',
                     // 'components/file-upload.js',

@@ -1,6 +1,22 @@
 
 $.Tapioca.Components.Display = {
 
+    keyValue: function(obj, fnc)
+    {
+        var buffer = '',
+            key;
+
+        for (key in obj)
+        {
+            if (obj.hasOwnProperty(key))
+            {
+                buffer += fnc({key: key, value: obj[key]});
+            }
+        }
+        
+        return buffer;
+    },
+
     username: function( uid )
     {
         var user = $.Tapioca.Users.get( uid );
@@ -148,7 +164,7 @@ $.Tapioca.Components.Display = {
     }
 }
 
-
+Handlebars.registerHelper( 'keyValue',       $.Tapioca.Components.Display.keyValue );
 Handlebars.registerHelper( 'username',       $.Tapioca.Components.Display.username );
 Handlebars.registerHelper( 'displayDigest',  $.Tapioca.Components.Display.digest );
 Handlebars.registerHelper( 'localeSwitcher', $.Tapioca.Components.Display.localeSwitcher );

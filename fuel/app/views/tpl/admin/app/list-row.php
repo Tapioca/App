@@ -14,6 +14,7 @@
                                         </a>
                                         <a href="javascript:;" class="btn btn-mini btn-danger btn-delete-trigger">
                                             <i class="icon-trash"></i>
+                                            <?= __('tapioca.ui.label.delete'); ?>
                                         </a>
                                     </div>
                                 </td>

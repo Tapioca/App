@@ -37,7 +37,7 @@
 						<h6><?= __('tapioca.ui.label.app_library'); ?></h6>
 						<ul id="app-nav-files-{{ slug }}">
 							<li data-namespace="library">
-								<a href="<?= Uri::create('app/'); ?>{{ slug }}/library"><?= __('tapioca.ui.label.app_library'); ?></a>
+								<a href="<?= Uri::create('app/'); ?>{{ slug }}/library"><?= __('tapioca.ui.label.library_all_files'); ?></a>
 							</li>
 							<li class="divider"></li>
 							<li>

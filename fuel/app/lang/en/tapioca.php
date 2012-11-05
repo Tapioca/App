@@ -113,6 +113,8 @@ return array(
             'not_activated'      => 'not activated',
             'activated'          => 'activated',
             'edit'               => 'edit',
+            'delete'             => 'delete',
+            'select'             => 'select',
             'clone'              => 'clone',
             'edit_app_profile'   => 'Profile',
             'edit_app_user'      => 'Users',
@@ -139,7 +141,18 @@ return array(
             'col_status'         => 'Status',
             'col_status_draft'   => 'draft',
             'col_status_public'  => 'public',
-            'col_status_private' => 'private'
+            'col_status_private' => 'private',
+            'library_all_files'  => 'All files',
+            'library_image'      => 'Image',
+            'library_video'      => 'Video',
+            'library_document'   => 'Document',
+            'library_other'      => 'Other',
+            'categories'         => 'Categories',
+            'tags'               => 'Tags',
+            'all_tags'           => 'All tags',
+            'filename'           => 'filename',
+            'category'           => 'category',
+            'no_file'            => 'no file'
         ),
         'dialog' => array(
             'beforeunload' => 'Are you sure you want to leave with out save?',
@@ -149,6 +162,7 @@ return array(
         'delete' => array(
             'question'        => 'Are you sure you want to delete %1$s from %2$s ?',
             'user'            => 'the users',
+            'file'            => 'the library',
             'question_remove' => 'Are you sure you want to remove %1$s from group ?',
         ),
         'title' => array(
@@ -160,7 +174,7 @@ return array(
             'dashbord'        => 'Dashboard',
             'app_users'       => '%1s users',
             'new_collection'  => 'New collection',
-            'edit_collection' => 'Edit %1s'
+            'edit_collection' => 'Edit %1s collection'
         ),
         'session' => array(
             'user-profile'    => 'My Account',

@@ -1,7 +1,8 @@
 
-$.Tapioca.Collections.Collections = Backbone.Collection.extend(
+$.Tapioca.Collections.Files = Backbone.Collection.extend(
 {
-    urlString: 'collection',
+    urlString: 'library',
+    fetched:   false,
 
     initialize: function( options )
     {
@@ -26,8 +27,25 @@ $.Tapioca.Collections.Collections = Backbone.Collection.extend(
         });
     },
 
+    setCategories: function( attributes )
+    {
+        this.categories = this.categories || {};
+
+        _.extend(this.categories, attributes);
+        
+    },
+
     parse: function( response )
     {
+        this.setCategories( response.categories );
+
+        this.fetched = true;
+
         return response.results;
+    },
+
+    isFetched: function()
+    {
+        return this.fetched;
     }
 });

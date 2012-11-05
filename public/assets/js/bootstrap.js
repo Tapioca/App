@@ -47,8 +47,11 @@ $.Tapioca.Bootstrap = function()
                 var appslug = app.get('slug'),
                     appTeam = app.get('team');
 
-                $.Tapioca.UserApps[ appslug ].app   = app;
-                $.Tapioca.UserApps[ appslug ].users = new $.Tapioca.Collections.Users( appTeam );
+                $.Tapioca.UserApps[ appslug ].app     = app;
+                $.Tapioca.UserApps[ appslug ].users   = new $.Tapioca.Collections.Users( appTeam );
+                $.Tapioca.UserApps[ appslug ].library = new $.Tapioca.Collections.Files( {
+                    appslug: appslug
+                });
                 
                 loadCollection( appslug );
             });
@@ -80,7 +83,7 @@ $.Tapioca.Bootstrap = function()
                         });
 
                     $.Tapioca.UserApps[ appslug ].data[ _namespace ] = {
-                        schema:    false,
+                        schema:    false, // useless ?
                         abstracts: _abstracts
                     };
                 }, this)

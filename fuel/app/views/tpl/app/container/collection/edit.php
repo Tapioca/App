@@ -39,9 +39,15 @@
                                 <label class="control-label"><?= __('tapioca.ui.label.col_status'); ?></label>
                                 <div class="controls">
                                     <select>
-                                        <option value="draft"><?= __('tapioca.ui.label.col_status_draft'); ?></option>
-                                        <option value="public"><?= __('tapioca.ui.label.col_status_public'); ?></option>
-                                        <option value="private"><?= __('tapioca.ui.label.col_status_private'); ?></option>
+                                        <option value="draft"{{{isSelected status default="draft" attribute=" selected"}}>
+                                            <?= __('tapioca.ui.label.col_status_draft'); ?>
+                                        </option>
+                                        <option value="public"{{{isSelected status default="public" attribute=" selected"}}>
+                                            <?= __('tapioca.ui.label.col_status_public'); ?>
+                                        </option>
+                                        <option value="private"{{{isSelected status default="private" attribute=" selected"}}>
+                                            <?= __('tapioca.ui.label.col_status_private'); ?>
+                                        </option>
                                     </select>
                                 </div>
                             </div>

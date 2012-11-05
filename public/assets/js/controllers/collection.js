@@ -51,13 +51,18 @@ console.log('Collection Ref: ' +namespace+', ref: '+ref);
 
         if( collection.hasSchema() )
         {
-            collection.fetch()
+            collection.fetch({
+                success: function()
+                {
+                    $.Tapioca.view.render();
+                }
+            })
         }
 
         $.Tapioca.view = new $.Tapioca.Views.CollectionEdit({
             isNew: false,
             model: collection
-        }).render();
+        });
 
     }
 };
