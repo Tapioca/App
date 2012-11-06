@@ -56,6 +56,8 @@ $.Tapioca.Router = Backbone.Router.extend({
 
     appUsers: $.Tapioca.Controllers.AppAdmin.Users,
 
+    appSettings: $.Tapioca.Controllers.AppAdmin.Settings,
+
     appCollectionHome: $.Tapioca.Controllers.Collection.Home,
 
     appCollectionRef: $.Tapioca.Controllers.Collection.Ref,

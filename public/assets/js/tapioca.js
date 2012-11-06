@@ -70,7 +70,7 @@
             'app/admin/app/:slug'                   : 'adminAppEdit',
             'app/:appslug'                          : 'appHome',
             'app/:appslug/user'                     : 'appUsers',
-            // 'app/:appslug/settings'                 : 'appSettings',
+            'app/:appslug/settings'                 : 'appSettings',
             'app/:appslug/library/:basename.:ext'   : 'appLibraryRef',
             'app/:appslug/library'                  : 'appLibrary',
             'app/:appslug/collection/new'           : 'appCollectionNew',

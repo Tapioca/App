@@ -9,7 +9,7 @@ $.Tapioca.Views.Library = $.Tapioca.Views.Content.extend(
     {
         this.appslug   = $.Tapioca.appslug;
         this.tplRow    = Handlebars.compile( $.Tapioca.Tpl.app.container.library['index-row'] );
-        this.tplTags   = Handlebars.compile( $.Tapioca.Tpl.app.container.library.tags );
+        this.tplTags   = Handlebars.compile( $.Tapioca.Tpl.components.tags );
 
         Handlebars.registerPartial('library-list',  $.Tapioca.Tpl.app.container.library['index-list'] );
 
