@@ -129,8 +129,11 @@ return array(
                     'views/admin/app/edit.js',
 
                     'views/app/container/home/index.js',
+
                     'views/app/container/user/index.js',
                     'views/app/container/user/index-row.js',
+
+                    'views/app/container/settings/index.js',
 
                     'views/app/container/collection/index.js',
                     'views/app/container/collection/index-row.js',

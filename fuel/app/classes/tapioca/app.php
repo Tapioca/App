@@ -81,6 +81,25 @@ class App
 	}
 
 	/**
+	 * Copy user properties and remove
+	 * privates data for public display
+	 *
+	 * @return  App object
+	 */
+	// public function __clone()
+	// {
+	// 	unset( $this->user['_id'] );
+	// 	unset( $this->user['password'] );
+	// 	unset( $this->user['ip_address'] );
+	// 	unset( $this->user['status'] );
+	// 	unset( $this->user['remember_me'] );
+	// 	unset( $this->user['password_reset_hash'] );
+		
+	// 	$this->user['avatar'] = \Gravy::from_email( $this->user['email'], 100, 'g', null, true);
+	// }
+
+
+	/**
 	 * Gets all the app info.
 	 *
 	 * @param   string|int  App id or name
@@ -193,6 +212,11 @@ class App
 			$app['locales'][] = \Config::get('tapioca.locales.default');
 		}
 
+		if ( ! array_key_exists('extwhitelist', $app))
+		{
+			$app['extwhitelist'] = \Config::get('tapioca.upload.ext_whitelist');
+		}
+
 		$app_id = uniqid();
 
 		$app['id'] = $app_id;
@@ -226,12 +250,13 @@ class App
 		if ($field === null)
 		{
 			return array(
-				'id'      => $this->app['id'],
-				'name'    => $this->app['name'],
-				'slug'    => $this->app['slug'],
-				'admins'  => $this->admins,
-				'locales' => $this->app['locales'],
-				'team'    => $this->team
+				'id'           => $this->app['id'],
+				'name'         => $this->app['name'],
+				'slug'         => $this->app['slug'],
+				'admins'       => $this->admins,
+				'locales'      => $this->app['locales'],
+				'extwhitelist' => $this->app['extwhitelist'],
+				'team'         => $this->team
 			);
 		}
 		// if field is an array - return requested fields
@@ -302,6 +327,12 @@ class App
 		if (array_key_exists('locales', $fields))
 		{
 			$update['locales'] = $fields['locales'];
+		}
+
+		// update extension whitelist
+		if (array_key_exists('extwhitelist', $fields))
+		{
+			$update['extwhitelist'] = $fields['extwhitelist'];
 		}
 
 		if (empty($update))

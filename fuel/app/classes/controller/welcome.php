@@ -67,6 +67,9 @@ class Controller_Welcome extends Controller
             'status'    => array(
                 'public' => $statusPublic,
                 'tech'   => $statusTech
+            ),
+            'medias'    => array(
+                'extWhitelist' => Config::get('tapioca.upload.ext_whitelist')
             )
         );
 

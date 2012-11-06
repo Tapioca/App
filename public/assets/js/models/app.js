@@ -81,6 +81,16 @@ $.Tapioca.Models.App = $.Tapioca.Models.Tapioca.extend(
         }
         
         return _.contains( this.admins, $.Tapioca.Session.get('id') );
+    },
+
+    getExtWhitelist: function()
+    {
+        if( _.isUndefined( this.get('extwhitelist') ) )
+        {
+            this.set('extwhitelist', $.Tapioca.config.medias.extWhitelist);
+        }
+
+        return this.get('extwhitelist');
     }
 
 });
