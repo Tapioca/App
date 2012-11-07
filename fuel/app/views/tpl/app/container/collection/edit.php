@@ -15,7 +15,7 @@
                             <a href="#collection-callback" data-toggle="tab" data-bypass="true"><?= __('tapioca.ui.label.edit_callback'); ?></a>
                         </li>
                     </ul>
-                    <form class="form-horizontal tab-content" method="post" action="<?= Uri::create('api/void'); ?>" target="postFrame">
+                    <?= Form::open(array('class' => 'form-horizontal tab-content')); ?>
                         <fieldset id="collection-desc" class="tab-pane active">
                             <div class="control-group">
                                 <label class="control-label"><?= __('tapioca.ui.label.col_namespace'); ?></label>
@@ -375,8 +375,7 @@
                         <fieldset id="collection-callback" class="tab-pane">
 
                         </fieldset>
-                    </form>
-                    <iframe name="postFrame" class="hide"></iframe>
+                    <?= Form::close(); ?>
                 </div><!-- /.pane-content -->
                 <div class="form-actions form-footer">
                     <button type="submit" id="profile-form-save" class="btn btn-primary disabled" disabled="disabled" data-loading-text="<?= __('tapioca.ui.label.saving'); ?>">

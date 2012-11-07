@@ -16,6 +16,7 @@ Autoloader::add_classes(array(
 	// Add classes you want to override here
 	// Example: 'View' => APPPATH.'classes/view.php',
 	'Controller_Rest'	=> APPPATH.'classes/core/controller/rest.php',
+	'Form_Instance'	    => APPPATH.'classes/core/form/instance.php',
 
 	'Mongo_Db'			=> APPPATH.'classes/core/mongo/db.php',
 	'GridFs'			=> APPPATH.'classes/core/mongo/gridfs.php',	
@@ -35,6 +36,7 @@ Autoloader::add_classes(array(
 	'Tapioca\\AppException'               => APPPATH.'classes/tapioca/group.php',
 	'Tapioca\\AppNotFoundException'       => APPPATH.'classes/tapioca/group.php',
 	'Tapioca\\PermissionsException'       => APPPATH.'classes/tapioca/permissions.php',
+	// 'Tapioca\\InviteException'            => APPPATH.'classes/tapioca/invite.php',
 
 	'Tapioca\\CollectionException'        => APPPATH.'classes/tapioca/collection.php', 
 	'Tapioca\\DocumentException'          => APPPATH.'classes/tapioca/document.php',  
@@ -46,6 +48,7 @@ Autoloader::add_classes(array(
 	'Tapioca\\User'                       => APPPATH.'classes/tapioca/user.php',
 	'Tapioca\\Attempts'                   => APPPATH.'classes/tapioca/attempts.php',
 	'Tapioca\\Permissions'                => APPPATH.'classes/tapioca/permissions.php',
+	// 'Tapioca\\Invite'                     => APPPATH.'classes/tapioca/invite.php',
 	'Tapioca\\App'                        => APPPATH.'classes/tapioca/app.php',
 	'Tapioca\\Collection'                 => APPPATH.'classes/tapioca/collection.php',
 	'Tapioca\\Document'                   => APPPATH.'classes/tapioca/document.php',

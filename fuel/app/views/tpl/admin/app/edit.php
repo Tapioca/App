@@ -12,7 +12,7 @@
                             <a href="#locales-form" data-toggle="tab" data-bypass="true"><?= __('tapioca.ui.label.edit_app_locale'); ?></a>
                         </li>
                     </ul>
-                    <form class="form-horizontal tab-content" method="post" action="<?= Uri::create('api/void'); ?>" target="postFrame">
+                    <?= Form::open(array('class' => 'form-horizontal tab-content')); ?>
                         <fieldset id="profile-form" class="tab-pane active">
                             <div class="control-group">
                                 <label class="control-label" for="slug"><?= __('tapioca.ui.label.app_slug'); ?></label>
@@ -80,8 +80,7 @@
                                 {{/each}}
                             </ul>
                         </fieldset>
-                    </form>
-                    <iframe name="postFrame" class="hide"></iframe>
+                    <?= Form::close(); ?>
                 </div><!-- /.pane-content -->
                 <div class="form-actions form-footer">
                     <button type="submit" id="app-form-save" class="btn btn-primary disabled" disabled="disabled" data-loading-text="<?= __('tapioca.ui.label.saving'); ?>">

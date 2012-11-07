@@ -12,7 +12,7 @@
                             <a href="#apps-form" data-toggle="tab" data-bypass="true"><?= __('tapioca.ui.session.edit_apps'); ?></a>
                         </li>
                     </ul>
-                    <form class="form-horizontal tab-content" method="post" action="<?= Uri::create('api/void'); ?>" target="postFrame">
+                    <?= Form::open(array('class' => 'form-horizontal tab-content')); ?>
                         <fieldset id="account-form" class="tab-pane active">
                             <div class="control-group">
                                 <label class="control-label"><?= __('tapioca.ui.session.name'); ?></label>
@@ -65,8 +65,7 @@
                                 {{/apps}}
                             </ul>
                         </fieldset>
-                    </form>
-                    <iframe name="postFrame" class="hide"></iframe>
+                    <?= Form::close(); ?>
                 </div><!-- /.pane-content -->
                 <div class="form-actions form-footer">
                     <button type="submit" id="profile-form-save" class="btn btn-primary disabled" disabled="disabled" data-loading-text="Saving stuff..."><?= __('tapioca.ui.label.submit'); ?></button>

@@ -12,7 +12,7 @@
                             <a href="#apikey-form" data-toggle="tab" data-bypass="true"><?= __('tapioca.ui.label.edit_app_apikey'); ?></a>
                         </li>
                     </ul>
-                    <form class="form-horizontal tab-content" method="post" action="<?= Uri::create('api/void'); ?>" target="postFrame">
+                    <?= Form::open(array('class' => 'form-horizontal tab-content')); ?>
                         <fieldset id="locales-form" class="tab-pane active">
                             <ul class="input-repeat-list">
                                 {{#each locales}}
@@ -34,8 +34,7 @@
 
                         </fieldset>
 
-                    </form>
-                    <iframe name="postFrame" class="hide"></iframe>
+                    <?= Form::close(); ?>
                 </div><!-- /.pane-content -->
                 <div class="form-actions form-footer">
                     <button type="submit" id="app-form-save" class="btn btn-primary disabled" disabled="disabled" data-loading-text="<?= __('tapioca.ui.label.saving'); ?>">
@@ -43,6 +42,3 @@
                     </button>
                     <button type="reset" class="btn"><?= __('tapioca.ui.label.cancel'); ?></button>
                 </div><!-- /.form-actions -->
-                <div id="dialog-confirm" class="hide">
-                    <p id="dialog-confirm-question"><?= __('tapioca.ui.dialog.beforeunload'); ?></p>
-                </div>
