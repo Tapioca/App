@@ -901,6 +901,9 @@ class Library
 	{
 		$config     = Config::get('tapioca.upload');
 
+		// extends extension whitelist with app settings
+		$config['ext_whitelist'] = static::$app->get('extwhitelist');
+
 		// process the uploaded files in $_FILES
 		Upload::process($config);
 

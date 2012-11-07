@@ -22,7 +22,7 @@ $.Tapioca.Views.AppAdminSettings = $.Tapioca.Views.FormView.extend(
     render: function()
     {
         var model = this.model.toJSON(),
-            ext   = this.model.getExtWhitelist();
+            ext   = this.model.get('extwhitelist');
 
         model.pageTitle    = $.Tapioca.I18n.get('title.edit_app', this.model.get('name'));
         model.extWhitelist = ext.join(', ');
@@ -53,10 +53,7 @@ $.Tapioca.Views.AppAdminSettings = $.Tapioca.Views.FormView.extend(
             locales       = [],
             defaultLocale = false;
 
-        if( whitelist != $.Tapioca.config.medias.extWhitelist.join(', '))
-        {
-            this.model.set('extwhitelist', whitelist.split(', '));
-        }
+        this.model.set('extwhitelist', whitelist.split(', '));
 
         $('#locales-form').find('input[name="locale-key"]').each(function( index )
         {

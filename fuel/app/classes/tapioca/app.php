@@ -81,22 +81,17 @@ class App
 	}
 
 	/**
-	 * Copy user properties and remove
+	 * Copy app properties and remove
 	 * privates data for public display
 	 *
 	 * @return  App object
 	 */
-	// public function __clone()
-	// {
-	// 	unset( $this->user['_id'] );
-	// 	unset( $this->user['password'] );
-	// 	unset( $this->user['ip_address'] );
-	// 	unset( $this->user['status'] );
-	// 	unset( $this->user['remember_me'] );
-	// 	unset( $this->user['password_reset_hash'] );
-		
-	// 	$this->user['avatar'] = \Gravy::from_email( $this->user['email'], 100, 'g', null, true);
-	// }
+	public function __clone()
+	{
+		unset( $this->app['_id'] );
+		unset( $this->app['locales_keys'] );
+		unset( $this->app['locale_default'] );
+	}
 
 
 	/**
@@ -247,17 +242,11 @@ class App
 		}
 
 		// if no fields were passed - return entire app
-		if ($field === null)
+		if ( is_null( $field ) )
 		{
-			return array(
-				'id'           => $this->app['id'],
-				'name'         => $this->app['name'],
-				'slug'         => $this->app['slug'],
-				'admins'       => $this->admins,
-				'locales'      => $this->app['locales'],
-				'extwhitelist' => $this->app['extwhitelist'],
-				'team'         => $this->team
-			);
+			$public = clone $this;
+
+			return $public->app;
 		}
 		// if field is an array - return requested fields
 		else if (is_array($field))
