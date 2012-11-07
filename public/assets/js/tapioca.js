@@ -221,7 +221,7 @@
                 // check if we set a dialog before we unload page
                 if($.Tapioca.BeforeUnload.verify())
                 {
-                    $.Tapioca.Dialog.open(callback)
+                    $.Tapioca.Dialog.confirm(callback, { text: __('dialog.beforeunload')});
                 }
                 else
                 {

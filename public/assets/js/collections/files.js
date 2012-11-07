@@ -14,7 +14,7 @@ $.Tapioca.Collections.Files = Backbone.Collection.extend(
        return $.Tapioca.config.apiUrl + this.appslug + '/' + this.urlString;
     },
 
-    model: $.Tapioca.Models.Collection,
+    model: $.Tapioca.Models.File,
 
     sorted: function( field )
     {

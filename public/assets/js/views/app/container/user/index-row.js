@@ -46,7 +46,7 @@ $.Tapioca.Views.AppAdminUserRow = Backbone.View.extend(
             text = $.Tapioca.I18n.get('delete.question_remove', user.get('name')),
             self = this;
 
-        $.Tapioca.Dialog.open( _.bind( this.delete, this ), { text: text });
+        $.Tapioca.Dialog.confirm( _.bind( this.delete, this ), { text: text });
     },
 
     delete: function()

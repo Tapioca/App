@@ -30,7 +30,7 @@ $.Tapioca.Models.App = $.Tapioca.Models.Tapioca.extend(
             text = $.Tapioca.I18n.get('delete.question', this.get('name'), type),
             self = this;
 
-        $.Tapioca.Dialog.open( _.bind( this.delete, this ), { text: text });
+        $.Tapioca.Dialog.confirm( _.bind( this.delete, this ), { text: text });
     },
 
     getWorkingLocale: function()

@@ -89,6 +89,4 @@
                     </button>
                     <button type="reset" class="btn"><?= __('tapioca.ui.label.cancel'); ?></button>
                 </div><!-- /.form-actions -->
-                <div id="dialog-confirm" class="hide">
-                    <p id="dialog-confirm-question"><?= __('tapioca.ui.dialog.beforeunload'); ?></p>
-                </div>
+

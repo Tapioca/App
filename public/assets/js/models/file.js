@@ -26,6 +26,6 @@ $.Tapioca.Models.File = $.Tapioca.Models.Tapioca.extend(
             text = $.Tapioca.I18n.get('delete.question', this.get('filename'), type),
             self = this;
 
-        $.Tapioca.Dialog.open( _.bind( this.delete, this ), { text: text });
+        $.Tapioca.Dialog.confirm( _.bind( this.delete, this ), { text: text });
     }
 });

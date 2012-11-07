@@ -22,7 +22,4 @@
                         <tbody>
                         </tbody>
                     </table>
-                    <div id="dialog-confirm" class="hide">
-                        <p id="dialog-confirm-question"></p>
-                    </div>
                 </div>

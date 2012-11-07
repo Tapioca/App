@@ -44,14 +44,11 @@
                                 {{#digest}}
                                 <th>{{ label }}</th>
                                 {{/digest}}
-                                <th width="150"><?= __('tapioca.ui.label.document_status'); ?></th>
-                                <th width="120"></th>
+                                <th width="100"><?= __('tapioca.ui.label.document_status'); ?></th>
+                                <th width="150"></th>
                             </tr>
                         </thead>
                         <tbody>
                         </tbody>
                     </table>
-                    <div id="dialog-confirm" class="hide">
-                        <p id="dialog-confirm-question"></p>
-                    </div>
                 </div>

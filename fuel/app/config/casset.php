@@ -39,6 +39,7 @@ return array(
                     'font-awesome.css',
                     'bootstrap.css',
                     'bootstrap-overload.css',
+                    'ui.css',
                     'colorpicker.css',
                     'datepicker.css',
                     'redactor.css',
