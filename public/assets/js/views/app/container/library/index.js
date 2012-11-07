@@ -35,51 +35,55 @@ $.Tapioca.Views.Library = $.Tapioca.Views.Content.extend(
             this.display();
         }
 
+
         return this;
     },
 
     display: function()
     {
-        $('#file-collections-empty').remove();
-
-        _.each( this.collection.models, this.displayRow, this);
-
-        var tags      = this.tplTags({ tags: this.tags}),
-            $tags     = $('#tags-list'),
-            $category = $('#category-list'),
-            self      = this;
-
-        $tags.append(tags);
-
-        this.$tags     = $tags.find('li');
-        this.$category = $category.find('li');
-
-        var filterTags = function(event)
+        if( this.collection.models.length > 0 )
         {
-            self.$tags.removeClass('active');
+            this.$table.empty();
 
-            var key = $(event.target).addClass('active').attr('data-tag');
+            _.each( this.collection.models, this.displayRow, this);
 
-            for( var i in self.viewpointer )
+            var tags      = this.tplTags({ tags: this.tags}),
+                $tags     = $('#tags-list'),
+                $category = $('#category-list'),
+                self      = this;
+
+            $tags.append(tags);
+
+            this.$tags     = $tags.find('li');
+            this.$category = $category.find('li');
+
+            var filterTags = function(event)
             {
-                self.viewpointer[ i ].filterTags( key );
-            }
-        };
+                self.$tags.removeClass('active');
 
-        var filterCategory = function(event)
-        {
-            self.$category.removeClass('active');
+                var key = $(event.target).addClass('active').attr('data-tag');
 
-            var key = $(event.target).addClass('active').attr('data-category');
+                for( var i in self.viewpointer )
+                {
+                    self.viewpointer[ i ].filterTags( key );
+                }
+            };
 
-            for( var i in self.viewpointer )
+            var filterCategory = function(event)
             {
-                self.viewpointer[ i ].filterCategory( key );
-            }
-        };
+                self.$category.removeClass('active');
 
-        this.$tags.click(filterTags)
-        this.$category.click(filterCategory)
+                var key = $(event.target).addClass('active').attr('data-category');
+
+                for( var i in self.viewpointer )
+                {
+                    self.viewpointer[ i ].filterCategory( key );
+                }
+            };
+
+            this.$tags.click(filterTags)
+            this.$category.click(filterCategory)
+        }
     },
 
     displayRow: function( model )

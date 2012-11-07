@@ -22,10 +22,5 @@ $.Tapioca.Controllers.Library = {
         $.Tapioca.appslug = appslug;
 
 console.log('Library Ref: ' +basename+'.'+ext);
-    },
-
-    New: function( appslug )
-    {
-        $.Tapioca.appslug = appslug;
     }
 };

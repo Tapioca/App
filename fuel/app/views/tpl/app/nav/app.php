@@ -41,7 +41,7 @@
 							</li>
 							<li class="divider"></li>
 							<li>
-								<a href="<?= Uri::create('app/'); ?>{{ slug }}/library/upload" class="admin-action">
+								<a href="javascript:;" class="admin-action upload-trigger">
 									<i class="icon-plus"></i>
 									<?= __('tapioca.ui.label.add_file'); ?>
 								</a>

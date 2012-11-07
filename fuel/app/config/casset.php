@@ -82,17 +82,20 @@ return array(
 
                     'library::handlebars/handlebars-1.0.rc.1.js',
 
-                    // 'library::fileupload/jquery.ui.widget.js',
                     'library::fileupload/jquery.iframe-transport.js',
                     'library::fileupload/jquery.fileupload.js',
+                    'library::fileupload/jquery.fileupload-ui.js',
+                    'library::fileupload/jquery.fileupload-fp.js',
+                    // 'library::fileupload/canvas-to-blob.js',
+                    // 'library::fileupload/load-image.js',
 
                     'tapioca.js',
                     'bootstrap.js',
 
                     'modules/mediator.js',
                     'modules/dialog.js',
-                    'modules/beforeUnload.js',
-                    // 'modules/padlock.js',
+                    'modules/before-unload.js',
+                    'modules/file-upload.js',
                     'modules/i18n.js',
                     
                     'models/tapioca.js',

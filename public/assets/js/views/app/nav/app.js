@@ -16,6 +16,10 @@ $.Tapioca.Views.NavApp = Backbone.View.extend(
         $.Tapioca.Mediator.subscribe( _channel, _.bind( this.highlight,  this ) );
     },
 
+    events: {
+        'click a.upload-trigger': 'openUpload'
+    },
+
     render: function()
     {
         var model = this.model.toJSON(),
@@ -64,6 +68,13 @@ $.Tapioca.Views.NavApp = Backbone.View.extend(
 
             return true;
         })
+    },
+
+    openUpload: function()
+    {
+        $.Tapioca.Components.FileUpload.init({
+            appslug: this.appslug
+        });
     },
 
     onClose: function()

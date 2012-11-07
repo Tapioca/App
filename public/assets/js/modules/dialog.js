@@ -8,7 +8,8 @@ $.Tapioca.Dialog = (function()
         modal: true
     };
 
-    var buttons = { buttons: {} },
+    var $dialog = false,
+        buttons = { buttons: {} },
         _yes,
         _no;
 
@@ -25,12 +26,12 @@ $.Tapioca.Dialog = (function()
 
     var destroy = function()
     {
-        $('#dialog-confirm').dialog('destroy');
+        $dialog.dialog('destroy');
     };
 
     var close = function()
     {
-        $('#dialog-confirm').dialog('close');
+        $dialog.dialog('close');
     };
 
     var confirm = function(callback, settings)
@@ -54,24 +55,23 @@ $.Tapioca.Dialog = (function()
 
         var config = $.extend({}, defaults, settings || {}, buttons);
 
-        $('#dialog-confirm').dialog(config);
+        $dialog = $('#dialog-confirm');
+
+        $dialog.dialog(config);
     };
 
-    var open = function(callback, settings)
+    var open = function(settings)
     {
-        if( $('#dialog-confirm').size() == 0 )
+        if( $('#dialog-modal').size() == 0 )
         {
-            $('body').append('<div id="dialog-confirm"><p id="dialog-confirm-question"></p></div>')
-        }
-
-        if( !_.isUndefined( settings ) && !_.isUndefined( settings.text ) )
-        {
-            $('#dialog-confirm-question').text( settings.text );
+            $('body').append('<div id="dialog-modal"></div>');
         }
 
         var config = $.extend({}, defaults, settings || {});
 
-        $('#dialog-confirm').dialog(config);
+        $dialog = $('#dialog-modal');
+
+        $dialog.dialog(config);
     };
 
     return {
