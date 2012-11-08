@@ -1,3 +1,3 @@
-{{#tags}}
+{{#keyValue tags}}
 	<li data-tag="{{key}}">{{value}}</li>
-{{/tags}}
+{{/keyValue}}

@@ -18,6 +18,10 @@ $.Tapioca.Views.Library = $.Tapioca.Views.Content.extend(
         this.$el.appendTo('#app-content');
     },
 
+    events: {
+        'click a.upload-trigger': 'upload'
+    },
+
     render: function()
     {
         var tpl  = Handlebars.compile( $.Tapioca.Tpl.app.container.library.index ),
@@ -93,7 +97,7 @@ $.Tapioca.Views.Library = $.Tapioca.Views.Content.extend(
 
         _.each(tags, function(tag)
         {
-            this.tags.push(tag);
+            this.tags[ tag.key ] = tag.value;
             mergedTags.push( tag.key );
         }, this);
 
@@ -103,6 +107,13 @@ $.Tapioca.Views.Library = $.Tapioca.Views.Content.extend(
             tpl:       this.tplRow,
             parent:    this.$table,
             mergedTags: mergedTags
+        });
+    },
+
+    upload: function()
+    {
+        $.Tapioca.Components.FileUpload.init({
+            appslug: this.appslug
         });
     },
 

@@ -1,7 +1,7 @@
 
 $.Tapioca.Components.Display = {
 
-    keyValue: function(obj, fnc)
+    keyValue: function(obj, options)
     {
         var buffer = '',
             key;
@@ -10,7 +10,7 @@ $.Tapioca.Components.Display = {
         {
             if (obj.hasOwnProperty(key))
             {
-                buffer += fnc({key: key, value: obj[key]});
+                buffer += options.fn({key: key, value: obj[key]});
             }
         }
         
