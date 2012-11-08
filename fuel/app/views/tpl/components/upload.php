@@ -1,5 +1,6 @@
 
 					<h2 class="page-name">Upload file </h2>
+					<a href="javascript:;" id="close-upload">close</a>
 					<!-- The file upload form used as target for the file upload widget -->
 					<form id="fileupload" action="<?= Uri::create('api/'); ?>{{ appslug }}/library" method="POST" enctype="multipart/form-data" class="clear-left">
 						<br>
@@ -10,21 +11,12 @@
 								<span class="btn btn-success fileinput-button">
 									<i class="icon-plus icon-white"></i>
 									<span>Add files...</span>
-									<input type="file" name="files[]" multiple>
+									<input type="file" name="files[]"{{#multiple}} multiple{{/multiple}}>
 								</span>
 								<button type="submit" class="btn btn-primary start" id="btn-start-upload">
 									<i class="icon-upload icon-white"></i>
 									<span>Start upload</span>
 								</button>
-								<!-- button type="reset" class="btn btn-warning cancel">
-									<i class="icon-ban-circle icon-white"></i>
-									<span>Cancel upload</span>
-								</button>
-								<button type="button" class="btn btn-danger delete">
-									<i class="icon-trash icon-white"></i>
-									<span>Delete</span>
-								</button>
-								<input type="checkbox" class="toggle"-->
 							</div>
 							<div class="span5">
 								<input id="tags" type="text" name="tags" placeholder="séparez les tags par des virgules" />
@@ -42,9 +34,8 @@
 						<!-- The loading indicator is shown during file processing -->
 						<div class="fileupload-loading"></div>
 						<!-- The table listing the files available for upload/download -->
-						<table class="table table-striped">
-							<tbody class="files" data-toggle="modal-gallery" data-target="#modal-gallery"></tbody>
-						</table>
+						<ul id="upload-files-list">
+						</ul>
 					</form>
 
 				</div><!-- /.pane-content -->
