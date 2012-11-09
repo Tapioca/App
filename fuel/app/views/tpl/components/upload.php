@@ -1,12 +1,13 @@
 
-					<h2 class="page-name">Upload file </h2>
-					<a href="javascript:;" id="close-upload">close</a>
+					<h2 class="page-name">Upload file{{#multiple}}s{{/multiple}}</h2>
+					<a href="javascript:;" id="close-upload" class="close">x</a>
 					<!-- The file upload form used as target for the file upload widget -->
-					<form id="fileupload" action="<?= Uri::create('api/'); ?>{{ appslug }}/library" method="POST" enctype="multipart/form-data" class="clear-left">
+					<form id="fileupload" action="<?= Uri::create('api/'); ?>{{ appslug }}/library/{{ filename }}" method="POST" enctype="multipart/form-data" class="clear-left">
 						<br>
 						<!-- The fileupload-buttonbar contains buttons to add/delete files and start/cancel the upload -->
 						<div class="row fileupload-buttonbar">
-							<div class="span3">
+
+							<div class="span7">
 								<!-- The fileinput-button span is used to style the file input field as button -->
 								<span class="btn btn-success fileinput-button">
 									<i class="icon-plus icon-white"></i>
@@ -17,10 +18,10 @@
 									<i class="icon-upload icon-white"></i>
 									<span>Start upload</span>
 								</button>
+
+								<input id="tags" type="text" placeholder="séparez les tags par des virgules">
 							</div>
-							<div class="span5">
-								<input id="tags" type="text" name="tags" placeholder="séparez les tags par des virgules" />
-							</div>
+
 							<!-- The global progress information -->
 							<div class="span5 fileupload-progress fade">
 								<!-- The global progress bar -->

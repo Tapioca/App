@@ -5,20 +5,23 @@ $.Tapioca.Components.FileUpload = {
     {
         var defaults = {
             autoUpload:             true,
-            singleFileUploads:      true,
-            limitMultiFileUploads:  1,
+            singleFileUploads:      false,
+            limitMultiFileUploads:  5,
             limitConcurrentUploads: 1,
             formData:               {},
             height:                 300
         };
 
         var tpl    = Handlebars.compile( $.Tapioca.Tpl.components.upload ),
-            config = $.extend({}, defaults, _settings || {}),
+            config = $.extend(defaults, _settings || {}),
+            flag   = false,
             $fileupload,
             $tags,
             $start,
             $list,
-            uploader;
+            $dialog,
+            uploader,
+            uploaderData;
 
         // accept file types based on app settings
         extwhitelist = $.Tapioca.UserApps[ config.appslug ].app.get('extwhitelist');
@@ -30,14 +33,16 @@ $.Tapioca.Components.FileUpload = {
             height: config.height
         });
 
-        $('#dialog-modal').html( tpl({
+        $dialog = $('#dialog-modal');
+
+        $dialog.html( tpl({
             appslug: config.appslug,
-            multiple: (!config.singleFileUploads)
+            multiple: (!config.singleFileUploads),
+            filename: config.filename || false,
         }))
 
         $fileupload = $('#fileupload');
         $tags       = $('#tags');
-        $start      = $('#btn-start-upload');
         $list       = $('#upload-files-list');
 
         $('#fileupload-trigger').click($fileupload.click);
@@ -46,6 +51,20 @@ $.Tapioca.Components.FileUpload = {
             $.Tapioca.Components.FileUpload.clean();
             $.Tapioca.Dialog.close();
         });
+        $('#fileinput-clear').click(function()
+        {
+            $dialog.find('div.alert').remove();
+            $list.empty();
+        })
+        $('#btn-start-upload').click(function()
+        {
+            $dialog.find('div.alert').remove();
+
+            if( flag )
+            {
+                uploaderData.submit();
+            }
+        })
 
         $fileupload.fileupload({
             dataType:               'json',
@@ -58,8 +77,10 @@ $.Tapioca.Components.FileUpload = {
             add: function (e, data) 
             {
                 var valid  = true,
-                    text   = 'file added',
+                    text   = '',
                     errors = [];
+
+                uploaderData = data;
 
                 $.each(data.files, function (index, file)
                 {
@@ -80,14 +101,11 @@ $.Tapioca.Components.FileUpload = {
                     if( errors.length > 0 ) 
                         text = errors.join(', ');
 
-                    $list.append('<li>' + file.name + ': ' + text + '</li>');
+                    $list.append('<li class="float-fixer">' + file.name + text + '</li>');
                 });
 
-                $start.click(function()
-                {
-                    if( valid )
-                        data.submit();
-                });
+                if( valid )
+                    flag = true;
 
                 return;
             },
@@ -98,19 +116,44 @@ $.Tapioca.Components.FileUpload = {
             },
             done: function (e, data)
             {
-                if(typeof data.result[0].errors == 'undefined')
+                var refresh = false;
+
+                if(typeof data.result[0].error != 'undefined')
                 {
-                    var library = $.Tapioca.UserApps[ config.appslug ].library;
-                        library.fetch();
-
-                    console.log(data.result);
-
-                    if( typeof _success == 'function')
-                        _success();
+                    $list.before('<div class="alert">' + data.result[0].error + '</div>');
                 }
                 else
                 {
-                    alert(data.result[0].errors);
+                    // _.each(data.result, function( result )
+                    // {
+                    var $items = $list.find('li');
+
+                    $.each(data.result, function (index, result)
+                    {
+                        var $item = $items.eq( index );
+
+                        if(typeof result.error == 'undefined')
+                        {
+                            $item.append('<span class="pull-right label label-success">ok</span>');
+
+                            refresh = true;
+
+                            if( typeof _success == 'function')
+                                _success();
+                        }
+                        else
+                        {
+                            $item.append('<span class="pull-right label label-error">' + result.error + '</span>');
+                        }
+                    });
+                }
+
+                flag = false;
+
+                if( refresh )
+                {
+                    var library = $.Tapioca.UserApps[ config.appslug ].library;
+                        library.fetch();                    
                 }
             },
             submit: function (e, data)
