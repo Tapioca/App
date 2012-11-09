@@ -1,10 +1,6 @@
 
 $.Tapioca.Views.Library = $.Tapioca.Views.Content.extend(
 {
-    viewpointer: [],
-    tags: [],
-    $tags: null,
-
     initialize: function( options )
     {
         this.appslug   = $.Tapioca.appslug;
@@ -19,7 +15,9 @@ $.Tapioca.Views.Library = $.Tapioca.Views.Content.extend(
     },
 
     events: {
-        'click a.upload-trigger': 'upload'
+        'click a.upload-trigger':  'upload',
+        'click #tags-list li':     'filterTags',
+        'click #category-list li': 'filterCategory'
     },
 
     render: function()
@@ -32,7 +30,9 @@ $.Tapioca.Views.Library = $.Tapioca.Views.Content.extend(
 
         this.html( html );
 
-        this.$table = this.$el.find('tbody');
+        this.$table      = this.$el.find('tbody');
+        this.$tagsList   = $('#tags-list');
+        this.$categories = $('#category-list');
 
         if( this.collection.isFetched() )
         {
@@ -43,50 +43,51 @@ $.Tapioca.Views.Library = $.Tapioca.Views.Content.extend(
         return this;
     },
 
+    filterTags: function(event)
+    {
+        this.$tag.removeClass('active');
+
+        var key = $(event.target).addClass('active').attr('data-tag');
+
+        for( var i in this.viewpointer )
+        {
+            this.viewpointer[ i ].filterTags( key );
+        }
+    },
+
+    filterCategory: function(event)
+    {
+        this.$category.removeClass('active');
+
+        var key = $(event.target).addClass('active').attr('data-category');
+
+        for( var i in this.viewpointer )
+        {
+            this.viewpointer[ i ].filterCategory( key );
+        }
+    },
+
     display: function()
     {
         if( this.collection.models.length > 0 )
         {
+            this.clearList();
+            this.viewpointer = [];
+            this.tags        = [];
+
             this.$table.empty();
 
             _.each( this.collection.models, this.displayRow, this);
 
-            var tags      = this.tplTags({ tags: this.tags}),
-                $tags     = $('#tags-list'),
-                $category = $('#category-list'),
-                self      = this;
+            var tags = this.tplTags({ tags: this.tags});
 
-            $tags.append(tags);
+            this.$tagsList.html(tags);
 
-            this.$tags     = $tags.find('li');
-            this.$category = $category.find('li');
+            this.$tag      = this.$tagsList.find('li');
+            this.$category = this.$categories.find('li');
 
-            var filterTags = function(event)
-            {
-                self.$tags.removeClass('active');
-
-                var key = $(event.target).addClass('active').attr('data-tag');
-
-                for( var i in self.viewpointer )
-                {
-                    self.viewpointer[ i ].filterTags( key );
-                }
-            };
-
-            var filterCategory = function(event)
-            {
-                self.$category.removeClass('active');
-
-                var key = $(event.target).addClass('active').attr('data-category');
-
-                for( var i in self.viewpointer )
-                {
-                    self.viewpointer[ i ].filterCategory( key );
-                }
-            };
-
-            this.$tags.click(filterTags)
-            this.$category.click(filterCategory)
+            this.$tag.removeClass('active');
+            this.$category.removeClass('active');
         }
     },
 
@@ -117,13 +118,17 @@ $.Tapioca.Views.Library = $.Tapioca.Views.Content.extend(
         });
     },
 
-    onClose: function()
+    clearList: function()
     {
-        this.collection.unbind('reset', this.display);
-
         _.each( this.viewpointer, function( view )
         {
             view.close();
         }, this);
+    },
+
+    onClose: function()
+    {
+        this.collection.unbind('reset', this.display);
+        this.clearList();
     }
 });
