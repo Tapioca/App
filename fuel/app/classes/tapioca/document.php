@@ -334,6 +334,9 @@ class Document
 // exit;
 		if( $result )
 		{
+			if( isset( $result[0]['_id'] ) )
+				unset( $result[0]['_id'] );
+			
 			// return individual document
 			return $result[0];
 		}
