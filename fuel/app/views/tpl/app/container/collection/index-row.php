@@ -1,5 +1,5 @@
 
-                                {{{displayDigest digest uri}}}
+                                {{{displayDigest digest uri=uri}}}
                                 <td> 
                                     {{{docStatus _ref locale.key revisions }}}
                                 </td>

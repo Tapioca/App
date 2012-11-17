@@ -1,7 +1,19 @@
 
 $.Tapioca.Components.Display = {
 
-    keyValue: function(obj, options)
+    dateFromTimestamp: function( timestamp, options )
+    {
+        if( _.isUndefined( options.hash.format ) )
+        {
+            options.hash.format = '%d/%m/%Y';
+        }
+
+        var date = new Date( timestamp * 1000 );
+
+        return _.strftime( date, options.hash.format );
+    },
+
+    keyValue: function( obj, options )
     {
         var buffer = '',
             key;
@@ -24,15 +36,15 @@ $.Tapioca.Components.Display = {
         return user.get('name');
     },
 
-    digest: function( digest, uri )
+    digest: function( digest, options )
     {
         var _html    = '',
             urlStart = '',
             urlEnd   = '';
-            
-        if(!_.isUndefined( uri ))
+
+        if( !_.isUndefined( options.hash.uri ) )
         {
-            urlStart = '<a href="' + uri + '">';
+            urlStart = '<a href="' + options.hash.uri + '">';
             urlEnd   = '</a>';
         }
 
@@ -101,7 +113,7 @@ $.Tapioca.Components.Display = {
 
         for(var i = -1, l = locales.length; ++i < l;)
         {
-            html += '<li><a href="' + baseUri + '?locale=' + locales[ i ].key + '">' + locales[ i ].label + '</a></li>';
+            html += '<li><a href="' + baseUri + '?l=' + locales[ i ].key + '">' + locales[ i ].label + '</a></li>';
         }
 
         return html;
@@ -164,9 +176,10 @@ $.Tapioca.Components.Display = {
     }
 }
 
-Handlebars.registerHelper( 'keyValue',       $.Tapioca.Components.Display.keyValue );
-Handlebars.registerHelper( 'username',       $.Tapioca.Components.Display.username );
-Handlebars.registerHelper( 'displayDigest',  $.Tapioca.Components.Display.digest );
-Handlebars.registerHelper( 'localeSwitcher', $.Tapioca.Components.Display.localeSwitcher );
-Handlebars.registerHelper( 'roleSelector',   $.Tapioca.Components.Display.role );
-Handlebars.registerHelper( 'docStatus',      $.Tapioca.Components.Display.status );
+Handlebars.registerHelper( 'dateFromTimestamp', $.Tapioca.Components.Display.dateFromTimestamp );
+Handlebars.registerHelper( 'keyValue',          $.Tapioca.Components.Display.keyValue );
+Handlebars.registerHelper( 'username',          $.Tapioca.Components.Display.username );
+Handlebars.registerHelper( 'displayDigest',     $.Tapioca.Components.Display.digest );
+Handlebars.registerHelper( 'localeSwitcher',    $.Tapioca.Components.Display.localeSwitcher );
+Handlebars.registerHelper( 'roleSelector',      $.Tapioca.Components.Display.role );
+Handlebars.registerHelper( 'docStatus',         $.Tapioca.Components.Display.status );
