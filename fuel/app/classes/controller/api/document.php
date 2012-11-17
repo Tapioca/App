@@ -80,7 +80,7 @@ class Controller_Api_Document extends Controller_Api
 
 				if( static::$ref )
 				{
-					static::$data = static::$document->get();
+					static::$data = static::$document->get( static::$revision );
 				}
 				else
 				{
