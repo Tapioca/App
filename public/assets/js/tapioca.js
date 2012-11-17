@@ -34,6 +34,28 @@
         return size;
     };
 
+    // add a wrapper to 401 when session expired
+    Backbone.wrapError = function(onError, originalModel, options)
+    {
+        return function(model, resp)
+        {
+            resp = model === originalModel ? resp : model;
+
+            if( resp.status === 401 )
+            {
+                $.Tapioca.Mediator.publish('user::notLoggedIn');
+            }
+
+            if (onError)
+            {
+                onError(originalModel, resp, options);
+            }
+            else
+            {
+                originalModel.trigger('error', originalModel, resp, options);
+            }
+        };
+    };
 
     // App namespace
     $.Tapioca = typeof $.Tapioca === 'undefined' ? {} : $.Tapioca;
