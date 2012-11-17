@@ -114,6 +114,7 @@ return array(
             'activated'          => 'activated',
             'edit'               => 'edit',
             'delete'             => 'delete',
+            'remove'             => 'remove',
             'select'             => 'select',
             'clone'              => 'clone',
             'edit_app_profile'   => 'Profile',
@@ -155,7 +156,8 @@ return array(
             'all_tags'           => 'All tags',
             'filename'           => 'filename',
             'category'           => 'category',
-            'no_file'            => 'no file'
+            'no_file'            => 'no file',
+            'by'                 => 'by'
         ),
         'dialog' => array(
             'beforeunload' => 'Are you sure you want to leave with out save?',
@@ -177,7 +179,9 @@ return array(
             'dashbord'        => 'Dashboard',
             'app_users'       => '%1s users',
             'new_collection'  => 'New collection',
-            'edit_collection' => 'Edit %1s collection'
+            'edit_collection' => 'Edit %1s collection',
+            'new_document'    => 'New document',
+            'edit_document'   => 'Edit document'
         ),
         'session' => array(
             'user-profile'    => 'My Account',
@@ -199,6 +203,12 @@ return array(
             'author'           => 'Author',
             'guest'            => 'Guest',
             '_REVOKED_ACCESS_' => 'Revoked user',
+        ),
+        'library' => array(
+            'image'    => 'Image',
+            'video'    => 'Video',
+            'document' => 'Document',
+            'other'    => 'Other',
         )
     ),
 );
