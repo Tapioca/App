@@ -15,9 +15,10 @@ $.Tapioca.Views.Collection = $.Tapioca.Views.Content.extend(
 
         this.abstracts.bind('reset', this.display, this);
 
-        if(!_.isUndefined(params.locale))
+        // get locale
+        if(!_.isUndefined(params.l))
         {
-            $.Tapioca.UserApps[ this.appslug ].app.setWorkingLocale( params.locale );
+            $.Tapioca.UserApps[ this.appslug ].app.setWorkingLocale( params.l );
         }
 
         this.locale = $.Tapioca.UserApps[ this.appslug ].app.getWorkingLocale();
