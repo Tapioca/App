@@ -24,14 +24,10 @@ $.Tapioca.Dialog = (function()
         }
     };
 
-    var destroy = function()
-    {
-        $dialog.dialog('destroy');
-    };
-
     var close = function()
     {
         $dialog.dialog('close');
+        $dialog.remove();
     };
 
     var confirm = function(callback, settings)
