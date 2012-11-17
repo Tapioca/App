@@ -82,6 +82,7 @@ return array(
 
                     'library::handlebars/handlebars-1.0.rc.1.js',
 
+                    'library::redactor/redactor.js',
                     'library::fileupload/jquery.iframe-transport.js',
                     'library::fileupload/jquery.fileupload.js',
                     'library::fileupload/jquery.fileupload-ui.js',
