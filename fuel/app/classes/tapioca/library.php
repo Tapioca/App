@@ -32,11 +32,6 @@ class Library
 	protected static $app = null;
 
 	/**
-	 * @var  bool  Library resume
-	 */
-	protected static $summary = false;
-
-	/**
 	 * @var  array  File's object
 	 */
 	protected $file = null;
@@ -85,9 +80,6 @@ class Library
 		static::$db         = \Mongo_Db::instance();
 		static::$gfs        = \GridFs::getFs(static::$db);
 
-		
-		$this->get_summary();
-
 		// if a Name was passed
 		if ($filename)
 		{
@@ -123,54 +115,6 @@ class Library
 	}
 
 	/**
-	 * Return a summary of the library,
-	 * include total files by categories
-	 * and image resize presets
-	 *
-	 * @return  object
-	 */
-	public function get_summary()
-	{
-		$summary = static::$db
-					->get_where(static::$dbCollectionName, array(
-						'type' => 'summary'
-					), 1);
-
-		if (count($summary) == 1)
-		{
-			static::$summary = $summary[0];
-
-			return true;
-		}
-
-		return false;
-	}
-
-	private function set_summary()
-	{
-		if( !static::$summary )
-		{
-			$fileTypes = Config::get('tapioca.file_types');
-			$summary   = array(
-					'type'   => 'summary',
-					'presets' => array()
-				);
-
-			foreach ($fileTypes as $key => $value)
-			{
-				$summary[$key] = 0;
-			}
-
-			static::$db
-				->where(array('type' => 'summary'))
-				->update(static::$dbCollectionName, $summary, array('upsert' => true));
-
-			static::$summary = $this->get_summary();
-		}
-	}
-	 
-
-	/**
 	 * apply preset to a file
 	 *
 	 * @param   string preset name
@@ -188,7 +132,7 @@ class Library
 			return true;
 		}
 
-		$presets = static::$summary['presets'];
+		$presets = static::$app->get('library.presets');
 
 		if( !isset( $presets[$preset_name] ) )
 		{
@@ -221,27 +165,11 @@ class Library
 
 	public function getAll($category = null, $tag = null)
 	{
-		// exclude summary
-		$where = array('type' => array( '$exists' => false ));
-
-		$ret = new \stdClass;
-
+		$where = array();
 
 		if( !is_null( $category ) )
 		{
 			$where['category'] = $category;
-
-			if( $category == 'image' )
-			{
-				$ret->presets = static::$summary['presets'];
-			}
-		}
-		else
-		{
-			$ret->categories           = new \stdClass;
-			$ret->categories->image    = static::$summary['image'];
-			$ret->categories->video    = static::$summary['video'];
-			$ret->categories->document = static::$summary['document'];
 		}
 
 		if( !is_null( $tag ) )
@@ -249,12 +177,11 @@ class Library
 			$where['tags.key'] = $tag;
 		}
 
-
 		$hash = static::$db
 					->where($where)
 					->hash( static::$dbCollectionName, true );
 
-		return array_merge( (array) $ret, (array) $hash );
+		return $hash;
 	}
 
 	public function get()
@@ -609,9 +536,6 @@ class Library
 				))
 				->update(static::$dbCollectionName, $new_file, array('upsert' => true));
 
-		// if first file upload, create collection's summary
-		$this->set_summary();
-
 		if($ret & !$update)
 		{
 			static::$app->inc_library($new_file['category']);
@@ -741,10 +665,7 @@ class Library
 
 	public function delete_all(User $user)
 	{
-		$files = static::$db
-					->get_where(static::$dbCollectionName, array(
-						'type'   => array('$ne' => 'summary')
-					));
+		$files = static::$db->get(static::$dbCollectionName);
 
 		foreach($files as $file)
 		{

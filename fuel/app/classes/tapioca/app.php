@@ -333,9 +333,11 @@ class App
 		}
 
 		// update extension whitelist
-		if (array_key_exists('extwhitelist', $fields))
+		if (array_key_exists('extwhitelist', $fields['library']))
 		{
-			$update['extwhitelist'] = $fields['extwhitelist'];
+			$update['library'] = $this->get('library');
+			
+			$update['library']['extwhitelist'] = $fields['library']['extwhitelist'];
 		}
 
 		if (empty($update))
