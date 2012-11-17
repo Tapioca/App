@@ -3,13 +3,12 @@
 
 $.Tapioca.Bootstrap = function()
 {
+    $.Tapioca.Apps  = new $.Tapioca.Collections.Apps();
+    $.Tapioca.Users = new $.Tapioca.Collections.Users();
+
     if( $.Tapioca.Session.isAdmin() )
     {
-        $.Tapioca.Apps = new $.Tapioca.Collections.Apps();
-
         $.Tapioca.Apps.fetch({async: false});
-
-        $.Tapioca.Users = new $.Tapioca.Collections.Users();
 
         $.Tapioca.Users.fetch({async: false});
     }
