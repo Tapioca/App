@@ -1,7 +1,7 @@
 
 $.Tapioca.Controllers.Library = {
 
-    Home: function( appslug ) 
+    Home: function( appslug, category ) 
     {
         $.Tapioca.appslug = appslug;
 
@@ -13,8 +13,15 @@ $.Tapioca.Controllers.Library = {
         }
 
         $.Tapioca.view = new $.Tapioca.Views.Library({
-            collection: library
+            collection: library,
+            category:   category
         }).render();
+    },
+
+    Category: function( appslug, category ) 
+    {
+        $.Tapioca.Controllers.Library.Home( appslug, category);
+
     },
 
     Ref: function( appslug, basename, ext)

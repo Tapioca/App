@@ -68,6 +68,8 @@ $.Tapioca.Router = Backbone.Router.extend({
 
     appLibrary: $.Tapioca.Controllers.Library.Home,
 
+    appLibraryCat: $.Tapioca.Controllers.Library.Category,
+
     appLibraryRef: $.Tapioca.Controllers.Library.Ref,
 
     notFound: function( path )

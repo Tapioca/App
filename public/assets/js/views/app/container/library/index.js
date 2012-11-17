@@ -3,9 +3,10 @@ $.Tapioca.Views.Library = $.Tapioca.Views.Content.extend(
 {
     initialize: function( options )
     {
-        this.appslug   = $.Tapioca.appslug;
-        this.tplRow    = Handlebars.compile( $.Tapioca.Tpl.app.container.library['index-row'] );
-        this.tplTags   = Handlebars.compile( $.Tapioca.Tpl.components.tags );
+        this.appslug    = $.Tapioca.appslug;
+        this.tplRow     = Handlebars.compile( $.Tapioca.Tpl.app.container.library['index-row'] );
+        this.tplTags    = Handlebars.compile( $.Tapioca.Tpl.components.tags );
+        this.catTrigger = options.category; 
 
         Handlebars.registerPartial('library-list',  $.Tapioca.Tpl.app.container.library['index-list'] );
 
@@ -59,7 +60,16 @@ $.Tapioca.Views.Library = $.Tapioca.Views.Content.extend(
     {
         this.$category.removeClass('active');
 
-        var key = $(event.target).addClass('active').attr('data-category');
+        if( !_.isUndefined( event.target) )
+        {
+            var key = $(event.target).addClass('active').attr('data-category');
+        }
+        else
+        {
+            var key = event;
+
+            this.$category.filter('[data-category="'+ event +'"]').addClass('active');
+        }
 
         for( var i in this.viewpointer )
         {
@@ -88,6 +98,11 @@ $.Tapioca.Views.Library = $.Tapioca.Views.Content.extend(
 
             this.$tag.removeClass('active');
             this.$category.removeClass('active');
+
+            if( !_.isUndefined( this.catTrigger ) )
+            {
+                this.filterCategory( this.catTrigger );
+            }
         }
     },
 

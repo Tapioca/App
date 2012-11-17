@@ -24,7 +24,7 @@ $.Tapioca.Components.FileUpload = {
             uploaderData;
 
         // accept file types based on app settings
-        extwhitelist = $.Tapioca.UserApps[ config.appslug ].app.get('extwhitelist');
+        extwhitelist = $.Tapioca.UserApps[ config.appslug ].app.get('library.extwhitelist');
 
         config.acceptFileTypes = "/(\.|\/)(" + extwhitelist.join('|') + ")$/i";
 

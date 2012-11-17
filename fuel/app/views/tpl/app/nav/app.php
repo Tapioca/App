@@ -39,6 +39,11 @@
 							<li data-namespace="library">
 								<a href="<?= Uri::create('app/'); ?>{{ slug }}/library"><?= __('tapioca.ui.label.library_all_files'); ?></a>
 							</li>
+							{{#keyValue library.files}}
+							<li data-namespace="library">
+								<a href="<?= Uri::create('app/'); ?>{{ ../slug }}/library/c/{{ key }}">{{{I18n key}}}</a>
+							</li>
+							{{/keyValue}}
 							<li class="divider"></li>
 							<li>
 								<a href="javascript:;" class="admin-action upload-trigger">

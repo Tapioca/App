@@ -72,10 +72,11 @@
             'app/:appslug/user'                     : 'appUsers',
             'app/:appslug/settings'                 : 'appSettings',
             'app/:appslug/library/:basename.:ext'   : 'appLibraryRef',
+            'app/:appslug/library/c/:category'      : 'appLibraryCat',
             'app/:appslug/library'                  : 'appLibrary',
             'app/:appslug/collection/new'           : 'appCollectionNew',
             'app/:appslug/:namespace/edit'          : 'appCollectionEdit',
-            // 'app/:appslug/:namespace/:ref'          : 'appCollectionRef',
+            'app/:appslug/:namespace/:ref'          : 'appCollectionRef',
             'app/:appslug/:namespace'               : 'appCollectionHome',
             '*path'                                 : 'notFound'
         }
