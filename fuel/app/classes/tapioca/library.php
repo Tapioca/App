@@ -168,26 +168,7 @@ class Library
 			static::$summary = $this->get_summary();
 		}
 	}
-
-	/**
-	 * Increment/decrement total files per categories
-	 *
-	 * @param   string  category
-	 * @param   int   Increment|Decrement
-	 * @return  void
-	 */
-	public function inc_summary($category, $direction = 1)
-	{
-		$ret = static::$db->command(
-					array('findandmodify' => static::$dbCollectionName,
-						  'query'         => array('type' => 'summary'),
-						  'update'        => array('$inc' => array($category => (int) $direction)),
-						  'new'           => true
-					)
-				);
-
-		return (bool) ($ret['ok'] == 1);
-	}
+	 
 
 	/**
 	 * apply preset to a file
@@ -633,7 +614,7 @@ class Library
 
 		if($ret & !$update)
 		{
-			$this->inc_summary($new_file['category']);
+			static::$app->inc_library($new_file['category']);
 		}
 
 		// preview
@@ -829,7 +810,7 @@ class Library
 
 				if($delete)
 				{
-					$this->inc_summary($this->file['category'], -1);
+					static::$app->inc_library($this->file['category'], -1);
 				}
 
 				$this->file     = null;
@@ -902,7 +883,7 @@ class Library
 		$config     = Config::get('tapioca.upload');
 
 		// extends extension whitelist with app settings
-		$config['ext_whitelist'] = static::$app->get('extwhitelist');
+		$config['ext_whitelist'] = static::$app->get('library.extwhitelist');
 
 		// process the uploaded files in $_FILES
 		Upload::process($config);

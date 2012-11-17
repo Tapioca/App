@@ -207,9 +207,21 @@ class App
 			$app['locales'][] = \Config::get('tapioca.locales.default');
 		}
 
-		if ( ! array_key_exists('extwhitelist', $app))
+		if ( ! array_key_exists('library', $app))
 		{
-			$app['extwhitelist'] = \Config::get('tapioca.upload.ext_whitelist');
+			$app['library'] = array(
+				'presets'      => array(),
+				'files'        => array(),
+				'extwhitelist' => \Config::get('tapioca.upload.ext_whitelist')
+			);
+
+			$fileTypes = \Config::get('tapioca.file_types');
+
+			foreach ($fileTypes as $key => $value)
+			{
+				$app['library']['files'][$key] = 0;
+			}
+
 		}
 
 		$app_id = uniqid();
@@ -257,9 +269,10 @@ class App
 			foreach ($field as $key)
 			{
 				// check to see if field exists in app
-				if (array_key_exists($key, $this->app))
+				$val = \Arr::get($this->app, $key, '__MISSING_KEY__');
+				if ($val !== '__MISSING_KEY__')
 				{
-					$values[$key] = $this->app[$key];
+					$values[$key] = $val;
 				}
 				else
 				{
@@ -274,10 +287,11 @@ class App
 		// if single field was passed - return its value
 		else
 		{
-			// check to see if field exists in app
-			if (array_key_exists($field, $this->app))
+			// check to see if field exists in user
+			$val = \Arr::get($this->app, $field, '__MISSING_KEY__');
+			if ($val !== '__MISSING_KEY__')
 			{
-				return $this->app[$field];
+				return $val;
 			}
 
 			throw new \AppException(
@@ -733,6 +747,27 @@ class App
 		}
 
 		return false;
+	}
+
+
+	/**
+	 * Increment/decrement total files per categories
+	 *
+	 * @param   string  category
+	 * @param   int   Increment|Decrement
+	 * @return  void
+	 */
+	public function inc_library($category, $direction = 1)
+	{
+		$ret = static::$db->command(
+					array('findandmodify' => static::$dbCollectionName,
+						  'query'         => array('_id' => $this->app['_id']),
+						  'update'        => array('$inc' => array('library.files.'.$category => (int) $direction)),
+						  'new'           => true
+					)
+				);
+
+		return (bool) ($ret['ok'] == 1);
 	}
 
 }
