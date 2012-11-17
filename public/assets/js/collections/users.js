@@ -28,7 +28,7 @@ $.Tapioca.Collections.Users = Backbone.Collection.extend(
         return response.results;
     },
 
-    reload: function()
+    reload: function( _cb )
     {
         var userIds = [];
 
@@ -39,7 +39,14 @@ $.Tapioca.Collections.Users = Backbone.Collection.extend(
 
         userIds = userIds.join(';');
 
-        this.fetch({ data: {  set: userIds } });
+        this.fetch({ 
+            data: {  set: userIds },
+            success: function()
+            {
+                if( typeof _cb === 'function')
+                    _cb();
+            } 
+        });
     },
 
     isFetched: function()

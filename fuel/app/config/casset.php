@@ -83,6 +83,7 @@ return array(
                     'library::handlebars/handlebars-1.0.rc.1.js',
 
                     'library::redactor/redactor.js',
+
                     'library::fileupload/jquery.iframe-transport.js',
                     'library::fileupload/jquery.fileupload.js',
                     'library::fileupload/jquery.fileupload-ui.js',
@@ -98,6 +99,7 @@ return array(
                     'modules/before-unload.js',
                     'modules/file-upload.js',
                     'modules/i18n.js',
+                    'modules/form-factory.js',
                     
                     'models/tapioca.js',
                     'models/user.js',
@@ -105,6 +107,7 @@ return array(
                     'models/app.js',
                     'models/collection.js',
                     'models/abstract.js',
+                    'models/document.js',
                     'models/file.js',
 
                     'collections/users.js',
@@ -143,6 +146,10 @@ return array(
                     'views/app/container/collection/index.js',
                     'views/app/container/collection/index-row.js',
                     'views/app/container/collection/edit.js',
+                    'views/app/container/collection/document.js',
+                    'views/app/container/collection/revisions.js',
+                    'views/app/container/collection/doc-form.js',
+                    'views/app/container/collection/embed-ref.js',
 
                     'views/app/container/library/index.js',
                     'views/app/container/library/index-row.js',

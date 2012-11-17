@@ -25,7 +25,52 @@ $.Tapioca.Controllers.Collection = {
     {
         $.Tapioca.appslug = appslug;
 
-console.log('Collection Ref: ' +namespace+', ref: '+ref);
+        var params = Backbone.history.getQueryParameters();
+
+
+        // get locale
+        if(!_.isUndefined(params.l))
+        {
+            $.Tapioca.UserApps[ appslug ].app.setWorkingLocale( params.l );
+        }
+
+        var collection   = $.Tapioca.UserApps[ appslug ].collections.get( namespace ),
+            abstracts    = $.Tapioca.UserApps[ appslug ].data[ namespace ].abstracts,
+            users        = $.Tapioca.UserApps[ appslug ].users,
+            locale       = $.Tapioca.UserApps[ appslug ].app.getWorkingLocale(),
+            baseUri      = $.Tapioca.app.setRoute('appCollectionRef', [ appslug, namespace, ref ] );
+            isNew        = ( ref === 'new' ),
+            fetchOptions = $.param( $.extend({l: locale.key}, params) ),
+            revision     = params.r,
+            docOptions   = {
+                appslug:   appslug,
+                namespace: namespace
+            },
+            docAttributes = {};
+
+
+        if( !isNew )
+            docAttributes._ref = ref;
+
+        var doc =  new $.Tapioca.Models.Document( docAttributes, docOptions )
+
+        $.Tapioca.view = new $.Tapioca.Views.Document({
+            appslug:    appslug,
+            namespace:  namespace,
+            ref:        ref,
+            revision:   revision,
+            locale:     locale,
+
+            isNew:      isNew,
+            baseUri:    baseUri,
+
+            schema:     collection,
+            abstracts:  abstracts,
+            doc:        doc,
+            users:      users,
+            docOptions: fetchOptions
+
+        }).render();
     },
 
     New: function( appslug )
