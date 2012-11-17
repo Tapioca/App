@@ -63,6 +63,7 @@ class Controller_Welcome extends Controller
             'bbRootUrl' => str_replace($domain, '', Uri::base()),
             'apiUrl'    => Uri::create('api/'),
             'appUrl'    => Uri::create('app'),
+            'filesUrl'  => Uri::create('files/'),
             'roles'     => Config::get('tapioca.roles'),
             'status'    => array(
                 'public' => $statusPublic,
