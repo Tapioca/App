@@ -40,8 +40,9 @@ class Controller_Templates extends Controller
 			else
 			{
 				$name = str_replace('.php', '', $filename);
-				
-				$arr[ $name ] = View::forge( $path.DS.$filename )->auto_filter( false )->render();
+
+				$html         = View::forge( $path.DS.$filename )->auto_filter( false )->render();
+				$arr[ $name ] = trim( str_replace(array("\r\n", "\r", "\n", "\t"), ' ', $html) );
 			}
 		}
 
