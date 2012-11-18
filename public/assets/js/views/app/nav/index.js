@@ -28,7 +28,7 @@ $.Tapioca.Views.Nav = Backbone.View.extend(
 
         this.$paneContent = this.$el.find('div.pane-content');
 
-        this.$el.TapiocaNano();
+        $('#main').TapiocaNano();
 
         $.Tapioca.Mediator.subscribe( 'section::highlight', _.bind( this.clearHighlight,  this ) );
         

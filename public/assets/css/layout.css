@@ -712,7 +712,8 @@ header#tapp {
 }
 
 .input-repeat-list {
-	list-style:none
+	list-style:none;
+	margin-left: 0;
 }
 
 .input-repeat-list li {

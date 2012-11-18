@@ -3,6 +3,9 @@ $.Tapioca.Components.Display = {
 
     dateFromTimestamp: function( timestamp, options )
     {
+        if( _.isUndefined( timestamp) )
+            return;
+
         if( _.isUndefined( options.hash.format ) )
         {
             options.hash.format = '%d/%m/%Y';

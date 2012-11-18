@@ -2,8 +2,8 @@
                     <?= Form::open('tapioca-document-form'); ?>
                         <div class="row-fluid">
                             <div class="span8">
-                                <fieldset id="form-holder">
-                                    <legend>{{ pageTitle }}</legend>
+                                <div id="form-holder">
+                                    <h3 id="doc-form-header">{{ pageTitle }}</h3>
                                     <div class="dropdown btn-group{{#isNew}} hide{{/isNew}}" id="locale-switch">
                                         <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
                                             {{ locale.label }}
@@ -13,7 +13,7 @@
                                             {{{localeSwitcher appslug baseUri }}}
                                         </ul>
                                     </div>
-                                </fieldset>
+                                </div>
                             </div>
                             <div class="span4">
                                 <ul id="revisions">

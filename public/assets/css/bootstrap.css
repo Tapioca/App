@@ -578,12 +578,14 @@ fieldset {
   margin: 0;
   border: 0;
 }
-legend {
+legend,
+#doc-form-header {
   display: block;
   width: 100%;
   padding: 0;
   margin-bottom: 27px;
   font-size: 19.5px;
+  font-weight: normal;
   line-height: 36px;
   color: #333333;
   border: 0;

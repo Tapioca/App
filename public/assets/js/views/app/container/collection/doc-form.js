@@ -76,15 +76,45 @@ $.Tapioca.Views.DocForm = Backbone.View.extend(
             }
         });
 
+        Handlebars.registerHelper('_getSource', function(context, options)
+        {
+            var url   = $.Tapioca.config.apiUrl + self.appslug + '/document/' + options.hash.collection + '?l=' + self.locale.key,
+                query = {select: this.docEmbedded.split('::')},
+                self  = this;
+
+            url = url+'&q='+JSON.stringify(query);
+
+            hxr = $.ajax({
+                url: url,
+                dataType: 'json',
+                async: false,
+                success: function(data)
+                {
+                    delete data._id;
+
+                    ret.embedded = data;
+                }
+            });
+
+            var abstracts = $.Tapioca.UserApps[ self.appslug ].data[ options.hash.collection ].abstracts,
+                list      = _.pluck( abstracts.toJSON(), options.hash.label);
+console.log( abstracts.toJSON() )
+console.log( list )
+console.log( options.hash.collection )
+console.log( options.hash.label )
+console.log( options.hash.value )
+
+                return ''; //self.docPreview(context, abstract.get('digest'), prefix);
+        });
 
         return this;
     },
 
     events:
     {
-        // 'click .array-repeat-trigger'                                        : 'addNode',
-        // 'click .input-repeat-list li:last-child .input-repeat-trigger'       : 'addInput',
-        // 'click .input-repeat-list li:not(:last-child) .input-repeat-trigger' : 'removeInput',
+        'click .array-repeat-trigger'                                        : 'addNode',
+        'click .input-repeat-list li:last-child .input-repeat-trigger'       : 'addInput',
+        'click .input-repeat-list li:not(:last-child) .input-repeat-trigger' : 'removeInput',
         'click .doc-list-trigger'                                            : 'docList',
         'click .doc-remove-trigger'                                          : 'docRemove',
         // 'click .file-list-trigger'                                           : 'fileList',
@@ -116,12 +146,16 @@ $.Tapioca.Views.DocForm = Backbone.View.extend(
 
         if( total )
         {
+            var preventDuplicate = [];
+
             for( var i = -1; ++i < total; )
             {
                 var d = dependencies[ i ];
 
-                if( d.type == 'collection' )
+                if( d.type == 'collection' && ( $.inArray( d.namespace, preventDuplicate) == -1 ) )
                 {
+                    preventDuplicate.push( d.namespace );
+
                     var collection = $.Tapioca.UserApps[ this.appslug ].data[ d.namespace ].abstracts;
 
                     if( !collection.isFetched() )
@@ -306,6 +340,61 @@ $.Tapioca.Views.DocForm = Backbone.View.extend(
             form:      this.$el
         });
     },
+   
+    addInput: function(event)
+    {
+        var target      = this.targetData(event),
+            type        = this.factory.getType(target.node.type),
+            prefixCheck = target.prefix.split('.');
+            lastIndex   = (prefixCheck.length - 1);
+
+        prefixCheck.splice(lastIndex, 1);
+        
+        target.prefix       = prefixCheck.join('.');
+        target.node.pattern = true;
+
+        this.factory.define(type, target.node, target.prefix, target.key);
+
+        var htmlStr  = this.factory.getHtml(),
+            template = Handlebars.compile(htmlStr),
+            html     = template({});
+        
+        target.$.parents('ul.input-repeat-list').append(html);
+
+        this.bindInput();
+    },
+
+    removeInput: function(event)
+    {
+        $(event.target).parents('li').remove();
+    },
+
+    addNode: function(event)
+    {
+        var target = this.targetData(event);
+
+        this.factory.define('loopStart', target.node);
+        this.factory.define('incCounter', target.node);
+
+        if(_.isUndefined(target.node.template))
+        {
+            this.factory.walk(target.node.node, target.prefix, target.key);
+        }
+        else
+        {
+            this.factory.define('template', target.node.template, null, null);
+        }
+
+        this.factory.define('loopEnd', null);
+
+        var htmlStr  = this.factory.getHtml(),
+            template = Handlebars.compile(htmlStr),
+            html     = template({});
+        
+        target.$.parents('p.align-right').before(html);
+
+        this.bindInput();
+    },
 
     bindInput: function()
     {
@@ -317,18 +406,21 @@ $.Tapioca.Views.DocForm = Backbone.View.extend(
             var $parent = $(this).prev('div.btn-group').eq(0).hide();
         });
 
-        this.$el.find('textarea').not('[data-binded="true"]').each(function()
+        this.$el.find('textarea[data-wysiwyg]').not('[data-binded="true"]').each(function()
         {
             var $this    = $(this),
-                config   = ($this.attr('data-wysiwyg')) ? {} : { air: true},
-                settings = $.extend({}, 
-                {
-                    buttons:       ['html', '|', 'bold', 'italic', 'link'],
-                    airButtons:    ['bold', 'italic', 'link'],
-                    keyupCallback: _.bind( _parent.change, _parent),
-                    paragraphy:    false
-                }, config);
 
+                buttons  = ($this.attr('data-toolbar')) ? 
+                            $this.attr('data-toolbar').split('::') : 
+                            ['html', '|', 'bold', 'italic', 'link'],
+
+                settings = {
+                    buttons:       buttons,
+                    keyupCallback: _.bind( _parent.change, _parent),
+                    paragraphy:    false,
+                    minHeight:     100
+                };
+console.log(settings)
             $this
                 .redactor(settings)
                 .attr('data-binded', 'true');
