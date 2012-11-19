@@ -59,6 +59,7 @@ Autoloader::add_classes(array(
 	'Tapioca\\Install'                    => APPPATH.'classes/tapioca/install.php',
 
 	// Tapioca Resque jobs
+	'Tapioca\\Jobs'                       => APPPATH.'classes/tapioca/jobs.php',
 	'Tapioca\\Jobs\\PHP_Job'              => APPPATH.'classes/tapioca/jobs/job.php',
 	'Tapioca\\Jobs\\Dependency'           => APPPATH.'classes/tapioca/jobs/dependency.php',
 ));

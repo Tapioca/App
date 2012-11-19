@@ -19,7 +19,8 @@ return array(
         'files'           => 'files',
         'deletes'         => 'deletes',
         'previews'        => 'previews',
-        'invitaions'      => 'invitaions'
+        'invitaions'      => 'invitaions',
+        'queue'           => 'queue'
     ),
 
     /*
@@ -31,10 +32,16 @@ return array(
     ),
 
     /*
-     * Delete token
+     * Delete token TTL
      */
 
     'deleteToken' => 600, // 10 minutes
+
+    /*
+     * Archived Jobs TTL
+     */
+
+    'cleanQueue' => 172800, // 2 days
     
     /*
      * Remember Me settings
@@ -244,6 +251,8 @@ return array(
         'delete_apps',
         'disable_apps',
 
+        'list_jobs',
+
         'manage_settings',
         'update_core',
 
@@ -256,6 +265,8 @@ return array(
         'app_invite_users',
         'app_remove_users',
         'app_promote_users',
+
+        'app_list_jobs',
 
         'app_list_collections',
         'app_read_collections_public',
@@ -313,6 +324,8 @@ return array(
             'create_apps',
             'delete_apps',
             'disable_apps',
+
+            'list_jobs',
         ),
         'admin' => array(
             'list_users',
@@ -326,6 +339,8 @@ return array(
             'app_invite_users',
             'app_remove_users',
             'app_promote_users',
+
+            'app_list_jobs',
 
             'app_list_collections',
             'app_read_collections_public',

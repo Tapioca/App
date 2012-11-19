@@ -40,7 +40,9 @@ return array(
 
 		// app
 	'api/app'                                          => array('api/app',                     'name' => 'api_app'),
+	'api/job'                                          => array('api/job',                     'name' => 'api_job'),
 	//'api/:appslug/admin/:userid'                       => array('api/app/admin',             'name' => 'api_app_admin'),
+	'api/:appslug/job'                                 => array('api/app/job',                 'name' => 'api_app_job'),
 	'api/:appslug/invite'                              => array('api/app/invite',              'name' => 'api_app_invite'),
 	'api/:appslug/user/:userid'                        => array('api/app/user',                'name' => 'api_app_user'),
 	'api/:appslug/user'                                => array('api/app/user',                'name' => 'api_app_user_get'),
