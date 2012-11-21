@@ -74,5 +74,10 @@ $.Tapioca.Controllers.Admin = {
             model: user,
             isNew: isNew
         }).render();
+    },
+
+    Workers: function()
+    {
+        $.Tapioca.view = new $.Tapioca.Views.AdminWorkers().render();
     }
 }

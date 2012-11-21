@@ -90,6 +90,7 @@
             'app/admin/user/:uid'                   : 'adminUserEdit',
             'app/admin/app'                         : 'adminApp',
             'app/admin/app/:slug'                   : 'adminAppEdit',
+            'app/admin/workers'                     : 'adminWorkers',
             'app/:appslug'                          : 'appHome',
             'app/:appslug/user'                     : 'appUsers',
             'app/:appslug/settings'                 : 'appSettings',

@@ -135,6 +135,7 @@ return array(
                     'views/admin/app/list.js',
                     'views/admin/app/list-row.js',
                     'views/admin/app/edit.js',
+                    'views/admin/workers/index.js',
 
                     'views/app/container/home/index.js',
 

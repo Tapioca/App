@@ -15,5 +15,10 @@
                                     <?= __('tapioca.ui.label.app_users'); ?>
                                 </a>
                             </li>
+                            <li>
+                                <a href="<?= Uri::create('app/admin/workers'); ?>">
+                                    <?= __('tapioca.ui.label.app_workers'); ?>
+                                </a>
+                            </li>
                         </ul>
                     </div>
