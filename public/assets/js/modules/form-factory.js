@@ -1,6 +1,7 @@
 
-var formFactory = function()
+var formFactory = function( locale )
 {
+    this.locale             = locale;
     this.html               = '{{#model}}';
     this.firstFieldset      = "\n" + '{{/model}}';
     this.firstFieldsetOpen  = false;    
@@ -341,51 +342,74 @@ formFactory.prototype.select = function(item, prefix)
 
     if( ! _.isUndefined( item.source ) )
     {
-        item.options = null;
-
-        this.dependencies.push({
-            type:      'collection',
-            namespace: item.source.collection
-        });
-
-        str += this.indent(4) + '{{{ _getSource ' + item.id + ' collection="' + item.source.collection + '" label="' + item.source.label + '" value="' + item.source.value + '"}}}';
-    }
-    else
-    {
-        str += this.options( item.id, item.options);
+        item.options = this.getSource( item.source );
     }
 
-    str += this.indent(3);
-    str += '</select>';
+    // str += this.options( item.id, item.options);
 
-    return str;
-};
-
-formFactory.prototype.options = function( itemId, options )
-{
-    var str = '';
-
-    for (var i in options)
+    for (var i in item.options)
     {
+        var options = item.options[ i ];
+
         // option group
-        if( _.isArray( options[i] ) )
+        if( _.isArray( options ) )
         {
             str += this.indent(4) + '<optgroup label="' + i + '">';
             
-            for(var j = -1, nbOptions = options[i].length; ++j < nbOptions;)
+            for(var j = -1, nbOptions = options.length; ++j < nbOptions;)
             {
-                str += this.indent(5) + '<option value="' + options[i][j].value +'">' + options[i][j].label + '</option>';
+                str += this.indent(5) + '<option value="' + options[j].value +'"{{isSelected '+ item.id + ' default="' + options.value +'" attribute="selected"}}>' + options[j].label + '</option>';
             }
 
             str += this.indent(4) + '</optgroup>';
         }
         else
         {
-            str += this.indent(4) + '<option value="' + options[i].value +'"{{isSelected '+ itemId + ' default="' + options[i].value +'" attribute="selected"}}>' + options[i].label + '</option>';
+            str += this.indent(4) + '<option value="' + options.value +'"{{isSelected '+ item.id + ' default="' + options.value +'" attribute="selected"}}>' + options.label + '</option>';
         }
     }
 
+    str += '</select>';
+
     return str;
+};
+
+// return options object
+formFactory.prototype.getSource = function( source )
+{
+    var url     = $.Tapioca.config.apiUrl + $.Tapioca.appslug + '/document/' + source.collection + '?l=' + this.locale,
+        query   = {select: [ source.label, source.value ]},
+        options = [{
+            label:'',
+            value:''
+        }];
+
+    if( !_.isUndefined( source.sortBy ))
+    {
+        query.sort = source.sortBy;
+    }
+
+    url = url+'&q='+JSON.stringify(query);
+
+    hxr = $.ajax({
+        url: url,
+        dataType: 'json',
+        async: false,
+        success: function(data)
+        {
+            var r = data.results;
+            for( var i = -1; ++i < data.total;)
+            {
+                // keep first select empty
+                options[ (i + 1) ] = {
+                    label: r[ i ][source.label], 
+                    value: r[ i ][source.label]
+                };
+            }
+        }
+    });
+
+    return options; 
 }
 
 formFactory.prototype.bool = function(item, prefix, key)

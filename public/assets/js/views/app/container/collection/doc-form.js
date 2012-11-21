@@ -15,7 +15,7 @@ $.Tapioca.Views.DocForm = Backbone.View.extend(
         this.namespace = options.schema.get('namespace');
         this.schema    = options.schema.get('schema');
         this.parent    = options.parent;
-        this.factory   = new formFactory();
+        this.factory   = new formFactory( this.locale.key );
 
         this.tplEmbedRef = Handlebars.compile( $.Tapioca.Tpl.app.container.collection['embed-ref'] );
 
