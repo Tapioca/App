@@ -44,10 +44,11 @@ $.Tapioca.Views.CollectionRow = Backbone.View.extend(
     setStatus: function( event )
     {
         var _status = parseInt( $( event.target ).attr('data-status')),
+            _url    = this.model.url() + '?l=' + this.locale.key, 
             _self   = this;
 
         var put = $.ajax({
-            url:      this.model.url(),
+            url:      _url,
             data:     JSON.stringify({status: _status}),
             dataType: 'json',
             type:     'PUT'

@@ -1,7 +1,10 @@
 
                                 {{{displayDigest digest uri=uri}}}
-                                <td> 
-                                    {{{docStatus _ref locale.key revisions }}}
+                                <td>
+                                    <div class="dropdown btn-group">
+                                        {{{docStatus _ref locale.key revisions }}}
+                                        {{> docStatusList}}
+                                    </div>
                                 </td>
                                 <td>
                                     <div class="btn-group float-right">

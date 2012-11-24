@@ -736,8 +736,10 @@ class Document
 				'locale'     => static::$locale,
 				'revision'   => $revision
 			);
-
-			\Resque::enqueue( Config::get('resque.queue'), '\\Tapioca\\Jobs\\Dependency', $resqueArgs, true);
+			
+			Jobs::push( static::$app->get('slug'), '\\Tapioca\\Jobs\\Dependency', $resqueArgs, null);
+			
+			// \Resque::enqueue( Config::get('resque.queue'), '\\Tapioca\\Jobs\\Dependency', $resqueArgs, true);
 		}
 
 		return $this->abstract; //$this->set_locale_revision($revision);

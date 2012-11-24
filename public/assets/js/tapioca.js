@@ -197,7 +197,11 @@
         // start the application
         Backbone.history.start({pushState: true, root: $.Tapioca.config.host});
 
-        $.Tapioca.Dialog.init()
+        $.Tapioca.Dialog.init();
+
+        // register commun partials templates
+        var docStatusList = $.Tapioca.Components.Display.statusList();
+        Handlebars.registerPartial('docStatusList', docStatusList);
 
         // All navigation should be passed through the navigate method, 
         // to be processed by the router.  If the link has a data-bypass

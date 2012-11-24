@@ -81,30 +81,30 @@ $.Tapioca.Components.Display = {
             }
         }
 
-        var value = $.Tapioca.config.status.tech[ status ];
-
-        var html = '<div class="dropdown btn-group">\
-                        ';
+        var value = $.Tapioca.config.status.tech[ status ],
+            html  = '';
 
         if(status > -2)
         {
-            html += '<a class="dropdown-toggle label ' + value.class + '" data-toggle="dropdown" href="javascript:void(0)">' + value.label + '</a>\
-                        <ul class="dropdown-menu pull-right" data-type="set-status">';
-
-            var _public = $.Tapioca.config.status.public;
-
-            for(var i = -1, l = _public.length; ++i < l;)
-            {
-                html += '<li><a href="javascript:void(0)" data-status="' + _public[i].value + '">' + _public[i].label + '</a></li>';
-            }
-            html += '</ul>';
+            return '<a class="dropdown-toggle label ' + value.class + '" data-toggle="dropdown" href="javascript:void(0)">' + value.label + '</a>';
         }
         else
         {
-            html += '<span class="label ' + value.class + '">' + value.label + '</span>';
+            return '<span class="label ' + value.class + '">' + value.label + '</span>';
         }
+    },
 
-        html += '</div>';
+    statusList: function()
+    {
+        var html    = '<ul class="dropdown-menu" data-type="set-status">',
+            _public = $.Tapioca.config.status.public;
+
+        for(var i = -1, l = _public.length; ++i < l;)
+        {
+            html += '<li><a href="javascript:void(0)" data-status="' + _public[i].value + '">' + _public[i].label + '</a></li>';
+        }
+        
+        html += '</ul>';
 
         return html;
     },
@@ -163,7 +163,7 @@ $.Tapioca.Components.Display = {
         else
         {
             html += '<a class="dropdown-toggle label" data-toggle="dropdown" href="javascript:void(0)">' + targetRole + '</a>\
-                        <ul class="dropdown-menu pull-right" data-type="set-status">';
+                        <ul class="dropdown-menu" data-type="set-status">';
 
             for(var i = shooter, l = roles.length; i < l; ++i)
             {
