@@ -67,6 +67,8 @@ $.Tapioca.Dialog = (function()
 
         $dialog = $('#dialog-modal');
 
+        $dialog.html('')
+
         $dialog.dialog(config);
     };
 

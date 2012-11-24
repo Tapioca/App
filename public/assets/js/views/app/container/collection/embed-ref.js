@@ -7,6 +7,7 @@ $.Tapioca.Views.EmbedRef = Backbone.View.extend(
     {
         this.appslug   = $.Tapioca.appslug;
         this.abstracts = options.abstracts;
+        this.locale    = options.locale;
         this.namespace = this.model.get('namespace');
         this.$form     = options.form;
 
@@ -39,9 +40,25 @@ $.Tapioca.Views.EmbedRef = Backbone.View.extend(
 
     render: function()
     {
+        var abstracts = this.abstracts.toJSON(),
+            locale    = this.locale.key,
+            models    = _.filter( abstracts, function( model)
+                        {
+                            // if document not translanted in current locale
+                            if( _.isUndefined( model.revisions.active[ locale ] ) )
+                                return false;
+
+                            // is the active revision published ?
+                            var active   = ( model.revisions.active[ locale ] - 1),
+                                revision = model.revisions.list[ active ];
+
+                            return (revision.status == 100)
+
+                        });
+
         var tpl  = Handlebars.compile( $.Tapioca.Tpl.app.container.collection['embed-ref-list'] ),
             html = tpl({
-                abstracts:  this.abstracts.toJSON(),
+                abstracts:  models,
                 name:       this.model.get('name'),
                 digest:     this.model.get('digest')
             });
