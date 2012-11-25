@@ -2,7 +2,7 @@
 $.Tapioca.Views.LibraryRow = Backbone.View.extend(
 {
     tagName: 'tr',
-    tag: true,
+    tag:      true,
     category: true,
     
     initialize: function( options )
@@ -10,6 +10,7 @@ $.Tapioca.Views.LibraryRow = Backbone.View.extend(
         this.appslug    = options.appslug;
         this.tpl        = options.tpl;
         this.mergedTags = options.mergedTags;
+        this.$form      = options.form;
 
         this.$el.appendTo( options.parent );
 
@@ -21,7 +22,8 @@ $.Tapioca.Views.LibraryRow = Backbone.View.extend(
     },
 
     events: {
-        'click a.btn-delete-trigger': 'delete'
+        'click a.btn-delete-trigger':  'delete',
+        'click a.select-file-trigger': 'select'
     },
 
     render: function()
@@ -79,6 +81,18 @@ $.Tapioca.Views.LibraryRow = Backbone.View.extend(
             this.category = true;
             this.$el.show();
         }
+    },
+
+    select: function()
+    {
+        var ret = {
+            filename: this.model.get('filename'),
+            category: this.model.get('category')
+        }
+
+        this.$form.trigger('document:addFile', ret);
+
+        $.Tapioca.Dialog.close();
     },
 
     delete: function()

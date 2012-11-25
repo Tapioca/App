@@ -1,6 +1,6 @@
 
                 <div class="app-content-header">
-                    <h2 class="page-name"><?= __('tapioca.ui.label.app_library'); ?></a></h2>
+                    <h2 class="page-name"><?= __('tapioca.ui.label.app_library'); ?></h2>
                     <div class="btn-group">
                         <a class="btn upload-trigger" href="javascript:;">
                             <i class="icon-plus"></i>

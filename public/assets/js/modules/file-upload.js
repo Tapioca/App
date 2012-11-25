@@ -139,7 +139,10 @@ $.Tapioca.Components.FileUpload = {
                             refresh = true;
 
                             if( typeof _success == 'function')
-                                _success();
+                                _success(null, {
+                                    filename: result.name,
+                                    category: result.category
+                                });
                         }
                         else
                         {

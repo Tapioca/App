@@ -452,7 +452,7 @@ formFactory.prototype.file = function(item, prefix, key)
 
     if( !_.isUndefined( item.upload ) )
     {
-        str += this.indent(4) + '<a class="btn" href="javascript:void(0)">' +
+        str += this.indent(4) + '<a class="btn btn-upload-trigger" href="javascript:void(0)" data-prefix="' + this.getName(item, prefix) + '" data-key="'+key+'">' +
                this.indent(5) + '<i class="icon-upload"></i> upload' +
                this.indent(4) + '</a>';
     }

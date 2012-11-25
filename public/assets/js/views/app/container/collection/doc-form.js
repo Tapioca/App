@@ -18,6 +18,7 @@ $.Tapioca.Views.DocForm = Backbone.View.extend(
         this.factory   = new formFactory( this.locale.key );
 
         this.tplEmbedRef = Handlebars.compile( $.Tapioca.Tpl.app.container.collection['embed-ref'] );
+        this.tplThumb    = Handlebars.compile( $.Tapioca.Tpl.app.container.collection.thumb );
 
         this.factory.walk( this.schema, '', '');
 
@@ -76,51 +77,53 @@ $.Tapioca.Views.DocForm = Backbone.View.extend(
             }
         });
 
-        Handlebars.registerHelper('_getSource', function(context, options)
-        {
-            var url   = $.Tapioca.config.apiUrl + self.appslug + '/document/' + options.hash.collection + '?l=' + self.locale.key,
-                query = {select: this.docEmbedded.split('::')},
-                self  = this;
+        // moved to form factory
+//         Handlebars.registerHelper('_getSource', function(context, options)
+//         {
+//             var url   = $.Tapioca.config.apiUrl + self.appslug + '/document/' + options.hash.collection + '?l=' + self.locale.key,
+//                 query = {select: this.docEmbedded.split('::')},
+//                 self  = this;
 
-            url = url+'&q='+JSON.stringify(query);
+//             url = url+'&q='+JSON.stringify(query);
 
-            hxr = $.ajax({
-                url: url,
-                dataType: 'json',
-                async: false,
-                success: function(data)
-                {
-                    delete data._id;
+//             hxr = $.ajax({
+//                 url:      url,
+//                 dataType: 'json',
+//                 async:    false,
+//                 success: function(data)
+//                 {
+//                     delete data._id;
 
-                    ret.embedded = data;
-                }
-            });
+//                     ret.embedded = data;
+//                 }
+//             });
 
-            var abstracts = $.Tapioca.UserApps[ self.appslug ].data[ options.hash.collection ].abstracts,
-                list      = _.pluck( abstracts.toJSON(), options.hash.label);
-console.log( abstracts.toJSON() )
-console.log( list )
-console.log( options.hash.collection )
-console.log( options.hash.label )
-console.log( options.hash.value )
+//             var abstracts = $.Tapioca.UserApps[ self.appslug ].data[ options.hash.collection ].abstracts,
+//                 list      = _.pluck( abstracts.toJSON(), options.hash.label);
+// console.log( abstracts.toJSON() )
+// console.log( list )
+// console.log( options.hash.collection )
+// console.log( options.hash.label )
+// console.log( options.hash.value )
 
-                return ''; //self.docPreview(context, abstract.get('digest'), prefix);
-        });
+//                 return ''; //self.docPreview(context, abstract.get('digest'), prefix);
+//         });
 
         return this;
     },
 
     events:
     {
-        'click .array-repeat-trigger'                                        : 'addNode',
+        'click a.array-repeat-trigger'                                       : 'addNode',
         'click .input-repeat-list li:last-child .input-repeat-trigger'       : 'addInput',
         'click .input-repeat-list li:not(:last-child) .input-repeat-trigger' : 'removeInput',
-        'click .doc-list-trigger'                                            : 'docList',
-        'click .doc-remove-trigger'                                          : 'docRemove',
-        // 'click .file-list-trigger'                                           : 'fileList',
-        // 'click .file-remove-trigger'                                         : 'fileRemove',
-        // 'document:addFile'                                                   : 'addFile',
-        'document::addDoc'                                                    : 'addDoc'
+        'click a.doc-list-trigger'                                           : 'docList',
+        'click a.doc-remove-trigger'                                         : 'docRemove',
+        'click a.file-list-trigger'                                          : 'fileList',
+        'click a.file-remove-trigger'                                        : 'fileRemove',
+        'click a.btn-upload-trigger'                                         : 'upload',
+        'document:addFile'                                                   : 'addFile',
+        'document::addDoc'                                                   : 'addDoc'
     },
 
 
@@ -340,6 +343,53 @@ console.log( options.hash.value )
             form:      this.$el
         });
     },
+
+    fileList: function(event)
+    {
+        this.target = event;
+
+        new $.Tapioca.Views.EmbedFile({
+            collection: $.Tapioca.UserApps[ this.appslug ].library,
+            form:       this.$el
+        });
+    },
+
+    addFile: function(event, file)
+    {
+        var target   = this.targetData(this.target),
+            _html    = '',
+            hasThumb = target.$.parents('div.controls').eq(0).find('ul.thumbnails');
+
+        if(hasThumb.size() > 0)
+        {
+            hasThumb.remove();
+        }
+
+        _html = this.embedData(file, _html, target.prefix);
+
+        var $parent = target.$.parents('div.btn-group').eq(0);
+
+        $parent.before(_html);
+
+        $.Tapioca.Dialog.close();
+    },
+
+    fileRemove: function(event)
+    {
+        $(event.target).parents('ul.thumbnails').remove();
+    },
+
+    upload: function( event )
+    {
+        this.target = event;
+
+        $.Tapioca.Components.FileUpload.init({
+                appslug:           this.appslug,
+                singleFileUploads: true,
+            },
+            _.bind( this.addFile, this )
+        );
+    },
    
     addInput: function(event)
     {
@@ -420,7 +470,7 @@ console.log( options.hash.value )
                     paragraphy:    false,
                     minHeight:     100
                 };
-console.log(settings)
+//console.log(settings)
             $this
                 .redactor(settings)
                 .attr('data-binded', 'true');
@@ -530,4 +580,27 @@ console.log(settings)
         }
     },
 
+    embedDataFile: function(hash, str, prefix)
+    {
+        var thumb = {};
+
+        switch(hash.category)
+        {
+            case 'image': 
+                            thumb.url = $.Tapioca.config.filesUrl + this.appslug + '/image/preview-'+hash.filename;
+                            break;
+            case 'video':
+                            thumb.icon = 'film'
+                            break;
+            default:
+                            thumb.icon = 'file'
+        }
+
+        thumb.str = str;
+
+        return this.tplThumb({
+            hash:  hash,
+            thumb: thumb
+        });
+    }
 })

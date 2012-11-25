@@ -428,6 +428,7 @@ class Library
 					$result[] = array(
 						'name'          => $file['filename'],
 						'size'          => $file['length'],
+						'category'      => $file['category'],
 						'url'           => $file_url,
 						'thumbnail_url' => $preview_url,
 						'delete_url'    => $api_url,
