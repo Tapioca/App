@@ -144,6 +144,9 @@ return array(
 
                     'views/app/container/settings/index.js',
 
+                    'views/app/container/library/index.js',
+                    'views/app/container/library/index-row.js',
+
                     'views/app/container/collection/index.js',
                     'views/app/container/collection/index-row.js',
                     'views/app/container/collection/edit.js',
@@ -151,9 +154,7 @@ return array(
                     'views/app/container/collection/revisions.js',
                     'views/app/container/collection/doc-form.js',
                     'views/app/container/collection/embed-ref.js',
-
-                    'views/app/container/library/index.js',
-                    'views/app/container/library/index-row.js',
+                    'views/app/container/collection/embed-file.js',
 
                     'controllers/session.js',
                     'controllers/admin.js',
