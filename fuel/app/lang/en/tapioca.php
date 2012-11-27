@@ -160,7 +160,9 @@ return array(
             'filename'           => 'filename',
             'category'           => 'category',
             'no_file'            => 'no file',
-            'by'                 => 'by'
+            'by'                 => 'by',
+            'worker_job'         => 'Job',
+            'worker_perfom'      => 'Do Job',
         ),
         'dialog' => array(
             'beforeunload' => 'Are you sure you want to leave with out save?',
@@ -228,6 +230,12 @@ return array(
             'alpha_dash'    => 'The %1$s field must only contain alpha-numeric characters, underscores, and dashes.',
             'numeric'       => 'The %1$s field must contain only numbers.',
             'integer'       => 'The %1$s field must contain an integer.'
+        ),
+        'jobs' => array(
+            'status_waiting'  => 'waiting',
+            'status_running'  => 'running',
+            'status_failed'   => 'failed',
+            'status_complete' => 'complete'
         )
     ),
 );

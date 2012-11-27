@@ -9,7 +9,36 @@ $.Tapioca.Views.AdminWorkers = $.Tapioca.Views.Content.extend(
         
         this.$table = this.$el.find('tbody');
 
+        this.get();
+
         return this;
+    },
+
+    get: function()
+    {
+        var url  = $.Tapioca.config.apiUrl + 'job',
+            self = this,
+            hxr  = $.ajax({
+                url:      url,
+                dataType: 'json',
+                success: function(data)
+                {
+                    var r    = data.results,
+                        html = '';
+
+                    for( var i = -1; ++i < data.total;)
+                    {
+                        html += self.tplRow( r[ i ] );
+                    }
+
+                    self.$table.html( html );
+                }
+            });
+    },
+
+    display: function( jobs )
+    {
+
     },
 
     onClose: function()
