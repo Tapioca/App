@@ -12,18 +12,18 @@
                             <a href="#apps-form" data-toggle="tab" data-bypass="true"><?= __('tapioca.ui.session.edit_apps'); ?></a>
                         </li>
                     </ul>
-                    <?= Form::open(array('class' => 'form-horizontal tab-content')); ?>
+                    <?= Form::open(array('class' => 'form-horizontal tab-content', 'id' => 'tapioca-user-form')); ?>
                         <fieldset id="account-form" class="tab-pane active">
                             <div class="control-group">
                                 <label class="control-label"><?= __('tapioca.ui.label.user_name'); ?></label>
                                 <div class="controls">
-                                    <input id="name" type="text" value="{{ name }}" class="span7">
+                                    <input id="name" name="name" type="text" value="{{ name }}" class="span7">
                                 </div>
                             </div>
                             <div class="control-group">
                                 <label class="control-label"><?= __('tapioca.ui.label.user_email'); ?></label>
                                 <div class="controls">
-                                    <input id="email" type="text" value="{{ email }}" class="span7">
+                                    <input id="email" name="email" type="text" value="{{ email }}" class="span7">
                                 </div>
                             </div>
                             <div class="control-group">
@@ -38,7 +38,7 @@
                         <fieldset id="password-form" class="tab-pane">
 
                             <div class="control-group">
-                                <label for="password" class="control-label"><?= __('tapioca.ui.label.new_password'); ?></label>
+                                <label for="password" name="password" class="control-label"><?= __('tapioca.ui.label.new_password'); ?></label>
                                 <div class="controls">
                                     <input type="text" id="password">
                                     <a href="javascript:;" id="password-generator">

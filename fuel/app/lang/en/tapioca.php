@@ -106,6 +106,7 @@ return array(
             'user_email'         => 'Email',
             'user_status'        => 'Status',
             'user_role'          => 'Role',
+            'user_password'      => 'Password',
             'new_password'       => 'New password',
             'conf_password'      => 'Confirm',
             'send_password'      => 'Send password',
@@ -212,6 +213,21 @@ return array(
             'video'    => 'Video',
             'document' => 'Document',
             'other'    => 'Other',
+        ),
+        'rules' => array(
+            'required'      => 'The %1$s field is required.',
+            'matches'       => 'The %1$s field does not match the %2$s field.',
+            'valid_email'   => 'The %1$s field must contain a valid email address.',
+            'min_length'    => 'The %1$s field must be at least %2$s characters in length.',
+            'max_length'    => 'The %1$s field must not exceed %2$s characters in length.',
+            'exact_length'  => 'The %1$s field must be exactly %2$s characters in length.',
+            'greater_than'  => 'The %1$s field must contain a number greater than %2$s.',
+            'less_than'     => 'The %1$s field must contain a number less than %2$s.',
+            'alpha'         => 'The %1$s field must only contain alphabetical characters.',
+            'alpha_numeric' => 'The %1$s field must only contain alpha-numeric characters.',
+            'alpha_dash'    => 'The %1$s field must only contain alpha-numeric characters, underscores, and dashes.',
+            'numeric'       => 'The %1$s field must contain only numbers.',
+            'integer'       => 'The %1$s field must contain an integer.'
         )
     ),
 );

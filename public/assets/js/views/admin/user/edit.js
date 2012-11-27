@@ -21,6 +21,30 @@ $.Tapioca.Views.AdminUserEdit = $.Tapioca.Views.FormView.extend(
 
         this.html( html, 'app-form');
 
+        // validation rules
+        
+        this.form = document.getElementById('tapioca-user-form');
+
+        var _rules = [
+            {
+                display: __('label.user_name'),
+                name:    'name',
+                rules:   'required'
+            },
+            {
+                display: __('label.user_email'),
+                name:    'email',
+                rules:   'required|valid_email'
+            },
+            {
+                display: __('label.user_password'),
+                name:    'password',
+                rules:   'required|min_length[6]'
+            }
+        ];
+        
+        this.addRules( _rules );   
+
         return this;
     },
 
@@ -40,63 +64,65 @@ $.Tapioca.Views.AdminUserEdit = $.Tapioca.Views.FormView.extend(
 
     submit: function()
     {
-
         // reset warning and feedback
-        this.$el.find('input').removeClass('warning');
-
-        var _data = {
-                email: $('#email').val(), 
-                name:  $('#name').val(),
-                admin: $('#admin').is(':checked')
-            },
-            password = $('#password').val(),
-            $btn     = $('#profile-form-save'),
-            valid    = true, // flag for pasword
-            self     = this;
-
-        if( !_.isBlank( password ) )
-        {
-            _data['password'] = password;
-        }
-
-        this.model.set(_data);
+        // this.$el.find('input').removeClass('warning');
         
-        if(valid)
+        if( this.validateForm() )
         {
-            // Sets button state to loading - disables button and swaps text to loading text
-            this.$btnSubmit.button('loading');
-
-            this.model.save({}, {
-                success: function(model, response)
-                {
-                    $('#password').val('');
-
-                    self.model.unset('password', {silent: true});
-
-                    self.resetForm();
-
-                    if(self.isNew)
-                    {
-                        $.Tapioca.Users.add( model )
-
-                        var href = $.Tapioca.app.setRoute('adminUserEdit', [ model.get('id') ] )
-
-                        Backbone.history.navigate( href );
-                    }
-
+            var _data = {
+                    email: $('#email').val(), 
+                    name:  $('#name').val(),
+                    admin: $('#admin').is(':checked')
                 },
-                error: function(model, response)
-                {
-                    self.model.set( self.model.previousAttributes() );
+                password = $('#password').val(),
+                $btn     = $('#profile-form-save'),
+                valid    = true, // flag for pasword
+                self     = this;
 
-                    self.resetForm();
-                }
-            });
-        }
-        else
-        {
-            this.model.set( this.model.previousAttributes() );
-            self.resetForm();
-        }
+            if( !_.isBlank( password ) )
+            {
+                _data['password'] = password;
+            }
+
+            this.model.set(_data);
+            
+            if(valid)
+            {
+                // Sets button state to loading - disables button and swaps text to loading text
+                this.$btnSubmit.button('loading');
+
+                this.model.save({}, {
+                    success: function(model, response)
+                    {
+                        $('#password').val('');
+
+                        self.model.unset('password', {silent: true});
+
+                        self.resetForm();
+
+                        if(self.isNew)
+                        {
+                            $.Tapioca.Users.add( model )
+
+                            var href = $.Tapioca.app.setRoute('adminUserEdit', [ model.get('id') ] )
+
+                            Backbone.history.navigate( href );
+                        }
+
+                    },
+                    error: function(model, response)
+                    {
+                        self.model.set( self.model.previousAttributes() );
+
+                        self.resetForm();
+                    }
+                });
+            }
+            else
+            {
+                this.model.set( this.model.previousAttributes() );
+                self.resetForm();
+            }
+        } // validation
     }
 });

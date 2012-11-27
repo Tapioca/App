@@ -77,38 +77,6 @@ $.Tapioca.Views.DocForm = Backbone.View.extend(
             }
         });
 
-        // moved to form factory
-//         Handlebars.registerHelper('_getSource', function(context, options)
-//         {
-//             var url   = $.Tapioca.config.apiUrl + self.appslug + '/document/' + options.hash.collection + '?l=' + self.locale.key,
-//                 query = {select: this.docEmbedded.split('::')},
-//                 self  = this;
-
-//             url = url+'&q='+JSON.stringify(query);
-
-//             hxr = $.ajax({
-//                 url:      url,
-//                 dataType: 'json',
-//                 async:    false,
-//                 success: function(data)
-//                 {
-//                     delete data._id;
-
-//                     ret.embedded = data;
-//                 }
-//             });
-
-//             var abstracts = $.Tapioca.UserApps[ self.appslug ].data[ options.hash.collection ].abstracts,
-//                 list      = _.pluck( abstracts.toJSON(), options.hash.label);
-// console.log( abstracts.toJSON() )
-// console.log( list )
-// console.log( options.hash.collection )
-// console.log( options.hash.label )
-// console.log( options.hash.value )
-
-//                 return ''; //self.docPreview(context, abstract.get('digest'), prefix);
-//         });
-
         return this;
     },
 
@@ -209,6 +177,77 @@ $.Tapioca.Views.DocForm = Backbone.View.extend(
         return this;
     },
 
+    bindInput: function()
+    {
+        var self    = this,
+            _parent = this.parent;
+
+        this.$el.find('table[data-dbref=true]').each(function()
+        {
+            var $parent = $(this).prev('div.btn-group').eq(0).hide();
+        });
+
+        this.$el.find('textarea[data-wysiwyg]').not('[data-binded="true"]').each(function()
+        {
+            var $this    = $(this),
+
+                buttons  = ($this.attr('data-toolbar')) ? 
+                            $this.attr('data-toolbar').split('::') : 
+                            ['html', '|', 'bold', 'italic', 'link'],
+
+                settings = {
+                    buttons:       buttons,
+                    keyupCallback: _.bind( _parent.change, _parent),
+                    paragraphy:    false,
+                    minHeight:     100
+                };
+//console.log(settings)
+            $this
+                .redactor(settings)
+                .attr('data-binded', 'true');
+        });
+
+        this.$el.find('input[type="date"]').not('[data-binded="true"]').each(function()
+        {
+            var $this     = $(this),
+                $altField = $('input[name="'+$this.attr('data-name')+'"]');
+            
+            $this.attr('data-binded', 'true');
+            
+            $this.datepicker({
+                dateFormat: 'dd/mm/yy',
+                onSelect: function(dateText, inst)
+                {
+                    var _getDate    = $this.datepicker('getDate'),
+                        epoch       = $.datepicker.formatDate('@', _getDate),
+                        defaultDate = $.datepicker.formatDate('MM d, yy', _getDate);
+
+                    $.datepicker.setDefaults( {
+                        defaultDate: new Date(defaultDate)
+                    });
+
+                    $altField.val(epoch / 1000);
+
+                    _parent.change();
+                }
+            });
+        });
+
+        this.$el.find(':input[data-rules]').not('[data-ruled="true"]').each(function()
+        {
+            var $this = $(this),
+                _rule = {
+                    name:    $this.attr('name'),
+                    display: $this.attr('data-label'),
+                    rules:   $this.attr('data-rules')
+                };
+
+            _parent.addRules( [_rule] );   
+
+            $this.attr('data-ruled', 'true');
+        });
+    },
+
     targetData: function(event)
     {
         var $target = $(event.target);
@@ -268,6 +307,8 @@ $.Tapioca.Views.DocForm = Backbone.View.extend(
 
         return ret;
     },
+
+    /* External Document */
 
     docPreview: function(data, digest, prefix)
     {
@@ -344,6 +385,8 @@ $.Tapioca.Views.DocForm = Backbone.View.extend(
         });
     },
 
+    /* Library */
+
     fileList: function(event)
     {
         this.target = event;
@@ -390,7 +433,9 @@ $.Tapioca.Views.DocForm = Backbone.View.extend(
             _.bind( this.addFile, this )
         );
     },
-   
+
+    /* Nodes Manager */
+
     addInput: function(event)
     {
         var target      = this.targetData(event),
@@ -446,76 +491,7 @@ $.Tapioca.Views.DocForm = Backbone.View.extend(
         this.bindInput();
     },
 
-    bindInput: function()
-    {
-        var self    = this,
-            _parent = this.parent;
-
-        this.$el.find('table[data-dbref=true]').each(function()
-        {
-            var $parent = $(this).prev('div.btn-group').eq(0).hide();
-        });
-
-        this.$el.find('textarea[data-wysiwyg]').not('[data-binded="true"]').each(function()
-        {
-            var $this    = $(this),
-
-                buttons  = ($this.attr('data-toolbar')) ? 
-                            $this.attr('data-toolbar').split('::') : 
-                            ['html', '|', 'bold', 'italic', 'link'],
-
-                settings = {
-                    buttons:       buttons,
-                    keyupCallback: _.bind( _parent.change, _parent),
-                    paragraphy:    false,
-                    minHeight:     100
-                };
-//console.log(settings)
-            $this
-                .redactor(settings)
-                .attr('data-binded', 'true');
-        });
-
-        this.$el.find('input[type="date"]').not('[data-binded="true"]').each(function()
-        {
-            var $this     = $(this),
-                $altField = $('input[name="'+$this.attr('data-name')+'"]');
-            
-            $this.attr('data-binded', 'true');
-            
-            $this.datepicker({
-                dateFormat: 'dd/mm/yy',
-                onSelect: function(dateText, inst)
-                {
-                    var _getDate    = $this.datepicker('getDate'),
-                        epoch       = $.datepicker.formatDate('@', _getDate),
-                        defaultDate = $.datepicker.formatDate('MM d, yy', _getDate);
-
-                    $.datepicker.setDefaults( {
-                        defaultDate: new Date(defaultDate)
-                    });
-
-                    $altField.val(epoch / 1000);
-
-                    _parent.change();
-                }
-            });
-        });
-
-        this.$el.find(':input[data-rules]').not('[data-ruled="true"]').each(function()
-        {
-            var $this = $(this),
-                _rule = {
-                    name:    $this.attr('name'),
-                    display: $this.attr('data-label'),
-                    rules:   $this.attr('data-rules')
-                };
-
-            _parent.addRules( [_rule] );   
-
-            $this.attr('data-ruled', 'true');
-        });
-    },
+    /* Embedded Data */
 
     embedData: function(hash, str, prefix)
     {
