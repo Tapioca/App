@@ -11,13 +11,13 @@
     // http://lostechies.com/derickbailey/2011/09/15/zombies-run-managing-page-transitions-in-backbone-apps/
     Backbone.View.prototype.close = function()
     {
-        this.remove();
-        this.unbind();
-
         if( this.onClose )
         {
             this.onClose();
         }
+
+        this.remove();
+        this.unbind();
 
         // $.Tapioca.view = false;
     }
