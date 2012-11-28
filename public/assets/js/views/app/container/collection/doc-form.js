@@ -108,12 +108,10 @@ $.Tapioca.Views.DocForm = Backbone.View.extend(
     getDependencies: function()
     {
         var dependencies = this.factory.getDependencies(),
-            library      = false,
-            self         = this,
-            callback     = function()
+            self          = this,
+            callback      = function()
             {
-                ++loaded;
-                console.log('callback ?')
+                ++self.loaded;
                 self.isDependenciesLoaded();
             };
 
@@ -122,17 +120,24 @@ $.Tapioca.Views.DocForm = Backbone.View.extend(
 
         if( this.total )
         {
-            var preventDuplicate = [];
-
             for( var i = -1; ++i < this.total; )
             {
-                var d = dependencies[ i ];
-
-                if( d.type == 'collection' && ( $.inArray( d.namespace, preventDuplicate) == -1 ) )
+                if( dependencies[ i ] === '__library__' )
                 {
-                    preventDuplicate.push( d.namespace );
+                    var library = $.Tapioca.UserApps[ this.appslug ].library;
 
-                    var collection = $.Tapioca.UserApps[ this.appslug ].data[ d.namespace ].abstracts;
+                    if( !library.isFetched() )
+                    {
+                        library.fetch({
+                            success: callback
+                        });
+                    }
+                    else
+                        callback()
+                }
+                else
+                {
+                    var collection = $.Tapioca.UserApps[ this.appslug ].data[ dependencies[ i ] ].abstracts;
 
                     if( !collection.isFetched() )
                         collection.fetch({
@@ -141,22 +146,6 @@ $.Tapioca.Views.DocForm = Backbone.View.extend(
                     else
                         callback();
                 }
-                else
-                {
-                    if( !library )
-                    {
-                        var library = $.Tapioca.UserApps[ this.appslug ].library;
-
-                        if( !library.isFetched() )
-                        {
-                            library.fetch({
-                                success: callback
-                            });
-                        }
-                    }
-                    else
-                        callback();
-                } // d.type
             } // for
         }
         else

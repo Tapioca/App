@@ -61,9 +61,16 @@ formFactory.prototype.getDependencies = function()
 {
     var dependencies = this.dependencies;
 
-    this.dependencies = [];
+    // reset
+    this.dependencies      = [];
 
     return dependencies;
+}
+
+formFactory.prototype.setDependencies = function( namespace )
+{
+    if( $.inArray( namespace, this.dependencies) === -1 )
+        this.dependencies.push( namespace );
 }
 
 formFactory.prototype.setPrefix = function(_prefix, _isArray, _id)
@@ -437,12 +444,9 @@ formFactory.prototype.file = function(item, prefix, key)
     // NESTED HELPERS NOT ALLOWED 
     // https://github.com/wycats/handlebars.js/issues/222
     var _prefix    =  this.getName(item, prefix).replace(/\[{{/g, '_#').replace(/}}\]/g, '#_').replace(/"/g, 'II'),
-        str        = '',
-        dependency = {
-            type:       'library'
-        };
+        str        = '';
 
-    this.dependencies.push( dependency );
+    this.setDependencies( '__library__' );
 
     str += this.indent(2) + '{{{ _embedData ' + item.id + ' prefix="' + _prefix + '" }}}' +
            this.indent(3) + '<div class="btn-group float-left">' +
@@ -467,13 +471,9 @@ formFactory.prototype.dbref = function(item, prefix, key)
     // NESTED HELPERS NOT ALLOWED 
     // https://github.com/wycats/handlebars.js/issues/222
     var _prefix    =  this.getName(item, prefix).replace(/\[{{/g, '_#').replace(/}}\]/g, '#_').replace(/"/g, 'II'),
-        str        = '',
-        dependency = {
-            type:      'collection',
-            namespace: item.collection
-        };
+        str        = '';
 
-    this.dependencies.push( dependency );
+    this.setDependencies( item.collection );
 
     str +=  this.indent(3) +
             '<div class="btn-group float-left">'+
