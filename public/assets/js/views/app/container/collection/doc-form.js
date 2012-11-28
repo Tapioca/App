@@ -94,32 +94,37 @@ $.Tapioca.Views.DocForm = Backbone.View.extend(
         'document::addDoc'                                                   : 'addDoc'
     },
 
-
     change: function()
     {
         this.parent.change();
     },
 
+    isDependenciesLoaded: function()
+    {
+        if( this.loaded == this.total )
+            this.render();
+    },
+
     getDependencies: function()
     {
         var dependencies = this.factory.getDependencies(),
-            total        = dependencies.length,
-            loaded       = 0,
             library      = false,
             self         = this,
             callback     = function()
             {
                 ++loaded;
-
-                if( loaded == total )
-                    self.render();
+                console.log('callback ?')
+                self.isDependenciesLoaded();
             };
 
-        if( total )
+        this.total       = dependencies.length;
+        this.loaded      = 0;
+
+        if( this.total )
         {
             var preventDuplicate = [];
 
-            for( var i = -1; ++i < total; )
+            for( var i = -1; ++i < this.total; )
             {
                 var d = dependencies[ i ];
 

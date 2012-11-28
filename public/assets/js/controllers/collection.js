@@ -27,7 +27,6 @@ $.Tapioca.Controllers.Collection = {
 
         var params = Backbone.history.getQueryParameters();
 
-
         // get locale
         if(!_.isUndefined(params.l))
         {
@@ -70,7 +69,7 @@ $.Tapioca.Controllers.Collection = {
             users:      users,
             docOptions: fetchOptions
 
-        }).render();
+        });
     },
 
     New: function( appslug )

@@ -23,12 +23,12 @@ $.Tapioca.Views.Document = $.Tapioca.Views.FormView.extend(
         this.users     = options.users;
 
         // is that bad???
-        // this model is required form change()
-        // but this.doc is more clean as name
+        // `this.model` is required for `change()`
+        // but `this.doc` is cleaner as variable name
         this.model = this.doc = options.doc;
 
         // check if every needed ressources
-        // is loaded
+        // are loaded
         if( !this.isNew )
             this.doc.fetch({ 
                 data: options.docOptions,
@@ -56,6 +56,22 @@ $.Tapioca.Views.Document = $.Tapioca.Views.FormView.extend(
         else
             ++this.loaded;
 
+
+        this.isRessourcesLoaded();
+        
+
+        return this;
+    },
+
+    isRessourcesLoaded: function()
+    {
+        if( this.loaded == this.total )
+        {
+            this.render();
+            this.renderRev();
+            this.renderDoc();
+        }
+
         return this;
     },
 
@@ -63,11 +79,7 @@ $.Tapioca.Views.Document = $.Tapioca.Views.FormView.extend(
     {
         ++this.loaded;
 
-        if( this.loaded == this.total )
-        {
-            this.renderRev();
-            this.renderDoc();
-        }
+        this.isRessourcesLoaded();
 
         return this;
     },
