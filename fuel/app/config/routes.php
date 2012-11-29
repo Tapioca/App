@@ -30,7 +30,7 @@ return array(
 
 		// document
 	'api/:appslug/document/:namespace/:ref/status'     => array('api/document/status',         'name' => 'api_document_status'),
-	'api/:appslug/document/:namespace/:ref'            => array('api/document/',               'name' => 'api_document_ref'),
+	'api/:appslug/document/:namespace/:ref'            => array('api/document/defined',        'name' => 'api_document_ref'),
 	'api/:appslug/document/:namespace'                 => array('api/document/',               'name' => 'api_document'),
 
 		// library

@@ -1,16 +1,18 @@
 <?php
 
-class Controller_Api_Document extends Controller_Api
+class Controller_Api_Document_Defined extends Controller_Api
 {
 	protected static $appslug;
 	private static $collection;
 	private static $document;
+	private static $ref;
 
 	public function before()
 	{
 		parent::before();
 
 		static::$appslug    = $this->param('appslug', false);
+		static::$ref        = $this->param('ref', null);
 
 		$namespace  = $this->param('namespace', false);
 
@@ -44,9 +46,9 @@ class Controller_Api_Document extends Controller_Api
 		// Document instance
 		try
 		{
-			$locale = Input::get('l', null);
+			$locale     = Input::get('l', null);
 
-			static::$document = Tapioca::document(static::$app, static::$collection, null, $locale );
+			static::$document = Tapioca::document(static::$app, static::$collection, static::$ref, $locale );
 		}
 		catch ( TapiocaException $e )
 		{
@@ -61,7 +63,7 @@ class Controller_Api_Document extends Controller_Api
 	{
         try
         {
-            Permissions::isGranted( 'app_list_documents' );
+            Permissions::isGranted( 'app_read_documents' );
         }
         catch( PermissionsException $e)
         {
@@ -71,17 +73,15 @@ class Controller_Api_Document extends Controller_Api
 
 		try
 		{
-			$query = Input::get('q', null);
+			$revision = Input::get('r', null);
 
-			// decode query
-			if( !is_null( $query ) )
+			// cast revision ID as integer
+			if( !is_null( $revision ) )
 			{
-				$query = json_decode($query, true);
-
-				static::$document->set( $query );
+				$revision = (int) $revision;
 			}
 
-			static::$data = static::$document->getAll();
+			static::$data   = static::$document->get( $revision );
 			static::$status = 200;
 		}
 		catch ( TapiocaException $e )
@@ -90,12 +90,11 @@ class Controller_Api_Document extends Controller_Api
 		}
 	}
 
-	//create collection data.
-	public function post_index()
+	public function put_index()
 	{
         try
         {
-            Permissions::isGranted( 'app_create_documents' );
+            Permissions::isGranted( 'app_edit_documents' );
         }
         catch( PermissionsException $e)
         {
@@ -107,15 +106,32 @@ class Controller_Api_Document extends Controller_Api
 
 		if( $model )
 		{
-			try
-			{
-				static::$data   = static::$document->save( $model, static::$user );
-				static::$status = 200;
+			static::$data   = static::$document->save( $model, static::$user );
+			static::$status = 200;
+		}
+	}
 
-			} catch (DocumentException $e)
-			{
-				static::error( $e->getMessage() );
-			}
-		} // if model
+	public function delete_index()
+	{
+		// todo: get document status to set appropriate permission
+        // $permission = 'app_read_collections_' . static::$collection->summary['status'];
+
+        try
+        {
+            Permissions::isGranted( 'app_delete_documents' );
+        }
+        catch( PermissionsException $e)
+        {
+            static::error( $e->getMessage() , 500 );
+            return;
+        }
+
+		if( ! static::deleteToken( 'document', static::$ref ))
+		{
+			return;
+		}
+		
+		static::$data   = array('status' => static::$document->delete());
+		static::$status = 200;
 	}
 }

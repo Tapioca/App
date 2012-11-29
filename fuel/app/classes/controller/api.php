@@ -166,6 +166,7 @@ class Controller_Api extends Controller_Rest
 		}
 	}
 
+	// collection helper
 	protected function dispatch(&$summary, &$schema, $values)
 	{
 		$arrSummary = Config::get('tapioca.collection.dispatch.summary');
@@ -185,6 +186,32 @@ class Controller_Api extends Controller_Rest
 		}
 
 		return;
+	}
+
+	// document helper
+	protected function clean()
+	{
+		$model = Input::json(null, false);
+
+		if( $model )
+		{
+			if(isset($model['_ref']))
+			{
+				unset($model['_ref']);
+			}
+
+			if(isset($model['_tapioca']))
+			{
+				unset($model['_tapioca']);
+			}
+
+			return $model;
+		}
+		
+		static::$data   = array('error' => __('tapioca.missing_required_params'));
+		static::$status = 500;
+
+		return false;
 	}
 
 	public function after( $response )
