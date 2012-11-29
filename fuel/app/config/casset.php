@@ -62,6 +62,7 @@ return array(
                     // 'library::jquery/jquery-ui-1.8.21.custom.min.js',
                     'library::jquery/jquery-ui-1.9.1.custom.js',
                     'library::nanoscroller/jquery.nanoscroller.js',
+
                     'library::bootstrap/bootstrap-button.js',
                     'library::bootstrap/bootstrap-tooltip.js',
                     'library::bootstrap/bootstrap-tab.js',
@@ -82,6 +83,8 @@ return array(
 
                     'library::handlebars/handlebars-1.0.rc.1.js',
 
+                    'library::form2js/form2js.js',
+                    
                     'library::redactor/redactor.js',
 
                     'library::fileupload/jquery.iframe-transport.js',

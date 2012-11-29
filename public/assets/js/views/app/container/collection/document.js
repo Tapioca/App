@@ -31,7 +31,7 @@ $.Tapioca.Views.Document = $.Tapioca.Views.FormView.extend(
         // are loaded
         if( !this.isNew )
             this.doc.fetch({ 
-                data: options.docOptions,
+                // data: options.docOptions,
                 success: _.bind( this.ressourcesLoaded, this )
             });
         else
@@ -141,26 +141,38 @@ $.Tapioca.Views.Document = $.Tapioca.Views.FormView.extend(
     {
         if( this.validateForm() )
         {
-        //     var formData = form2js('tapioca-document-form', '.'),
-        //         self     = this,
-        //         isNew    = this.model.isNew();
+            var formData = form2js('tapioca-document-form', '.'),
+                self     = this,
+                isNew    = this.model.isNew();
 
-        //     this.model.save(formData, {
-        //         success:function (model, response)
-        //         {
-        //             // prevent this.change()  to be trigged on render
-        //             this.initialized = false;
+                // Sets button state to loading - disables button and swaps text to loading text
+                this.$btnSubmit.button('loading');
 
-        //             if(isNew)
-        //             {
-        //                 var ref   = self.model.get('_ref');
-        //                     route = tapioca.app.router.reverse('documentRef'),
-        //                     href  = tapioca.app.router.createUri(route, [self.appSlug, self.namespace, ref]);
+// console.log( formData );
+            this.model.save(formData, {
+                success:function (model, response)
+                {
+                    // prevent this.change()  to be trigged on render
+                    self.vDocument = false;
 
-        //                 Backbone.history.navigate(href, true);
-        //             }
-        //         }
-        //     });
+                    if(isNew)
+                    {
+                        var href = $.Tapioca.app.setRoute('appCollectionRef', [ self.appslug, self.namespace, model.get('_ref') ] )
+
+                        Backbone.history.navigate( href );
+                    }
+
+                    self.abstracts.fetch();
+                    self.resetForm();
+                },
+                error: function(model, response)
+                {
+                    // self.model.set( self.model.previousAttributes() );
+                    console.log( response)
+
+                    self.resetForm();
+                }
+            });
         }
 
         return false;

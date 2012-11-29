@@ -43,7 +43,8 @@ $.Tapioca.Controllers.Collection = {
             revision     = params.r,
             docOptions   = {
                 appslug:   appslug,
-                namespace: namespace
+                namespace: namespace,
+                locale:    locale.key
             },
             docAttributes = {};
 
