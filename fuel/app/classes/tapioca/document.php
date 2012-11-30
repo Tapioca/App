@@ -197,25 +197,51 @@ class Document
 	 * @return  array
 	 * @throws  DocumentException
 	 */
-	public function abstracts( $status = null )
+	public function abstracts( $status = null, $ref = null )
 	{
 		$where = array(
 					'_abstract' => array( '$exists' => true )
 				);
 
-		if(!is_null($status))
+		// is that used somewhere ???
+		if( !is_null( $status ) )
 		{
 			$where['revisions.list.status'] = (int) $status;
 		}
 
-		//query database for collections's summaries
-		return static::$db
-				->select( array(), array('_abstract'))
-				->where($where)
-				->order_by(array(
-					'$natural' => 1
-				))
-				->hash( static::$dbCollectionName, true);
+		if( !is_null( $ref ) )
+		{
+			$where['_ref'] = $ref;
+		}
+
+		//query database for collections's abstracts
+		$query =  static::$db
+					->select( array(), array('_abstract'))
+					->where($where)
+					->order_by(array(
+						'$natural' => 1
+					));
+
+		if( !is_null( $ref ) )
+		{
+			$ret = $query->get_one( static::$dbCollectionName );
+
+			if( $ret )
+			{
+				unset( $ret['_id'] );
+				return $ret;
+			}
+			else
+			{
+				throw new \DocumentException(
+					__('tapioca.document_not_found', array('ref' => $ref, 'collection' => static::$collection->namespace))
+				);
+			}
+		}
+		else
+		{
+			return $query->hash( static::$dbCollectionName, true);
+		}
 	}
 
 	/**

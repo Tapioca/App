@@ -60,10 +60,10 @@ class Controller_Api_Collection_Abstract extends Controller_Api
         try
         {
             $documents      = Tapioca::document( static::$app, $collection );
-            static::$data   = $documents->abstracts();
+            static::$data   = $documents->abstracts( null, static::$ref );
             static::$status = 200;
         }
-        catch ( TapiocaException $e)
+        catch ( DocumentException $e)
         {
             static::error($e->getMessage());
         }
