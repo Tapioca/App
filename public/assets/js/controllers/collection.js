@@ -39,7 +39,7 @@ $.Tapioca.Controllers.Collection = {
             locale       = $.Tapioca.UserApps[ appslug ].app.getWorkingLocale(),
             baseUri      = $.Tapioca.app.setRoute('appCollectionRef', [ appslug, namespace, ref ] );
             isNew        = ( ref === 'new' ),
-            fetchOptions = $.param( $.extend({l: locale.key}, params) ),
+            fetchOptions = $.param( $.extend({}, params) ),
             revision     = params.r,
             docOptions   = {
                 appslug:   appslug,

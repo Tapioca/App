@@ -15,10 +15,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="span4">
-                                <ul id="revisions">
-                                </ul><!-- /#revisions -->
-                            </div><!-- /.span4 -->
+                            <div id="revisions-holder" class="span4"></div><!-- /.span4 -->
                         </div>
                     <?= Form::close(); ?>
                 </div><!-- /.pane-content -->

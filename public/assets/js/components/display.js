@@ -127,7 +127,7 @@ $.Tapioca.Components.Display = {
         return _html;
     },
 
-    status: function( ref, localeKey, revisions ) //revisions, appslug
+    status: function( revisions, localeKey  ) //revisions, appslug
     {
         var status = -2,
             revision = null;
@@ -244,6 +244,15 @@ $.Tapioca.Components.Display = {
 
         return html;
 
+    },
+
+    printR: function( obj )
+    {
+        var str  = '<pre>';
+            str += JSON.stringify(obj, null, "    ");
+            str += '</pre>';
+
+        return str;
     }
 }
 
@@ -257,3 +266,4 @@ Handlebars.registerHelper( 'roleSelector',      $.Tapioca.Components.Display.rol
 Handlebars.registerHelper( 'docStatus',         $.Tapioca.Components.Display.status );
 Handlebars.registerHelper( 'jobStatusText',     $.Tapioca.Components.Display.jobStatusText );
 Handlebars.registerHelper( 'jobStatusLabel',    $.Tapioca.Components.Display.jobStatusLabel );
+Handlebars.registerHelper( 'printR',            $.Tapioca.Components.Display.printR );

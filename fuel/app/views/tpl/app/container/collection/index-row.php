@@ -2,7 +2,7 @@
                                 {{{displayDigest digest uri=uri}}}
                                 <td>
                                     <div class="dropdown btn-group">
-                                        {{{docStatus _ref locale.key revisions }}}
+                                        {{{docStatus revisions locale.key }}}
                                         {{> docStatusList}}
                                     </div>
                                 </td>

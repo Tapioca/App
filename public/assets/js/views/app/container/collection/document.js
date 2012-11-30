@@ -31,7 +31,7 @@ $.Tapioca.Views.Document = $.Tapioca.Views.FormView.extend(
         // are loaded
         if( !this.isNew )
             this.doc.fetch({ 
-                // data: options.docOptions,
+                data: options.docOptions,
                 success: _.bind( this.ressourcesLoaded, this )
             });
         else
@@ -67,6 +67,9 @@ $.Tapioca.Views.Document = $.Tapioca.Views.FormView.extend(
     {
         if( this.loaded == this.total )
         {
+            // current document abstatract
+            this.abstract = ( this.isNew ) ? new $.Tapioca.Models.Abstract() : this.abstracts.get( this.ref );
+
             this.render();
             this.renderRev();
             this.renderDoc();
@@ -111,10 +114,8 @@ $.Tapioca.Views.Document = $.Tapioca.Views.FormView.extend(
 
     renderRev: function()
     {
-        var abstract = ( this.isNew ) ? new $.Tapioca.Models.Abstract() : this.abstracts.get( this.ref );
-
         this.vRevisions = new $.Tapioca.Views.Revisions({
-            model:    abstract,
+            model:    this.abstract,
             isNew:    this.isNew,
             appslug:  this.appslug,
             baseUri:  this.baseUri,
@@ -145,24 +146,28 @@ $.Tapioca.Views.Document = $.Tapioca.Views.FormView.extend(
                 self     = this,
                 isNew    = this.model.isNew();
 
-                // Sets button state to loading - disables button and swaps text to loading text
-                this.$btnSubmit.button('loading');
+            // Sets button state to loading - disables button and swaps text to loading text
+            this.$btnSubmit.button('loading');
 
-// console.log( formData );
             this.model.save(formData, {
                 success:function (model, response)
                 {
                     // prevent this.change()  to be trigged on render
-                    self.vDocument = false;
+                    // self.vDocument.initialized = false;
+                    self.ref = model.get('_ref');
 
                     if(isNew)
                     {
-                        var href = $.Tapioca.app.setRoute('appCollectionRef', [ self.appslug, self.namespace, model.get('_ref') ] )
+                        self.abstract.set({_ref: self.ref});
+
+                        self.abstracts.add( self.abstract );
+
+                        var href = $.Tapioca.app.setRoute('appCollectionRef', [ self.appslug, self.namespace, self.ref ] )
 
                         Backbone.history.navigate( href );
                     }
 
-                    self.abstracts.fetch();
+                    self.abstract.fetch();
                     self.resetForm();
                 },
                 error: function(model, response)

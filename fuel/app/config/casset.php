@@ -155,6 +155,7 @@ return array(
                     'views/app/container/collection/edit.js',
                     'views/app/container/collection/document.js',
                     'views/app/container/collection/revisions.js',
+                    'views/app/container/collection/revision-row.js',
                     'views/app/container/collection/doc-form.js',
                     'views/app/container/collection/embed-ref.js',
                     'views/app/container/collection/embed-file.js',

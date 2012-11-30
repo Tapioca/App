@@ -1,6 +1,11 @@
 
 $.Tapioca.Views.Revisions = $.Tapioca.Views.Content.extend(
 {
+    tagName:      'ul',
+    id:           'revisions',
+    className:    '',
+    viewPointers: [],
+
     initialize: function( options )
     {
         this.appslug  = options.appslug;
@@ -11,22 +16,23 @@ $.Tapioca.Views.Revisions = $.Tapioca.Views.Content.extend(
         this.isNew    = options.isNew;
         this.cache    = [];
 
+        this.$el.appendTo('#revisions-holder');
+
+        this.tplRow   = Handlebars.compile( $.Tapioca.Tpl.app.container.collection.revision );
+
+        this.model.bind('change:revisions', this.update, this)
+
         return this;        
     },
 
-    getUser: function( id )
+    update: function()
     {
-        if ( !this.cache[ id ] )
-        {
-            var user = this.users.get( id );
+        // empty list
+        this.$el.html('');
 
-            this.cache[ id ] = {
-                id:   id,
-                name: user.get('name')
-            };
-        }
+        this.isNew = false;
 
-        return this.cache[ id ];
+        this.render();
     },
 
     render: function()
@@ -37,35 +43,32 @@ $.Tapioca.Views.Revisions = $.Tapioca.Views.Content.extend(
                 active    = ( _.isUndefined( this.revision)) ? revisions.active[ this.locale.key ] : this.revision,
                 list      = _.filter(revisions.list, function( rev )
                             {
+                                rev.active = ( rev.revision == active );
+
                                 return (rev.locale === this.locale.key);
                             }, this);
-
-            _.each(list, function( rev )
-            {
-                if( rev.revision == active )
-                    rev.active = true;
-
-                rev.user = this.getUser( rev.user );
-
-            }, this);
         }
         else
         {
             var list = [];
         }
 
-
-        var tpl  = Handlebars.compile( $.Tapioca.Tpl.app.container.collection.revision ),
-            html = tpl({
-                appslug:    this.appslug,
-                baseUri:    this.baseUri,
-                revisions:  list
-            });
-
-        this.$revisions = $('#revisions');
-
-        this.$revisions.append( html );
+        _.each( list, this.display, this);
 
         return this;
+    },
+
+    display: function( revision )
+    {
+        this.viewPointers[ revision.id ] = new $.Tapioca.Views.RevisionRow({
+            revision: revision,
+            tpl:      this.tplRow,
+            $parent:  this.$el
+        }).render();
+    },
+
+    onClose: function()
+    {
+        this.model.unbind('change:revisions');
     }
 });
