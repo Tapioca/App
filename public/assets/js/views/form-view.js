@@ -11,6 +11,7 @@ $.Tapioca.Views.FormView = $.Tapioca.Views.Content.extend({
 	$btnSubmit:       false, 
     fields:           [],
     handlers:         {},
+    arrowKeyCode:     [37, 38, 39, 40],
 
     /*
      * Define the regular expressions that will be used
@@ -31,8 +32,12 @@ $.Tapioca.Views.FormView = $.Tapioca.Views.Content.extend({
 		'click button[type="submit"]' : 'submit'
 	},
 
-	change: function(event)
+	change: function( event )
 	{
+        // Do not trigger `change`on cursor move
+        if( $.inArray( event.keyCode, this.arrowKeyCode ) !== -1)
+            return;
+
 		if( !_.isUndefined( this.model.validate ) )
 		{
 			var $target = $(event.target),
