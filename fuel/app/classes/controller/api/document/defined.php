@@ -84,7 +84,7 @@ class Controller_Api_Document_Defined extends Controller_Api
 			static::$data   = static::$document->get( $revision );
 			static::$status = 200;
 		}
-		catch ( TapiocaException $e )
+		catch ( DocumentException $e )
 		{
 			static::error( $e->getMessage() );
 		}
