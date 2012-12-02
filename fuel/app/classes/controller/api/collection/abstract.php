@@ -42,6 +42,12 @@ class Controller_Api_Collection_Abstract extends Controller_Api
         static::$locale     = Input::get('l', null);
         static::$revision   = Input::get('r', null);
 
+        // cast revision ID as integer
+        if( !is_null( static::$revision ) )
+        {
+            static::$revision = (int) static::$revision;
+        }
+
         Permissions::set( static::$user, static::$app );
     }
 
