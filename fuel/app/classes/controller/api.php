@@ -119,6 +119,14 @@ class Controller_Api extends Controller_Rest
 
 		self::$data = $message;
 
+		// Get validation error
+		$rulesErrors = Tapioca::getFailedRules();
+
+		if( count($rulesErrors) > 0 )
+		{
+			self::$data['rules'] = $rulesErrors;
+		}
+
 		if( !is_null( $debug ) )
 		{
 			self::$data['debug'] = $debug;

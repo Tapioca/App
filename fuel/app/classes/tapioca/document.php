@@ -4,7 +4,6 @@ namespace Tapioca;
 
 use FuelException;
 use Config;
-use Set;
 
 class DocumentException extends FuelException {}
 
@@ -443,9 +442,8 @@ class Document
 		// Test document rules
 		if( count( $collectionData['rules'] ) > 0)
 		{
-			if(!$this->test_rules( $collectionData['rules'], $document))
+			if( !Tapioca::checkRules( $collectionData['rules'], $document ) )
 			{
-				// TODO: find a way to display $this->errors in Execption
 				throw new \DocumentException( __('tapioca.document_failed_at_rules_validation') );
 			}
 		}
@@ -898,51 +896,6 @@ class Document
 		}
 
 		return $localeRevision;
-	}
-
-	/**
-	 * Test each rules in the current document 
-	 *
-	 * @param   array collection rules definition
-	 * @param   array document data
-	 * @return  bool
-	 */
-	private function test_rules($rules_list, $document)
-	{
-		foreach($rules_list as $field)
-		{
-			$args = Set::extract($field['path'], $document);
-
-			foreach($field['rules'] as $rule)
-			{
-				// Strip the parameter (if exists) from the rule
-				// Rules can contain a parameter: max_length[5]
-				$param = false;
-				
-				if (preg_match("/(.*?)\[(.*)\]/", $rule, $match))
-				{
-					$rule	= $match[1];
-					$param	= explode('|', $match[2]);
-					$args	= array_merge($args, $param);
-				}
-
-				$valid = call_user_func_array(array(__NAMESPACE__ .'\Rules', $rule), $args);
-
-				if(!$valid)
-				{
-					$obj = new \stdClass;
-					$obj->rule = $rule;
-					$obj->path = $field['path'];
-					// $obj->args = array_merge(array($item['id']), (array) $param);
-					
-					$this->errors[] = $obj;
-					
-					return false;
-				}
-			}
-		}
-		
-		return true;
 	}
 
 	/**

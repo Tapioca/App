@@ -36,6 +36,7 @@ Autoloader::add_classes(array(
 	'Tapioca\\AppException'               => APPPATH.'classes/tapioca/group.php',
 	'Tapioca\\AppNotFoundException'       => APPPATH.'classes/tapioca/group.php',
 	'Tapioca\\PermissionsException'       => APPPATH.'classes/tapioca/permissions.php',
+	'Tapioca\\PreviewException'           => APPPATH.'classes/tapioca/preview.php',
 	// 'Tapioca\\InviteException'            => APPPATH.'classes/tapioca/invite.php',
 
 	'Tapioca\\CollectionException'        => APPPATH.'classes/tapioca/collection.php', 
@@ -56,6 +57,7 @@ Autoloader::add_classes(array(
 	'Tapioca\\Library'                    => APPPATH.'classes/tapioca/library.php',
 	'Tapioca\\Callback'                   => APPPATH.'classes/tapioca/callback.php',
 	'Tapioca\\Cast'                       => APPPATH.'classes/tapioca/cast.php',
+	'Tapioca\\Preview'                    => APPPATH.'classes/tapioca/preview.php',
 	'Tapioca\\Install'                    => APPPATH.'classes/tapioca/install.php',
 
 	// Tapioca Resque jobs

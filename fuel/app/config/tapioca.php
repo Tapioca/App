@@ -32,6 +32,12 @@ return array(
     ),
 
     /*
+     * Preview TTL
+     */
+
+    'previewLimit' => 172800, // 2 days
+
+    /*
      * Delete token TTL
      */
 

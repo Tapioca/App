@@ -39,6 +39,12 @@ class Tapioca
 	protected static $current_user = null;
 
 	/**
+	 * @var  array   List document validation error
+	 */
+	protected static $rulesErrors = array();
+
+
+	/**
 	 * Prevent instantiation
 	 */
 	final private function __construct() {}
@@ -527,6 +533,64 @@ class Tapioca
 		static::$db->where( array('token' => $token) )->delete( $collection );
 
 		return true;
+	}
+
+	/**
+	 * Test each rules in the current document 
+	 *
+	 * @param   array collection rules definition
+	 * @param   array document data
+	 * @return  bool
+	 */
+	public static function checkRules($rules_list, $document)
+	{
+		// reset errors list before
+		static::$rulesErrors = array();
+
+		foreach($rules_list as $field)
+		{
+			$args = \Set::extract($field['path'], $document);
+
+			foreach($field['rules'] as $rule)
+			{
+				// Strip the parameter (if exists) from the rule
+				// Rules can contain a parameter: max_length[5]
+				$param = false;
+				
+				if (preg_match("/(.*?)\[(.*)\]/", $rule, $match))
+				{
+					$rule	= $match[1];
+					$param	= explode('|', $match[2]);
+					$args	= array_merge($args, $param);
+				}
+
+				$valid = call_user_func_array(array(__NAMESPACE__ .'\Rules', $rule), $args);
+
+				if(!$valid)
+				{
+					$obj = new \stdClass;
+					$obj->rule = $rule;
+					$obj->path = $field['path'];
+					// $obj->args = array_merge(array($item['id']), (array) $param);
+					
+					static::$rulesErrors[] = $obj;
+					
+					return false;
+				}
+			}
+		}
+		
+		return true;
+	}
+
+	/**
+	 * Return failed rules array
+	 *
+	 * @return  array
+	 */
+	public static function getFailedRules()
+	{
+		return static::$rulesErrors;
 	}
 
 }
