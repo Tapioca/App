@@ -669,6 +669,8 @@ class Document
 			$revision = static::$revisionActive;
 		}
 
+		$revision = (int) $revision;
+
 		$set_out_of_date = ($status == 100);
 
 		foreach ($this->abstract['revisions']['list'] as &$value)

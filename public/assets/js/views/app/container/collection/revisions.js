@@ -25,6 +25,11 @@ $.Tapioca.Views.Revisions = $.Tapioca.Views.Content.extend(
         return this;        
     },
 
+    events: {
+        'click a.revision-btn':     'setRevision',
+        'click ul.dropdown-menu a': 'setStatus'
+    },
+
     update: function()
     {
         // empty list
@@ -53,18 +58,46 @@ $.Tapioca.Views.Revisions = $.Tapioca.Views.Content.extend(
             var list = [];
         }
 
-        _.each( list, this.display, this);
+        var _html = this.tplRow({
+            revisions: list
+        });
+
+        this.$el.html( _html );
+
+        this.$listItem = this.$el.find(' > li');
 
         return this;
     },
 
-    display: function( revision )
+    setStatus: function( event )
     {
-        this.viewPointers[ revision.id ] = new $.Tapioca.Views.RevisionRow({
-            revision: revision,
-            tpl:      this.tplRow,
-            $parent:  this.$el
-        }).render();
+        var $target   = $( event.target ),
+            _revision = $target.parents('li[data-revision]').attr('data-revision'),
+            _status   = parseInt( $target.attr('data-status') ),
+            _url      = this.model.url() + '?l=' + this.locale.key + '&r=' + _revision, 
+            _self     = this;
+
+        var put = $.ajax({
+            url:      _url,
+            data:     JSON.stringify({status: _status}),
+            dataType: 'json',
+            type:     'PUT'
+        });
+
+        put.done( function( p )
+        {
+            // console.log( p )
+            _self.model.set( p );
+        });
+
+        put.fail( this.error );
+    },
+
+    setRevision: function( event )
+    {
+        this.$listItem.removeClass('well').addClass('revision');
+
+        $( event.target ).parents('li').removeClass('revision').addClass('well');
     },
 
     onClose: function()

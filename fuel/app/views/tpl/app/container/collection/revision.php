@@ -1,4 +1,6 @@
-                                            <a href="javascript:;" data-revision="{{ revision }}">
+                                        {{#each revisions}}
+                                        <li class="{{#if active}}well{{else}}revision{{/if}}" data-revision="{{ revision }}">
+                                            <a href="javascript:;" class="revision-btn">
                                                 <span class="revision-id">#{{ revision }}</span>
                                                 <span class="revision-details">
                                                     {{dateFromTimestamp date.sec format='%Y-%m-%d %H:%M:%S'}}<br>
@@ -9,3 +11,5 @@
                                                 {{{docStatus this }}}
                                                 {{> docStatusList}}
                                             </div>
+                                        </li>
+                                        {{/each}}

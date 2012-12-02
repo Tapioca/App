@@ -20,6 +20,8 @@ class Mongo_Db extends Fuel\Core\Mongo_Db
 		}
 
 		$cursor		= $this->db->{$collection}->find($this->wheres, $this->selects);
+
+		$cursor->immortal(true);
 		
 		$total		= $cursor->count();
 		$documents	= $cursor->limit((int) $this->limit)->skip((int) $this->offset)->sort($this->sorts);

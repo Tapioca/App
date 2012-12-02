@@ -779,17 +779,20 @@ header#tapp {
 	margin-right: 10px;
 }
 
-#revision-active.well {
+#revisions .well {
 	margin: 0 0 10px;
 	min-height:35px;
 	padding: 10px 5px;
 }
 
-#revision-active .revision-id {
+#revisions .well .revision-id {
 	font-size:38px;
 	line-height:32px;
 }
 
+#revisions a {
+	text-decoration: none;
+}
 
 .media-preview {
 	padding: 5px 0;

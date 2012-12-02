@@ -63,6 +63,10 @@ $.Tapioca.Views.Document = $.Tapioca.Views.FormView.extend(
         return this;
     },
 
+    events: _.extend({
+        'click #revisions a.revision-btn': 'loadRevision'
+    }, $.Tapioca.Views.FormView.prototype.events),
+
     isRessourcesLoaded: function()
     {
         if( this.loaded == this.total )
@@ -128,6 +132,9 @@ $.Tapioca.Views.Document = $.Tapioca.Views.FormView.extend(
 
     renderDoc: function()
     {
+        if( this.vDocument )
+            this.vDocument.close();
+        
         this.vDocument = new $.Tapioca.Views.DocForm({
             model:   this.doc,
             schema:  this.schema,
@@ -135,6 +142,18 @@ $.Tapioca.Views.Document = $.Tapioca.Views.FormView.extend(
             baseUri: this.baseUri,
             locale:  this.locale,
             parent:  this
+        });
+    },
+
+    loadRevision: function( event )
+    {
+        var $target = $( event.target ).parents('li');
+
+        var fetchOptions = $.param( {r: $target.attr('data-revision') } );
+
+        this.doc.fetch({ 
+            data:   fetchOptions,
+            success: _.bind( this.renderDoc, this )
         });
     },
 
