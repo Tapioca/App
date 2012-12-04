@@ -58,18 +58,19 @@ class Controller_Welcome extends Controller
         }
 
         $settings = array(
-            'host'      => $domain,
-            'rootUrl'   => Uri::base(),
-            'bbRootUrl' => str_replace($domain, '', Uri::base()),
-            'apiUrl'    => Uri::create('api/'),
-            'appUrl'    => Uri::create('app'),
-            'filesUrl'  => Uri::create('files/'),
-            'roles'     => Config::get('tapioca.roles'),
-            'status'    => array(
-                'public' => $statusPublic,
-                'tech'   => $statusTech
+            'host'       => $domain,
+            'rootUrl'    => Uri::base(),
+            'bbRootUrl'  => str_replace($domain, '', Uri::base()),
+            'apiUrl'     => Uri::create('api/'),
+            'appUrl'     => Uri::create('app'),
+            'filesUrl'   => Uri::create('files/'),
+            'previewUrl' => Uri::create('preview/{{previewId}}'),
+            'roles'      => Config::get('tapioca.roles'),
+            'status'     => array(
+                'public'  => $statusPublic,
+                'tech'    => $statusTech
             ),
-            'medias'    => array(
+            'medias'     => array(
                 'extWhitelist' => Config::get('tapioca.upload.ext_whitelist')
             )
         );

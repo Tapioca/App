@@ -658,10 +658,12 @@ header#tapp {
 
 #app-content .form-footer {
 	bottom: 0;
+	left: 289px;
 	margin-bottom: 0;
 	position: fixed;
-	width: 100%;
-	z-index: 1000
+	right: 0;
+/*	width: 100%;*/
+	z-index: 1000;
 }
 
 #app-content .form-horizontal .control-group {
@@ -983,4 +985,43 @@ header#tapp {
 }
 
 .embed-ref-list {
+}
+
+
+	/* Preview
+	------------------------------ */
+
+#tapp-preview {
+	height: 100%;
+	left: 0;
+	position: absolute;
+	top: 0;
+	width: 100%;
+	z-index: 1100;
+}
+
+#tapp-preview header {
+	background: #fff;
+	display: block;
+	font-size: 14px;
+	height: 3%;
+	padding: .5% 1%;
+	width: 98%;
+}
+
+#tapp-preview iframe {
+	background: #fff;
+	border: 0;
+	height: 96%;
+	width: 100%;
+}
+
+#close-preview {
+	color: #ccc;
+	font-weight: bold;
+	float: right;
+}
+
+#close-preview:hover {
+	color: #aaa;
 }

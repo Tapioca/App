@@ -120,6 +120,7 @@ return array(
             'remove'             => 'remove',
             'select'             => 'select',
             'clone'              => 'clone',
+            'preview'            => 'Preview',
             'edit_app_profile'   => 'Profile',
             'edit_app_user'      => 'Users',
             'edit_app_admin'     => 'Admins',

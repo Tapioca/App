@@ -4,8 +4,9 @@ return array(
 	'_404_'      => 'welcome/404', // The main 404 route
 
 	// FRONT	
-	'app/(:any)' => 'welcome/index',
-	'app'        => 'welcome/index',
+	'preview/(:id)' => 'preview/index',
+	'app/(:any)'    => 'welcome/index',
+	'app'           => 'welcome/index',
 
 	// API REST 
 

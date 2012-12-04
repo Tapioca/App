@@ -43,7 +43,7 @@ class Preview
 			throw new \PreviewException( __('tapioca.no_valid_token') );
 		}
 
-		if( $object[0]['_tapioca_date'] <= $limitDate )
+		if( !isset($object[0]['_tapioca_date']) || $object[0]['_tapioca_date'] <= $limitDate )
 		{
 			throw new \PreviewException( __('tapioca.token_expire') );
 		}

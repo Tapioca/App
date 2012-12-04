@@ -64,7 +64,8 @@ $.Tapioca.Views.Document = $.Tapioca.Views.FormView.extend(
     },
 
     events: _.extend({
-        'click #revisions a.revision-btn': 'loadRevision'
+        'click #revisions a.revision-btn': 'loadRevision',
+        'click button.btn-preview'       : 'getPreview'
     }, $.Tapioca.Views.FormView.prototype.events),
 
     isRessourcesLoaded: function()
@@ -77,6 +78,7 @@ $.Tapioca.Views.Document = $.Tapioca.Views.FormView.extend(
             this.render();
             this.renderRev();
             this.renderDoc();
+            this.setPreviewBtn();
         }
 
         return this;
@@ -155,6 +157,53 @@ $.Tapioca.Views.Document = $.Tapioca.Views.FormView.extend(
             data:   fetchOptions,
             success: _.bind( this.renderDoc, this )
         });
+    },
+
+
+    setPreviewBtn: function()
+    {
+        var previews = this.schema.get('preview');
+
+        if( previews.length )
+        {
+            var $btn = $('#app-content').find('button.btn-preview');
+
+            $btn.append('<span class="caret"></span>');
+            $btn.dropdown()
+        }
+    },
+
+
+    getPreview: function()
+    {
+        if( this.validateForm() )
+        {
+            var formData = form2js('tapioca-document-form', '.'),
+                _url     = $.Tapioca.config.apiUrl + this.appslug + '/preview/' +  this.namespace;
+
+            var put = $.ajax({
+                url:      _url,
+                data:     JSON.stringify( formData ),
+                dataType: 'json',
+                type:     'POST'
+            });
+
+            put.done( function( p )
+            {
+                var url      = $.Tapioca.config.previewUrl.replace(/{{previewId}}/, p._id),
+                    tpl      = $.Tapioca.Tpl.app.container.collection.preview.replace(/{{url}}/g, url),
+                    $overlay = $( tpl ).hide().appendTo('body');
+
+                $overlay.fadeIn();
+
+                $('#close-preview').click(function()
+                {
+                    $overlay.remove();
+                })
+            });
+
+            put.fail( this.error );
+        }
     },
 
     submit: function()
