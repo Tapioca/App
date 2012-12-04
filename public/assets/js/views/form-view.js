@@ -34,9 +34,12 @@ $.Tapioca.Views.FormView = $.Tapioca.Views.Content.extend({
 
 	change: function( event )
 	{
-        // Do not trigger `change`on cursor move
-        if( $.inArray( event.keyCode, this.arrowKeyCode ) !== -1)
-            return;
+        if( !_.isUndefined( event ) )
+        {
+            // Do not trigger `change`on cursor move
+            if( $.inArray( event.keyCode, this.arrowKeyCode ) !== -1)
+                return;            
+        }
 
 		if( !_.isUndefined( this.model.validate ) )
 		{

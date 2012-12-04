@@ -90,9 +90,15 @@ $.Tapioca.Views.LibraryRow = Backbone.View.extend(
             category: this.model.get('category')
         }
 
+        // embed image size 
+        if( ret.category === 'image' )
+        {
+            ret.size = this.model.get('size');
+        }
+
         this.$form.trigger('document:addFile', ret);
 
-        $.Tapioca.Dialog.close();
+        // $.Tapioca.Dialog.close();
     },
 
     delete: function()
