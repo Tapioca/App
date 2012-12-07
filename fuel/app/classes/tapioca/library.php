@@ -425,7 +425,7 @@ class Library
 					$preview_url = (strpos($file['mimetype'], 'image') !== false) ?
 							\Uri::create('files/:appslug/:category/preview-:filename', $file_uri ) : '';
 
-					$result[] = array(
+					$tmp = array(
 						'name'          => $file['filename'],
 						'size'          => $file['length'],
 						'category'      => $file['category'],
@@ -434,6 +434,13 @@ class Library
 						'delete_url'    => $api_url,
 						'delete_type'   => 'DELETE'
 					);
+
+					if( isset( $file['size'] ))
+					{
+						$tmp['isize'] = $file['size'];
+					}
+
+					$result[] = $tmp;
 				}
 				catch(LibraryException $e)
 				{

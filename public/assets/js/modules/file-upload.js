@@ -139,10 +139,17 @@ $.Tapioca.Components.FileUpload = {
                             refresh = true;
 
                             if( typeof _success == 'function')
-                                _success(null, {
+                            {
+                                var ret = {
                                     filename: result.name,
                                     category: result.category
-                                });
+                                };
+
+                                if( typeof ret.isize != 'undefined')
+                                    ret.size = result.isize;
+
+                                _success(null, ret);
+                            }
                         }
                         else
                         {
