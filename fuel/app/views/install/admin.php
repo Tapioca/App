@@ -16,8 +16,7 @@
 						?>
 					</div>
 					<?php endif; ?>
-
-					<?= Form::open(array('action' => 'install/start', 'class' => 'form-horizontal')); ?>
+					<form method="post" accept-charset="utf-8" target="postFrame" class="form-horizontal" action="<?= Uri::create('install/start'); ?>">
 					<fieldset>
 						<legend class="padding-top-10px">Master Admin</legend>
 
