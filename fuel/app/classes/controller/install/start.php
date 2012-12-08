@@ -138,7 +138,7 @@ class Controller_Install_Start extends Controller
 
 	public function after( $response )
 	{
-		return View::forge('templates/install', self::$data)->auto_filter(false);
+		return Response::forge(View::forge('templates/install', self::$data)->auto_filter(false));
 	}
 
 }
