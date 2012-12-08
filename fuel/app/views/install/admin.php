@@ -16,7 +16,7 @@
 						?>
 					</div>
 					<?php endif; ?>
-					<form method="post" accept-charset="utf-8" target="postFrame" class="form-horizontal" action="<?= Uri::create('install/start'); ?>">
+					<form method="post" accept-charset="utf-8" class="form-horizontal" action="<?= Uri::create('install/start'); ?>">
 					<fieldset>
 						<legend class="padding-top-10px">Master Admin</legend>
 
