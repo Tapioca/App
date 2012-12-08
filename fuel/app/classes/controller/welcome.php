@@ -64,7 +64,7 @@ class Controller_Welcome extends Controller
             'apiUrl'     => Uri::create('api/'),
             'appUrl'     => Uri::create('app'),
             'filesUrl'   => Uri::create('files/'),
-            'previewUrl' => Uri::create('preview/{{previewId}}'),
+            'previewUrl' => Uri::create('preview/{{previewToken}}'),
             'roles'      => Config::get('tapioca.roles'),
             'status'     => array(
                 'public'  => $statusPublic,

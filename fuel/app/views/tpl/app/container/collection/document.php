@@ -29,9 +29,6 @@
                             <?= __('tapioca.ui.label.preview'); ?>
                         </button>
                         <ul class="dropdown-menu pull-right">
-                            <li><a href="#">Action</a></li>
-                            <li><a href="#">Another action</a></li>
-                            <li><a href="#">Something else here</a></li>
                             <li class="divider"></li>
                             <li><a href="javascript:;" data-preview="tapp-default">default preview</a></li>
                         </ul>

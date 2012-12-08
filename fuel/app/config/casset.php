@@ -159,6 +159,8 @@ return array(
                     'views/app/container/collection/embed-ref.js',
                     'views/app/container/collection/embed-file.js',
 
+                    'views/app/container/library/edit.js',
+
                     'controllers/session.js',
                     'controllers/admin.js',
                     'controllers/app.js',
@@ -171,6 +173,7 @@ return array(
                     // 'components/string.js',
                     // 'components/date.js',
                     'components/display.js',
+                    'components/array.js',
 
                     'router.js',
 

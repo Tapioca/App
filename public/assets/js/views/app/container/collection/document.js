@@ -65,7 +65,8 @@ $.Tapioca.Views.Document = $.Tapioca.Views.FormView.extend(
 
     events: _.extend({
         'click #revisions a.revision-btn': 'loadRevision',
-        'click button.btn-preview'       : 'getPreview'
+        'click button.btn-preview'       : 'getPreview',
+        'click a[data-preview]'          : 'getPreview'
     }, $.Tapioca.Views.FormView.prototype.events),
 
     isRessourcesLoaded: function()
@@ -166,19 +167,28 @@ $.Tapioca.Views.Document = $.Tapioca.Views.FormView.extend(
 
         if( previews.length )
         {
-            var $btn = $('#app-content').find('button.btn-preview');
+            var $btn          = $('#app-content').find('button.btn-preview'),
+                $dropdownMenu = $('#app-content').find('div.form-actions ul.dropdown-menu'),
+                list          = '';
 
+            _.each( previews, function( preview )
+            {
+                list += '<li><a href="javascript:;" data-preview="' + preview.url + '">' + preview.title + '</a></li>'
+            });
+
+            $dropdownMenu.prepend( list );
             $btn.append('<span class="caret"></span>');
-            $btn.dropdown()
+            $btn.dropdown();
         }
     },
 
 
-    getPreview: function()
+    getPreview: function( event )
     {
         if( this.validateForm() )
         {
-            var formData = form2js('tapioca-document-form', '.'),
+            var preview  = $( event.target ).attr('data-preview'),
+                formData = form2js('tapioca-document-form', '.'),
                 _url     = $.Tapioca.config.apiUrl + this.appslug + '/preview/' +  this.namespace;
 
             var put = $.ajax({
@@ -190,8 +200,30 @@ $.Tapioca.Views.Document = $.Tapioca.Views.FormView.extend(
 
             put.done( function( p )
             {
-                var url      = $.Tapioca.config.previewUrl.replace(/{{previewId}}/, p._id),
-                    tpl      = $.Tapioca.Tpl.app.container.collection.preview.replace(/{{url}}/g, url),
+                if( preview === 'tapp-default' )
+                {
+                    var url = $.Tapioca.config.previewUrl;
+                }
+                else
+                {
+
+                    var regex  = /({{doc.(.+?)}})/gi,
+                        string = preview,
+                        result;
+
+                    while(result = regex.exec( string ))
+                    {
+                        console.log(result[1], result[2], $.Tapioca.Components.Array.get( p, result[2] ));
+                        preview = preview.replace(result[1], $.Tapioca.Components.Array.get( p, result[2] ));
+                    }
+
+                    var url = preview;
+                }
+
+                // add preview token
+                url = url.replace(/{{previewToken}}/, p._id);
+
+                var tpl      = $.Tapioca.Tpl.app.container.collection.preview.replace(/{{url}}/g, url),
                     $overlay = $( tpl ).hide().appendTo('body');
 
                 $overlay.fadeIn();
