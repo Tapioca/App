@@ -35,35 +35,6 @@ $.Tapioca.Components.Form = {
         return width;
     },
 
-    atLeastOnce: function(context, options)
-    {
-        var ret = '';
-        
-        if(_.isEmpty(context))
-        {
-            context = (options.hash.type == 'array') ? [''] : {};
-        }
-
-        if(_.isArray(context))
-        {
-            var nb = context.length;
-            if(nb == 0)
-                nb = 1;
-
-
-            for(var i = -1; ++i < nb;)
-            {
-                ret = ret + options.fn(context[i]);
-            }
-        }
-        else if(_.isObject(context))
-        {
-            ret = ret + options.fn(context);
-        }
-
-        return ret;
-    },
-
     isSelected: function( value, options )
     {
         if(value == options.hash.default)
@@ -87,7 +58,6 @@ $.Tapioca.Components.Form = {
     }
 }
 Handlebars.registerHelper( 'slugify',     $.Tapioca.Components.Form.slugify );
-Handlebars.registerHelper( 'atLeastOnce', $.Tapioca.Components.Form.atLeastOnce );
 Handlebars.registerHelper( 'isSelected',  $.Tapioca.Components.Form.isSelected );
 Handlebars.registerHelper( 'isEmpty',     $.Tapioca.Components.Form.isEmpty );
 Handlebars.registerHelper( 'isNotEmpty',  $.Tapioca.Components.Form.isNotEmpty );

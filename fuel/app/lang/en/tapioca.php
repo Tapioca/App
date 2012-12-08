@@ -164,6 +164,8 @@ return array(
             'by'                 => 'by',
             'worker_job'         => 'Job',
             'worker_perfom'      => 'Do Job',
+            'label'              => 'label',
+            'key'                => 'key',
         ),
         'dialog' => array(
             'beforeunload' => 'Are you sure you want to leave with out save?',

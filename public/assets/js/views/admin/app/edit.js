@@ -3,15 +3,28 @@ $.Tapioca.Views.AdminAppEdit = $.Tapioca.Views.FormView.extend(
 {
     initialize: function( options )
     {
-        this.isNew = options.isNew;
-        
+        this.isNew     = options.isNew;
+        this.tplLocale = Handlebars.compile( $.Tapioca.Tpl.components.locales );
+
         return this;
     },
 
     events: _.extend({
-        'keyup #slug': 'slugify',
-        'keyup #name': 'slugify'
+        'keyup #slug'                                                        : 'slugify',
+        'keyup #name'                                                        : 'slugify',
+        'click .input-repeat-list li:last-child .input-repeat-trigger'       : 'addLocale',
+        'click .input-repeat-list li:not(:last-child) .input-repeat-trigger' : 'removeLocale'
     }, $.Tapioca.Views.FormView.prototype.events),
+
+    addLocale: function()
+    {
+        this.$el.find('ul.input-repeat-list').append( this.tplLocale({}));
+    },
+
+    removeLocale: function( event )
+    {
+        $(event.target).parents('li').remove();
+    },
 
     render: function()
     {
@@ -90,6 +103,7 @@ $.Tapioca.Views.AdminAppEdit = $.Tapioca.Views.FormView.extend(
     submit: function()
     {
 
+        console.log( this.model )
         // reset warning and feedback
         this.$el.find('input').removeClass('warning');
 
@@ -102,7 +116,7 @@ $.Tapioca.Views.AdminAppEdit = $.Tapioca.Views.FormView.extend(
 
         if( this.isNew )
         {
-            _data['slug'] = $('#slug').val();
+            _data['slug-suggest'] = $('#slug').val();
         }
 
         this.model.set(_data);

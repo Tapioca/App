@@ -202,6 +202,7 @@
         // register commun partials templates
         var docStatusList = $.Tapioca.Components.Display.statusList();
         Handlebars.registerPartial('docStatusList', docStatusList);
+        Handlebars.registerPartial('locale-list',  $.Tapioca.Tpl.components.locales );
 
         // All navigation should be passed through the navigate method, 
         // to be processed by the router.  If the link has a data-bypass

@@ -66,6 +66,13 @@ class Controller_Api_App extends Controller_Api
         // create an app
         try
         {
+            // Backbone use 'PUT' if `slug` is set.
+            if( isset( $fields['slug-sugest'] ) && !empty( $fields['slug-sugest'] ) )
+            {
+                $fields['slug'] = $fields['slug-sugest'];
+                unset( $fields['slug-sugest'] );
+            }
+
             $appId = Tapioca::app()->create($fields);
             
             if( $appId )

@@ -8,7 +8,6 @@ $.Tapioca.Views.AppAdminSettings = $.Tapioca.Views.FormView.extend(
         this.$el.appendTo('#app-content');
 
         this.tplLocale = Handlebars.compile( $.Tapioca.Tpl.components.locales );
-        Handlebars.registerPartial('locale-list',  $.Tapioca.Tpl.components.locales );
 
         this.appslug  = $.Tapioca.appslug;
 

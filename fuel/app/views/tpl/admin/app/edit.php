@@ -74,10 +74,10 @@
                             </table>
                         </fieldset>
                         <fieldset id="locales-form" class="tab-pane">
-                            <ul>
-                                {{#each locales}}
-                                <li>{{ label }} {{ key }} {{#default}}default{{/default}}</li>
-                                {{/each}}
+                            <ul class="input-repeat-list">
+                                {{#atLeastOnce locales}}
+                                    {{> locale-list}}
+                                {{/atLeastOnce}}
                             </ul>
                         </fieldset>
                     <?= Form::close(); ?>
