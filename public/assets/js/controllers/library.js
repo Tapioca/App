@@ -27,7 +27,20 @@ $.Tapioca.Controllers.Library = {
     Ref: function( appslug, basename, ext)
     {
         $.Tapioca.appslug = appslug;
+        
+        var library  = $.Tapioca.UserApps[ appslug ].library,
+            filename = basename + '.' + ext,
+            file     = new $.Tapioca.Models.File({
+                            filename: filename
+                        });
 
-console.log('Library Ref: ' +basename+'.'+ext);
+        if( !library.isFetched() )
+        {
+            library.fetch();
+        }
+
+        $.Tapioca.view = new $.Tapioca.Views.EditFile({
+            model: file
+        });
     }
 };
