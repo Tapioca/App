@@ -10,7 +10,7 @@ class Controller_Install_Start extends Controller
 
 		if(Tapioca::check_install())
 		{
-			Response::redirect('log');
+			Response::redirect('/');
 		}
 	}
 
