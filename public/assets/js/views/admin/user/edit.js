@@ -39,9 +39,14 @@ $.Tapioca.Views.AdminUserEdit = $.Tapioca.Views.FormView.extend(
             {
                 display: __('label.user_password'),
                 name:    'password',
-                rules:   'required|min_length[6]'
+                rules:   'min_length[6]'
             }
         ];
+
+        if( this.isNew )
+        {
+            _rules[2].rules += '|required';
+        }
         
         this.addRules( _rules );   
 
