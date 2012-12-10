@@ -561,6 +561,10 @@ class Tapioca
 				{
 					$rule	= $match[1];
 					$param	= explode('|', $match[2]);
+
+					if( empty( $args ) && $rule !== 'required' )
+						continue 2;
+					
 					$args	= array_merge($args, $param);
 				}
 
