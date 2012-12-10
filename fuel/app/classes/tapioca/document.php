@@ -395,6 +395,9 @@ class Document
 			throw new \TapiocaException( $e->getMessage() );
 		}
 
+		// Cast document's values
+		Cast::set($collection_data['cast'], $document);
+		
 		// Test document rules
 		if(isset($collection_data['rules']))
 		{
@@ -406,9 +409,6 @@ class Document
 		}
 
 		Callback::register(self::$group, $collection_data);
-
-		// Cast document's values
-		Cast::set($collection_data['cast'], $document);
 
 		// Global before callback
 		Callback::trigger('before', $document);
@@ -805,6 +805,10 @@ class Document
 				{
 					$rule	= $match[1];
 					$param	= explode('|', $match[2]);
+
+					if( empty( $args ) && $rule !== 'required' )
+						continue 2;
+					
 					$args	= array_merge($args, $param);
 				}
 
