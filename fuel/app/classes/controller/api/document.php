@@ -114,7 +114,7 @@ class Controller_Api_Document extends Controller_Api
 
 			} catch (DocumentException $e)
 			{
-				static::error( $e->getMessage() );
+				static::error( $e->getMessage(), 400 );
 			}
 		} // if model
 	}
