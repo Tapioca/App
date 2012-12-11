@@ -553,19 +553,19 @@ class Tapioca
 
 			foreach($field['rules'] as $rule)
 			{
+				// prevent to run rule on un-required field
+				if( empty( $args ) && $rule !== 'required' )
+					continue;
+
 				// Strip the parameter (if exists) from the rule
 				// Rules can contain a parameter: max_length[5]
 				$param = false;
-				
+
 				if (preg_match("/(.*?)\[(.*)\]/", $rule, $match))
 				{
-					$rule	= $match[1];
-					$param	= explode('|', $match[2]);
-
-					if( empty( $args ) && $rule !== 'required' )
-						continue 2;
-					
-					$args	= array_merge($args, $param);
+					$rule  = $match[1];
+					$param = explode('|', $match[2]);					
+					$args  = array_merge($args, $param);
 				}
 
 				$valid = call_user_func_array(array(__NAMESPACE__ .'\Rules', $rule), $args);
@@ -583,7 +583,7 @@ class Tapioca
 				}
 			}
 		}
-		
+
 		return true;
 	}
 

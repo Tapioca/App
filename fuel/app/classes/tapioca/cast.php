@@ -16,7 +16,10 @@ class Cast
 			$results = Set::extract($field['path'], $document);
 			$results = call_user_func_array(array('self', '_'.$field['type']), array($results));
 
-			self::apply($document, $field['path'], $results);
+			if( count($results) > 0)
+			{
+				self::apply($document, $field['path'], $results);
+			}
 
 		}
 
@@ -31,7 +34,7 @@ class Cast
 
 		foreach ($items as $key)
 		{
-			if($key == $target)
+			if($key == $target && !is_null( $doc ))
 			{
 				// our key is part of this level
 				if( array_key_exists($target, $doc) )

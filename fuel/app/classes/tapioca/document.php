@@ -448,10 +448,10 @@ class Document
 			}
 		}
 
-		Callback::register(static::$app, $collectionData);
-
 		// Cast document's values
 		Cast::set($collectionData['cast'], $document);
+
+		Callback::register(static::$app, $collectionData);
 
 		// Global before callback
 		Callback::trigger('before', $document);
