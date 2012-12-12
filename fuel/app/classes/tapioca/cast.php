@@ -16,8 +16,10 @@ class Cast
 			$results = Set::extract($field['path'], $document);
 			$results = call_user_func_array(array('self', '_'.$field['type']), array($results));
 
-			self::apply($document, $field['path'], $results);
-
+			if( count( $results ) > 0)
+			{
+				self::apply($document, $field['path'], $results);
+			}
 		}
 
 		return $document;

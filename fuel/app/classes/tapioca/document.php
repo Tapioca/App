@@ -800,14 +800,14 @@ class Document
 				// Strip the parameter (if exists) from the rule
 				// Rules can contain a parameter: max_length[5]
 				$param = false;
-				
+
+				if( empty( $args ) && $rule !== 'required' )
+					continue;
+
 				if (preg_match("/(.*?)\[(.*)\]/", $rule, $match))
 				{
 					$rule	= $match[1];
 					$param	= explode('|', $match[2]);
-
-					if( empty( $args ) && $rule !== 'required' )
-						continue 2;
 					
 					$args	= array_merge($args, $param);
 				}
