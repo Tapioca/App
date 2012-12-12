@@ -20,7 +20,7 @@ class Callback
 		{
 			static::$callbacks = $collection['callback'];
 			static::$slug      = $app->get('slug');
-			static::$namespace = ucfirst($group->get('slug'));
+			static::$namespace = ucfirst( static::$slug );
 
 			\Module::load(static::$slug);
 
