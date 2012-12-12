@@ -33,30 +33,33 @@ class Cast
 		{
 			if($key == $target)
 			{
-				// our key is part of this level
-				if( array_key_exists($target, $doc) )
-				{
-					// if the key contains array
-					// result remplace all the values
-					if( is_array($doc[$key]) )
+				// if( !is_null( $doc) )
+				// {
+					// our key is part of this level
+					if( array_key_exists($target, $doc) )
 					{
-						$doc[$key] = $result;
+						// if the key contains array
+						// result remplace all the values
+						if( is_array($doc[$key]) )
+						{
+							$doc[$key] = $result;
+						}
+						else
+						{
+							$doc[$key] = reset($result);
+						}
 					}
+					// our key is part of an array of object
 					else
 					{
-						$doc[$key] = reset($result);
-					}
-				}
-				// our key is part of an array of object
-				else
-				{
-					$nbResult = count($result);
+						$nbResult = count($result);
 
-					for($i = -1; ++$i < $nbResult;)
-					{
-						$doc[$i][$key] = $result[$i];
+						for($i = -1; ++$i < $nbResult;)
+						{
+							$doc[$i][$key] = $result[$i];
+						}
 					}
-				}
+				// }
 			}
 			else
 			{

@@ -967,3 +967,7 @@ header#tapp {
 .linedwrap .codelines .lineselect {
 	color: red;
 }
+
+.table.embed-data .thumbnails {
+	display: none;
+}
