@@ -26,11 +26,11 @@ $.Tapioca.Views.FormView = $.Tapioca.Views.Content.extend({
     alphaNumericRegex: /^[a-z0-9]+$/i,
     alphaDashRegex:    /^[a-z0-9_-]+$/i,
 	events: {
-		'keyup :input'                : 'change',
-		'change :input'               : 'change',
-		'keypress :input'             : 'onEnter',
-		'click button[type="submit"]' : 'submit',
-        'click button[type="reset"]'  : 'cancel'
+		'keyup :input'                  : 'change',
+		'change :input'                 : 'change',
+		'keypress :input:not(textarea)' : 'onEnter',
+		'click button[type="submit"]'   : 'submit',
+        'click button[type="reset"]'    : 'cancel'
 	},
 
 	change: function( event )
