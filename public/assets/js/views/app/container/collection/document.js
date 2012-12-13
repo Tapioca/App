@@ -200,28 +200,22 @@ $.Tapioca.Views.Document = $.Tapioca.Views.FormView.extend(
 
             put.done( function( p )
             {
-                if( preview === 'tapp-default' )
-                {
-                    var url = $.Tapioca.config.previewUrl;
-                }
-                else
-                {
+                var url = ( preview === 'tapp-default' ) ? $.Tapioca.config.previewUrl : preview;
 
-                    var regex  = /({{doc.(.+?)}})/gi,
-                        string = preview,
+                // add preview token
+                url = url.replace(/{{previewToken}}/, p._id);
+
+                if( preview !== 'tapp-default' )
+                {
+                    var regex  = /({{(.+?)}})/gi,
+                        string = url,
                         result;
 
                     while(result = regex.exec( string ))
                     {
-                        console.log(result[1], result[2], $.Tapioca.Components.Array.get( p, result[2] ));
-                        preview = preview.replace(result[1], $.Tapioca.Components.Array.get( p, result[2] ));
+                        url = url.replace(result[1], $.Tapioca.Components.Array.get( p, result[2] ));
                     }
-
-                    var url = preview;
                 }
-
-                // add preview token
-                url = url.replace(/{{previewToken}}/, p._id);
 
                 var tpl      = $.Tapioca.Tpl.app.container.collection.preview.replace(/{{url}}/g, url),
                     $overlay = $( tpl ).hide().appendTo('body');

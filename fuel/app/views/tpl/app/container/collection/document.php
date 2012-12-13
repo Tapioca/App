@@ -25,7 +25,7 @@
                     </button>
                     <button type="reset" class="btn"><?= __('tapioca.ui.label.cancel'); ?></button>
                     <div class="btn-group pull-right dropup">
-                        <button type="button" class="btn _dropdown-toggle btn-preview"><!-- data-toggle="dropdown" -->
+                        <button type="button" data-preview="tapp-default" class="btn btn-preview">
                             <?= __('tapioca.ui.label.preview'); ?>
                         </button>
                         <ul class="dropdown-menu pull-right">
