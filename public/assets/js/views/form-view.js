@@ -29,7 +29,8 @@ $.Tapioca.Views.FormView = $.Tapioca.Views.Content.extend({
 		'keyup :input'                : 'change',
 		'change :input'               : 'change',
 		'keypress :input'             : 'onEnter',
-		'click button[type="submit"]' : 'submit'
+		'click button[type="submit"]' : 'submit',
+        'click button[type="reset"]'  : 'cancel'
 	},
 
 	change: function( event )
@@ -79,6 +80,14 @@ $.Tapioca.Views.FormView = $.Tapioca.Views.Content.extend({
 
 		this.submit(event);
 	},
+
+
+    cancel: function()
+    {
+        $.Tapioca.BeforeUnload.clean();
+
+        window.history.back();
+    },
 
 	resetForm: function()
 	{
