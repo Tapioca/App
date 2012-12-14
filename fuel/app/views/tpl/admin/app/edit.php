@@ -61,7 +61,7 @@
                                             </a>
                                         </td>
                                         <td>
-                                            {{{roleSelector ../slug id  ../operator}}}
+                                            {! roleSelector ../slug id  ../operator}}
                                         </td>
                                         <td>
                                             <a href="javascript:;" class="btn btn-mini btn-danger btn-delete-trigger">

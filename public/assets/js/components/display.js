@@ -200,8 +200,8 @@ $.Tapioca.Components.Display = {
             return '<span class="label"> YOUR OWN ROLE</span>';
         }
 
-        var app  = $.Tapioca.UserApps[ appslug ].app,
-            team = app.get('team'),
+        var app   = $.Tapioca.UserApps[ appslug ].app,
+            team  = app.get('team'),
             roles = $.Tapioca.config.roles,
             target,
             shooter,
