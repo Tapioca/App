@@ -143,6 +143,7 @@ return array(
             'edit_schema'        => 'Schema',
             'edit_digest'        => 'Digest',
             'edit_callback'      => 'Callback',
+            'edit_preview'       => 'Preview',
             'col_namespace'      => 'Namespace',
             'col_name'           => 'Name',
             'col_desc'           => 'Description',
@@ -150,6 +151,7 @@ return array(
             'col_status_draft'   => 'draft',
             'col_status_public'  => 'public',
             'col_status_private' => 'private',
+            'col_preview'        => 'Preview',
             'library_all_files'  => 'All files',
             'library_image'      => 'Image',
             'library_video'      => 'Video',
@@ -166,6 +168,7 @@ return array(
             'worker_perfom'      => 'Do Job',
             'label'              => 'label',
             'key'                => 'key',
+            'url'                => 'url',
         ),
         'dialog' => array(
             'beforeunload' => 'Are you sure you want to leave with out save?',

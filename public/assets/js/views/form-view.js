@@ -7,8 +7,8 @@
 
 $.Tapioca.Views.FormView = $.Tapioca.Views.Content.extend({
 
-	inlineValidation: true, 
-	$btnSubmit:       false, 
+    inlineValidation: true, 
+    $btnSubmit:       false, 
     fields:           [],
     handlers:         {},
     arrowKeyCode:     [37, 38, 39, 40],
@@ -25,16 +25,18 @@ $.Tapioca.Views.FormView = $.Tapioca.Views.Content.extend({
     alphaRegex:        /^[a-z]+$/i,
     alphaNumericRegex: /^[a-z0-9]+$/i,
     alphaDashRegex:    /^[a-z0-9_-]+$/i,
-	events: {
-		'keyup :input'                  : 'change',
-		'change :input'                 : 'change',
-		'keypress :input:not(textarea)' : 'onEnter',
-		'click button[type="submit"]'   : 'submit',
-        'click button[type="reset"]'    : 'cancel'
-	},
+    events: {
+        'keyup :input'                                                       : 'change',
+        'change :input'                                                      : 'change',
+        'keypress :input:not(textarea)'                                      : 'onEnter',
+        'click button[type="submit"]'                                        : 'submit',
+        'click button[type="reset"]'                                         : 'cancel',
+        'click .input-repeat-list li:last-child .input-repeat-trigger'       : 'addRepeatNode',
+        'click .input-repeat-list li:not(:last-child) .input-repeat-trigger' : 'removeRepeatNode'
+    },
 
-	change: function( event )
-	{
+    change: function( event )
+    {
         if( !_.isUndefined( event ) )
         {
             // Do not trigger `change`on cursor move
@@ -42,44 +44,44 @@ $.Tapioca.Views.FormView = $.Tapioca.Views.Content.extend({
                 return;            
         }
 
-		if( !_.isUndefined( this.model.validate ) )
-		{
-			var $target = $(event.target),
-				name    = $target.attr('name'),
-				value   = $target.val();
+        if( !_.isUndefined( this.model.validate ) )
+        {
+            var $target = $(event.target),
+                name    = $target.attr('name'),
+                value   = $target.val();
 
-			// reset
-			$target.removeClass('alert');
+            // reset
+            $target.removeClass('alert');
 
-			var errorMessage = this.model.validate(name, value);
+            var errorMessage = this.model.validate(name, value);
 
-			if(!_.isBlank(errorMessage))
-			{
-				$target.addClass('alert');
-			}
-		}
+            if(!_.isBlank(errorMessage))
+            {
+                $target.addClass('alert');
+            }
+        }
 
-		this.unLoadToken = $.Tapioca.BeforeUnload.set(true, this.unLoadToken);
+        this.unLoadToken = $.Tapioca.BeforeUnload.set(true, this.unLoadToken);
 
-		if( !this.$btnSubmit )
-		{
-			this.$btnSubmit = this.$el.find('button[type="submit"]');
+        if( !this.$btnSubmit )
+        {
+            this.$btnSubmit = this.$el.find('button[type="submit"]');
 
-			this.$btnSubmit.removeClass('disabled').removeAttr('disabled');
-		}
-		
-	},
+            this.$btnSubmit.removeClass('disabled').removeAttr('disabled');
+        }
+        
+    },
 
-	onEnter: function(event)
-	{
-		if (event.keyCode != 13) return;
+    onEnter: function(event)
+    {
+        if (event.keyCode != 13) return;
 
-		// prevent bubbling
-		// event.stopPropagation();
-		// event.preventDefault();
+        // prevent bubbling
+        // event.stopPropagation();
+        // event.preventDefault();
 
-		this.submit(event);
-	},
+        this.submit(event);
+    },
 
 
     cancel: function()
@@ -89,16 +91,24 @@ $.Tapioca.Views.FormView = $.Tapioca.Views.Content.extend({
         window.history.back();
     },
 
-	resetForm: function()
-	{
-		$.Tapioca.BeforeUnload.clean();
+    // view override
+    addRepeatNode: function() {},
+
+    removeRepeatNode: function( event )
+    {
+        $( event.target ).parents('li').remove();
+    },
+
+    resetForm: function()
+    {
+        $.Tapioca.BeforeUnload.clean();
 
         this.$btnSubmit.button('reset');
-		this.$btnSubmit.attr('disabled', 'disabled').addClass('disabled');
-	},
+        this.$btnSubmit.attr('disabled', 'disabled').addClass('disabled');
+    },
 
-	displayErrors: function()
-	{
+    displayErrors: function()
+    {
         for(var i = -1, l = this.errors.length; ++i < l;)
         {
             var that   = this.errors[i],
@@ -107,7 +117,7 @@ $.Tapioca.Views.FormView = $.Tapioca.Views.Content.extend({
             $input.after('<p class="help-block">' + that.message + '</p>');
             $input.parents('div.control-group').addClass('error');
         }
-	},
+    },
 
 
     /*
@@ -240,7 +250,7 @@ $.Tapioca.Views.FormView = $.Tapioca.Views.Content.extend({
 
         if (this.errors.length > 0)
         {
-        	this.displayErrors();
+            this.displayErrors();
             return false;
         }
         

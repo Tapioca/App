@@ -31,6 +31,6 @@ $.Tapioca.Models.Collection = $.Tapioca.Models.Tapioca.extend(
 
     hasSchema: function()
     {
-        return _.isUndefined( this.attributes.schema );
+        return !_.isUndefined( this.attributes.schema );
     }
 });

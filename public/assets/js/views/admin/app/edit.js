@@ -11,19 +11,12 @@ $.Tapioca.Views.AdminAppEdit = $.Tapioca.Views.FormView.extend(
 
     events: _.extend({
         'keyup #slug'                                                        : 'slugify',
-        'keyup #name'                                                        : 'slugify',
-        'click .input-repeat-list li:last-child .input-repeat-trigger'       : 'addLocale',
-        'click .input-repeat-list li:not(:last-child) .input-repeat-trigger' : 'removeLocale'
+        'keyup #name'                                                        : 'slugify'
     }, $.Tapioca.Views.FormView.prototype.events),
 
-    addLocale: function()
+    addRepeatNode: function()
     {
         this.$el.find('ul.input-repeat-list').append( this.tplLocale({}));
-    },
-
-    removeLocale: function( event )
-    {
-        $(event.target).parents('li').remove();
     },
 
     render: function()

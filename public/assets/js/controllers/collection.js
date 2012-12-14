@@ -94,7 +94,12 @@ $.Tapioca.Controllers.Collection = {
 
         var collection = $.Tapioca.UserApps[ appslug ].collections.get( namespace );
 
-        if( collection.hasSchema() )
+        $.Tapioca.view = new $.Tapioca.Views.CollectionEdit({
+            isNew: false,
+            model: collection
+        });
+
+        if( !collection.hasSchema() )
         {
             collection.fetch({
                 success: function()
@@ -103,11 +108,10 @@ $.Tapioca.Controllers.Collection = {
                 }
             })
         }
-
-        $.Tapioca.view = new $.Tapioca.Views.CollectionEdit({
-            isNew: false,
-            model: collection
-        });
+        else
+        {
+            $.Tapioca.view.render();
+        }
 
     }
 };

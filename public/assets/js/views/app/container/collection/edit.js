@@ -7,14 +7,16 @@ $.Tapioca.Views.CollectionEdit = $.Tapioca.Views.FormView.extend(
 
         this.$el.appendTo('#app-content');
 
+        this.tplPreview = Handlebars.compile( $.Tapioca.Tpl.app.container.collection['preview-edit'] );
+
         this.model.bind('reset', this.render, this);
         
         return this;
     },
 
     events: _.extend({
-        'keyup #namespace': 'slugify',
-        'keyup #name':      'slugify'
+        'keyup #namespace' : 'slugify',
+        'keyup #name'      : 'slugify'
     }, $.Tapioca.Views.FormView.prototype.events),
 
 
@@ -26,9 +28,19 @@ $.Tapioca.Views.CollectionEdit = $.Tapioca.Views.FormView.extend(
         }
     },
 
+
+    addRepeatNode: function()
+    {
+        this.$el.find('ul.input-repeat-list').append( this.tplPreview({}));
+    },
+
     render: function()
     {
         var model       = this.model.toJSON();
+
+        model.schema        = JSON.stringify( model.schema,        null, ' ');
+        model.digest.fields = JSON.stringify( model.digest.fields, null, ' ');
+        model.callback      = JSON.stringify( model.callback,      null, ' ');
 
         model.isNew     = this.isNew;
         model.pageTitle = ( this.isNew ) ?
@@ -43,145 +55,83 @@ $.Tapioca.Views.CollectionEdit = $.Tapioca.Views.FormView.extend(
         this.$namespace = $('#namespace');
 
         this.editor();
+        // this.$el.find('textarea.lined').linedtextarea();
+
 
         return this;
     },
 
     editor: function()
     {
-        var $form = $('#form'),
-            dropCount = 0,
-            sortableOption = {
-              connectWith: '#form ul.sortable',
-              placeholder: 'ui-placeholder',
-              handle:      'span.element-required',
-              items:       'li[data-type]',
-              receive: function(event, ui)
-              {
-                  dropCount = ++dropCount;
 
-                  if(dropCount>1)
-                  {
-                    $(ui.item).addClass('ui-deleteMe');
-                  }
-              },
-              start: function(event, ui)
-              {
-                  dropCount = 0;   
-                  
-                  var placeholders = 0;
-
-                  $form.find('li.ui-placeholder').each(function()
-                  {
-                    placeholders = ++placeholders;
-
-                    if(placeholders > 1)
-                    {
-                      $(this).hide();
-                    }
-                  });
-              },
-              stop: function(event, ui)
-              {
-                var $item = $(ui.item);
-
-                if($item.attr('data-node'))
-                {
-                  $item.find('ul.sortable').sortable(sortableOption);
-                }
-
-                $form.find('li.ui-deleteMe').remove();
-                $form.find('ul.sortable').removeClass('empty');
-                dropCount = 0;
-
-                $item.find('input[name="label"]').focus();
-              }
-            };
-
-        $('#form-elements').find('li').draggable({
-            helper: 'clone',
-            connectToSortable: '#form ul.sortable'
-        });
-
-        $('#form').find('ul.sortable').sortable(sortableOption);
-
-        // EVENTS
-
-        $form.on('blur', 'input[name="label"]', function()
-        {
-          if(this.value!='')
-          {
-            var $wrapper = $(this).next('span.input-id-wrapper'),
-                $input   = $wrapper.find('input[name="id"]'),
-                _str     = $.Tapioca.Components.Form.slugify(this.value),
-                _width   = $.Tapioca.Components.Form.fieldWidth(this.parentNode, this.value);
-
-            this.style.width = _width + 'px';
-
-            $wrapper.show();
-            $input.val( _str ).width( _width );
-            this.parentNode.className += ' defined';
-          }
-        });
-
-        $form.on('keyup', 'input[name="label"], input[name="id"]', this.onEnter);
-
-        $form.on('click', 'input[name="id"]', function()
-        {
-          $(this).select();
-        });
-
-        $form.on('keyup', 'input[name="id"]', function()
-        {
-          if(this.value!='')
-          {
-            this.value = $.Tapioca.Components.Form.slugify(this.value);
-            var _width = $.Tapioca.Components.Form.fieldWidth(this.parentNode, this.value);
-
-            this.style.width = _width + 'px';
-          }
-        });
-
-        $form.on('click', 'span.remove', function()
-        {
-          $(this).parents('li').eq(0).remove();
-
-          if($form.find('li').size() == 0)
-          {
-            $form.find('ul').addClass('empty');
-          }
-        });
-
-        $form.on('click', 'span.options-trigger', function()
-        {
-          $(this).parents('li').eq(0).find('div.element-options').toggle();
-        })
-
-        $('#submit').click(function()
-        {
-          $('#form').find('li').removeClass('warning');
-
-          summary = [];
-
-          var schema  = parseForm( $('#form > ul > li[data-type]'), '' );
-          
-          var json = JSON.stringify(schema, null, "    ");
-          
-          $('#schema-holder').val(json);
-          
-          var json = JSON.stringify(summary, null, "    ");
-
-          $('#summary-holder').val(json);
-        });
     },
 
     submit: function()
     {
+        this.$btnSubmit.button('loading');
 
+        var previews = [];
+
+        $('#collection-preview').find('input[name="preview-url"]').each(function( index )
+        {
+            var $this    = $(this),
+                $parent  = $this.parents('li'),
+                _label   = $parent.find('input[name="preview-label"]').val(),
+                _url     = $this.val();
+
+            if( !_.isBlank( _label ) && !_.isBlank( _url ) )
+            {
+                var _obj = {
+                    label: _label,
+                    url:   _url
+                };
+
+                previews.push( _obj )
+            }
+        });
+
+        var self            = this,
+            collectionModel = {
+                name:      $('#name').val(),
+                desc:      $('#desc').val(),
+                status:    $('#status').val(),
+                schema:    jQuery.parseJSON( $('#schema').val() ),
+                digest:
+                {
+                    fields: jQuery.parseJSON( $('#digest').val() ),
+                    edited: $('#digest-edit').is(':checked')
+                },
+                callback : jQuery.parseJSON( $('#callback').val() ),
+                preview:   previews,
+            };
+
+        this.model.save( collectionModel, {
+                success:function (model, response)
+                {
+                    self.namespace = model.get('namespace');
+
+                    if( self.isNew )
+                    {
+                        $.Tapioca.UserApps[ appslug ].collections.add( model );
+                        
+                        var href = $.Tapioca.app.setRoute('appCollectionEdit', [ self.appslug, self.namespace ] )
+
+                        Backbone.history.navigate( href );
+                    }
+
+                    self.resetForm();
+                },
+                error: function(model, response)
+                {
+                    console.log( response)
+
+                    self.resetForm();
+                }
+            });
     },
 
     onClose: function()
     {
-        $('#form').off();
+        // $('#form').off();
     }
 });

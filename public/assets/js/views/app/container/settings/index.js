@@ -13,11 +13,6 @@ $.Tapioca.Views.AppAdminSettings = $.Tapioca.Views.FormView.extend(
 
     },
 
-    events: _.extend({
-        'click .input-repeat-list li:last-child .input-repeat-trigger'       : 'addLocale',
-        'click .input-repeat-list li:not(:last-child) .input-repeat-trigger' : 'removeLocale',
-    }, $.Tapioca.Views.FormView.prototype.events),
-
     render: function()
     {
         var model = this.model.toJSON(),
@@ -34,14 +29,9 @@ $.Tapioca.Views.AppAdminSettings = $.Tapioca.Views.FormView.extend(
         return this;
     },
 
-    addLocale: function()
+    addRepeatNode: function()
     {
         this.$el.find('ul.input-repeat-list').append( this.tplLocale({}));
-    },
-
-    removeLocale: function( event )
-    {
-        $(event.target).parents('li').remove();
     },
 
     submit: function( event )

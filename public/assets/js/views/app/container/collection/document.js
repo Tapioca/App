@@ -173,7 +173,7 @@ $.Tapioca.Views.Document = $.Tapioca.Views.FormView.extend(
 
             _.each( previews, function( preview )
             {
-                list += '<li><a href="javascript:;" data-preview="' + preview.url + '">' + preview.title + '</a></li>'
+                list += '<li><a href="javascript:;" data-preview="' + preview.url + '">' + preview.label + '</a></li>'
             });
 
             $dropdownMenu.prepend( list );
