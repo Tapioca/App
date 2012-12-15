@@ -609,7 +609,6 @@ class Tapioca
 	 */
     public static function sendInvite( $guestEmail, User $user, App $app, $hash )
     {
-        $emailTpl  = 'emails/confirm';
         $emailData = array(
                 'hostName' => $user->get('name'),
                 'appName'  => $app->get('name'),
@@ -618,11 +617,10 @@ class Tapioca
 
         if( $hash )
         {
-            $emailTpl = 'emails/invite';
             $emailData['linkUrl'] = \Uri::create('invite', array(), array( 'hash' => $hash ) );
         }
 
-        $emailBody    = \View::forge( $emailTpl, $emailData)->auto_filter(false);
+        $emailBody    = \View::forge( 'emails/invite', $emailData )->auto_filter(false);
         $emailSubject = __('tapioca.invite_new_user', array( 'app' => $app->get('name') ));
         
         \Package::load('email');
