@@ -37,7 +37,6 @@ Autoloader::add_classes(array(
 	'Tapioca\\AppNotFoundException'       => APPPATH.'classes/tapioca/group.php',
 	'Tapioca\\PermissionsException'       => APPPATH.'classes/tapioca/permissions.php',
 	'Tapioca\\PreviewException'           => APPPATH.'classes/tapioca/preview.php',
-	// 'Tapioca\\InviteException'            => APPPATH.'classes/tapioca/invite.php',
 
 	'Tapioca\\CollectionException'        => APPPATH.'classes/tapioca/collection.php', 
 	'Tapioca\\DocumentException'          => APPPATH.'classes/tapioca/document.php',  
@@ -49,7 +48,6 @@ Autoloader::add_classes(array(
 	'Tapioca\\User'                       => APPPATH.'classes/tapioca/user.php',
 	'Tapioca\\Attempts'                   => APPPATH.'classes/tapioca/attempts.php',
 	'Tapioca\\Permissions'                => APPPATH.'classes/tapioca/permissions.php',
-	// 'Tapioca\\Invite'                     => APPPATH.'classes/tapioca/invite.php',
 	'Tapioca\\App'                        => APPPATH.'classes/tapioca/app.php',
 	'Tapioca\\Collection'                 => APPPATH.'classes/tapioca/collection.php',
 	'Tapioca\\Document'                   => APPPATH.'classes/tapioca/document.php',

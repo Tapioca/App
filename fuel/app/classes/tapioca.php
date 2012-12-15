@@ -183,7 +183,7 @@ class Tapioca
 	 * Column value.
 	 *
 	 * @param   int|string  User id or Login Column value to find.
-	 * @throws  AuthException
+	 * @throws  UserNotFoundException
 	 * @return  User
 	 */
 	public static function user($id = null, $recache = false)
@@ -239,7 +239,7 @@ class Tapioca
 	 * @param   string  Password entered
 	 * @param   bool    Whether to remember the user or not
 	 * @return  bool
-	 * @throws  MontryAuthException
+	 * @throws  AuthException
 	 */
 	public static function login($login_column_value, $password, $remember = false)
 	{
@@ -596,5 +596,58 @@ class Tapioca
 	{
 		return static::$rulesErrors;
 	}
+
+	/**
+	 * Send invitation mail
+	 *
+     * @param   string       Guest email
+     * @param   object       Sender User instance
+     * @param   object       App instance
+     * @param   bool/string  activation hash if needed
+	 * @return  bool
+	 * @throws  TapiocaException
+	 */
+    public static function sendInvite( $guestEmail, User $user, App $app, $hash )
+    {
+        $emailTpl  = 'emails/confirm';
+        $emailData = array(
+                'hostName' => $user->get('name'),
+                'appName'  => $app->get('name'),
+                'linkUrl'  => \Uri::base()
+            );
+
+        if( $hash )
+        {
+            $emailTpl = 'emails/invite';
+            $emailData['linkUrl'] = \Uri::create('invite', array(), array( 'hash' => $hash ) );
+        }
+
+        $emailBody    = \View::forge( $emailTpl, $emailData)->auto_filter(false);
+        $emailSubject = __('tapioca.invite_new_user', array( 'app' => $app->get('name') ));
+        
+        \Package::load('email');
+
+        $config = \Config::get('tapioca.mailer');
+
+        $mailer = \Email::forge();
+
+        $mailer->from( $user->get('email'), $user->get('name') );
+        $mailer->to( $guestEmail );
+        $mailer->subject( $emailSubject );
+        $mailer->body( $emailBody );
+
+        try
+        {
+            return $mailer->send();
+        }
+        catch(\EmailValidationFailedException $e)
+        {
+            throw new \TapiocaException( 'email validation failed' );
+        }
+        catch(\EmailSendingFailedException $e)
+        {
+            throw new \TapiocaException( 'The driver could not send the email' );
+        }
+    }
 
 }

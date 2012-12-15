@@ -493,6 +493,8 @@ class App
 
 		if($query)
 		{
+			$this->load( $where );
+			
 			return true;
 		}
 

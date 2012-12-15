@@ -202,8 +202,7 @@ class User
 		// set activation hash if activation = true
 		if ($activation)
 		{
-			$hash = Str::random('alnum', 24);
-			$new_user['activation_hash'] = $this->generate_password($hash);
+			$new_user['activation_hash'] = base64_encode( $user['email'] );
 		}
 
 		// insert new user
@@ -219,7 +218,7 @@ class User
 				// return array of id and hash
 				return array(
 					'id'   => $user_id,
-					'hash' => base64_encode($user['email']).'/'.$hash
+					'hash' => $new_user['activation_hash']
 				);
 			}
 

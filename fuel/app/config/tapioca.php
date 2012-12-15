@@ -2,10 +2,18 @@
 
 return array(
 
+    'default_password' => 'azerty',
+
     'date' => array(
         'timezone' => 'Europe/Paris',
         'format'   => '%d/%m/%G'
     ),
+
+    'mailer' => array(
+        'email' => 'robot@tapiocapp.com',
+        'name'  => 'Tapioca Robot',
+    ),
+
 
     /*
      * Collections Names

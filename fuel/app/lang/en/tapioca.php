@@ -24,6 +24,7 @@ return array(
     'email_already_exists'            => 'That Email already exists.',
     'column_and_password_empty'       => ':column and Password can not be empty.',
     'email_and_password_empty'        => 'Email and Password can not be empty.',
+    'not_valid_email'                 => 'You must provide a valid Email.',
     'column_is_empty'                 => ':column must not be empty.',
     'email_already_in_use'            => 'That email is already in use.',
     'invalid_old_password'            => 'Old password is invalid',
@@ -37,6 +38,8 @@ return array(
     'user_already_disabled'           => 'The user is already disabled',
     'user_not_found'                  => 'The user does not exist.',
     'user_deleted'                    => 'User have been deleted.',
+    'invite_user'                     => 'Join :app group on Tapioca',
+
 
     /** Attempts Exception Messages **/
     'login_ip_required'    => 'Login Id and IP Adress are required to add a login attempt.',
