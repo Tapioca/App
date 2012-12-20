@@ -312,7 +312,7 @@ class Collection
 	public function create_summary(array $fields)
 	{
 
-		$namespace = (!is_null($fields['namespace'])) ? $fields['namespace'] : $fields['name'];
+		$namespace = (isset( $fields['namespace-suggest'] ) ) ? $fields['namespace-suggest'] : $fields['name'];
 
 		$fields['namespace'] = \Inflector::friendly_title($namespace, '-', true);
 
@@ -421,6 +421,7 @@ class Collection
 		$arrData    = Config::get('tapioca.collection.dispatch.data');
 
 		$revision = (count($this->data) + 1);
+		$defaults = array();
 
 		$data = array(
 			'app_id'      => static::$app->get('slug'),
@@ -435,10 +436,10 @@ class Collection
 			'cast'         => $this->castablePath,
 			'rules'        => $this->rulesPath,
 			'schema'       => $fields['schema'],
-			'callback'     => $fields['callback'],
-			'indexes'      => $fields['indexes'],
-			'dependencies' => $fields['dependencies'],
-			'template'     => $fields['template']
+			'callback'     => ( isset( $fields['callback'] ))     ? $fields['callback']     : $defaults,
+			'indexes'      => ( isset( $fields['indexes'] ))      ? $fields['indexes']      : $defaults,
+			'dependencies' => ( isset( $fields['dependencies'] )) ? $fields['dependencies'] : $defaults,
+			'template'     => ( isset( $fields['template'] ))     ? $fields['template']     : $defaults,
 		);
 
 		$revision = array(
@@ -616,6 +617,11 @@ class Collection
 					$obj->type = $item['type'];
 
 					$this->castablePath[] = $obj;
+
+					if( !isset( $item['rules']) )
+					{
+						$item['rules'] = array();
+					}
 
 					if($item['type'] == 'number' && !isset( $item['rules']))
 					{

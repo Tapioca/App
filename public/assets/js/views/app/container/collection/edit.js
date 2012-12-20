@@ -10,7 +10,7 @@ $.Tapioca.Views.CollectionEdit = $.Tapioca.Views.FormView.extend(
         this.tplPreview = Handlebars.compile( $.Tapioca.Tpl.app.container.collection['preview-edit'] );
 
         this.model.bind('reset', this.render, this);
-        
+
         return this;
     },
 
@@ -38,9 +38,12 @@ $.Tapioca.Views.CollectionEdit = $.Tapioca.Views.FormView.extend(
     {
         var model       = this.model.toJSON();
 
-        model.schema        = JSON.stringify( model.schema,        null, ' ');
-        model.digest.fields = JSON.stringify( model.digest.fields, null, ' ');
-        model.callback      = JSON.stringify( model.callback,      null, ' ');
+        if( !this.isNew )
+        {
+            model.schema        = JSON.stringify( model.schema,        null, ' ');
+            model.digest.fields = JSON.stringify( model.digest.fields, null, ' ');
+            model.callback      = JSON.stringify( model.callback,      null, ' ');            
+        }
 
         model.isNew     = this.isNew;
         model.pageTitle = ( this.isNew ) ?
@@ -91,6 +94,7 @@ $.Tapioca.Views.CollectionEdit = $.Tapioca.Views.FormView.extend(
         });
 
         var self            = this,
+            appslug         = $.Tapioca.appslug
             collectionModel = {
                 name:      $('#name').val(),
                 desc:      $('#desc').val(),
@@ -105,16 +109,21 @@ $.Tapioca.Views.CollectionEdit = $.Tapioca.Views.FormView.extend(
                 preview:   previews,
             };
 
+        if( this.isNew )
+        {
+            collectionModel['namespace-suggest'] = $('#namespace').val();
+            
+            $.Tapioca.UserApps[ appslug ].collections.add( this.model );
+        } 
+
         this.model.save( collectionModel, {
                 success:function (model, response)
                 {
                     self.namespace = model.get('namespace');
 
                     if( self.isNew )
-                    {
-                        $.Tapioca.UserApps[ appslug ].collections.add( model );
-                        
-                        var href = $.Tapioca.app.setRoute('appCollectionEdit', [ self.appslug, self.namespace ] )
+                    {                        
+                        var href = $.Tapioca.app.setRoute('appCollectionEdit', [ appslug, self.namespace ] )
 
                         Backbone.history.navigate( href );
                     }

@@ -144,6 +144,7 @@ return array(
         'collection' => array(
             'summary' => array(
                 'namespace',
+                'namespace-suggest',
                 'name',
                 'status'
             ),
@@ -157,6 +158,7 @@ return array(
         'dispatch' => array(
             'summary' => array(
                 'namespace',
+                'namespace-suggest',
                 'name',
                 'desc',
                 'status',
