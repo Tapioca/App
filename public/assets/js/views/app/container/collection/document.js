@@ -165,7 +165,7 @@ $.Tapioca.Views.Document = $.Tapioca.Views.FormView.extend(
     {
         var previews = this.schema.get('preview');
 
-        if( previews.length )
+        if( !_.isUndefined( previews ) && previews.length )
         {
             var $btn          = $('#app-content').find('button.btn-preview'),
                 $dropdownMenu = $('#app-content').find('div.form-actions ul.dropdown-menu'),
