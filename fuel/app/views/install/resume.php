@@ -9,7 +9,7 @@
 				<p>you can now create your collections and invite staff to participe.</p>
 
 				<p class="align-center">
-					<a class="btn btn-primary" href="<?= Uri::create('log'); ?>">Login</a>
+					<a class="btn btn-primary" href="<?= Uri::create('/'); ?>">Login</a>
 				</p>
 
 
