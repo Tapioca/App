@@ -16,17 +16,12 @@ class Controller_Api extends Controller_Rest
 
 		Config::load('rest', true);
 
-		self::$apiKey = Input::get('apikey', false);
+		self::$apiKey = Input::get('key', false);
 		self::$token  = Input::get('token', false);
 
-		if ( !Tapioca::check() && !static::$apiKey )
+		// if user is loggued to backoffice
+		if( Tapioca::check() )
 		{
-			Config::set('rest.auth', 'locked');
-			self::restricted();
-		}
-		else
-		{
-			// TODO: add api key check
 			try
 			{
 				self::$user = Tapioca::user();
@@ -36,10 +31,26 @@ class Controller_Api extends Controller_Rest
 				Config::set('rest.auth', 'locked');
 				self::error( $e->getMessage() );
 			}
-		} // Auth
+		}
+		// if api key provided
+		else if( self::$apiKey )
+		{
+			self::$user = static::$apiKey;
+		}
+		else
+		{
+			Config::set('rest.auth', 'locked');
+			self::restricted();
+		}
 
 		// set default format
 		$this->format = 'json';
+
+	}
+
+	protected static function signature()
+	{
+		$method = Input::method();
 
 	}
 

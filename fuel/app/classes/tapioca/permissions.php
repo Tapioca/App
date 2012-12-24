@@ -21,6 +21,9 @@ class Permissions
 
     public static function set($user, $app = null)
     {
+        if( !$user )
+            return;
+
         if( $user instanceof User )
         {
             $isAdmin = $user->get('admin');
@@ -52,6 +55,28 @@ class Permissions
             }
 
             static::$userRole = 'guest';
+        }
+        else
+        {
+            try
+            {
+                $api = Tapioca::app( array( 'api.key' => $user ) );
+
+                if( !is_null( $app ) && ( $api->get('name') != $app->get('name') ) )
+                {
+                    throw new \PermissionsException(
+                        __('tapioca.user_not_in_app', array('app' => $app->get('name')))
+                    );
+                }
+
+                static::$userRole = $api->get('api.role');
+            }
+            catch ( AuthException $e )
+            {
+                throw new \PermissionsException( 
+                        __('tapioca.app_key_invalid', array( 'api' => $user) )
+                    );
+            }
         }
     }
 

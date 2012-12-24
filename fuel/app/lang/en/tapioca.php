@@ -11,6 +11,7 @@ return array(
     /** App Exception Messages **/
     'app_already_exists'      => 'The app name ":app" already exists.',
     'app_slug_invalid'        => 'The app slug ":app" is invalid.',
+    'app_key_invalid'         => 'The api key ":api" is invalid.',
     'app_level_empty'         => 'You must specify a level of the app.',
     'app_name_empty'          => 'You must specify a name of the app.',
     'app_not_found'           => 'app ":app" does not exist.',

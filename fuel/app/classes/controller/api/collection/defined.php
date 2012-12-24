@@ -25,7 +25,15 @@ class Controller_Api_Collection_Defined extends Controller_Api
             return;
         }
 
-        Permissions::set( static::$user, static::$app );
+        try
+        {
+            Permissions::set( static::$user, static::$app );
+        }
+        catch( PermissionsException $e )
+        {
+            static::error($e->getMessage());
+            return;
+        }
 
         try
         {

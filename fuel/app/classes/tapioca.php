@@ -648,4 +648,48 @@ class Tapioca
         }
     }
 
+
+	public static function genApiKey($app_id, $slug)
+	{
+		$api_conf  = Config::get('tapioca.api');
+		$db_prefix = $api_conf['db_prefix'];
+		$salts     = $api_conf['salts'];
+		
+		$salt      = $salts[ array_rand( $salts ) ];
+		$str       = $slug.':'.$salt.':'.$app_id;
+		$key       = substr( hash('sha256', $str), 16, 16 );
+
+		$db        = new \stdClass;
+		$db->name  = $db_prefix.$slug;
+		$db->user  = $slug;
+		$db->pass  = \Str::random('alnum', 16);
+		$db->host  = 'localhost';
+		$db->key   = $key;
+
+		return $db;
+	}
+
+
+	// TO CLEAN
+	// protected static function createDbUser($name, $user, $pass, $readOnly = false)
+	// {
+	// 	$db_collection = Config::get('db.mongo.default');
+
+	// 	// TODO: trouver une façon plus élégante de faire ça.
+	// 	$mongo	= new Mongo('mongodb://'.$db_collection['username'].':'.$db_collection['password'].'@localhost');
+	// 	$db		= $mongo->selectDB($name);
+		
+	// 	// insert the user - note that the password gets hashed as 'username:mongo:password'
+	// 	// set readOnly to true if user should not have insert/delete privs
+	// 	$collection = $db->selectCollection("system.users");
+
+	// 	return $collection->insert(array('user' => $user, 'pwd' => self::get_user_pass($user, $pass), 'readOnly' => $readOnly));	
+	// }
+	
+	// protected static function getMongoUserPass($user, $pass)
+	// {
+	// 	$salted = "${user}:mongo:${pass}";
+
+	// 	return md5( $salted );
+	// }
 }

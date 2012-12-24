@@ -48,7 +48,15 @@ class Controller_Api_Collection_Abstract extends Controller_Api
             static::$revision = (int) static::$revision;
         }
 
-        Permissions::set( static::$user, static::$app );
+        try
+        {
+            Permissions::set( static::$user, static::$app );
+        }
+        catch( PermissionsException $e )
+        {
+            static::error($e->getMessage());
+            return;
+        }
     }
 
     public function get_index()

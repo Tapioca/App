@@ -40,6 +40,28 @@ return array(
     ),
 
     /*
+     * Store each app's data 
+     * in a separate Database
+     */
+
+    'multiDb' => false,
+
+    /*
+     * API key generator
+     */
+
+    'api' => array(
+        'salts' => array(
+            'Bull In The Heather',
+            'Crack Rock Steady',
+            'Famous Friends and Fashion Drunks',
+            'And We Thought Nation States Were A Bad Idea',
+            'Sing Along With the Patriotic Punks',
+        ),
+        'db_prefix' => ''
+    ),
+
+    /*
      * Preview TTL
      */
 

@@ -11,7 +11,15 @@ class Controller_Api_User extends Controller_Api
 
         static::$userId = $this->param('userid', false);
 
-        Permissions::set( static::$user );
+        try
+        {
+            Permissions::set( static::$user );
+        }
+        catch( PermissionsException $e )
+        {
+            static::error($e->getMessage());
+            return;
+        }
     }
 
     public function get_index()

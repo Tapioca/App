@@ -6,7 +6,15 @@ class Controller_Api_App extends Controller_Api
     {
         parent::before();
 
-        Permissions::set( static::$user );
+        try
+        {
+            Permissions::set( static::$user );
+        }
+        catch( PermissionsException $e )
+        {
+            static::error($e->getMessage());
+            return;
+        }
     }
 
     public function get_index()

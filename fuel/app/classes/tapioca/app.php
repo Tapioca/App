@@ -226,7 +226,8 @@ class App
 
 		$app_id = uniqid();
 
-		$app['id'] = $app_id;
+		$app['id']  = $app_id;
+		$app['api'] = Tapioca::genApiKey( $app_id, $app['slug'] );
 
 		$result = static::$db->insert(static::$dbCollectionName, $app);
 
@@ -773,6 +774,5 @@ class App
 
 		return (bool) ($ret['ok'] == 1);
 	}
-
 }
 

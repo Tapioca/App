@@ -29,7 +29,15 @@ class Controller_Api_Document extends Controller_Api
 		}
 
 		// set permission
-        Permissions::set( static::$user, static::$app );
+        try
+        {
+            Permissions::set( static::$user, static::$app );
+        }
+        catch( PermissionsException $e )
+        {
+            static::error($e->getMessage());
+            return;
+        }
 
 		try
 		{
