@@ -114,8 +114,16 @@ class Controller_Api_Document_Defined extends Controller_Api
 
 		if( $model )
 		{
-			static::$data   = static::$document->save( $model, static::$user );
-			static::$status = 200;
+            try
+            {
+    			static::$data   = static::$document->save( $model, static::$user );
+    			static::$status = 200;
+            }
+            catch( DocumentException $e)
+            {
+                static::error( $e->getMessage() , 400 );
+                return;
+            }
 		}
 	}
 
