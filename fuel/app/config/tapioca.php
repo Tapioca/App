@@ -166,7 +166,6 @@ return array(
         'collection' => array(
             'summary' => array(
                 'namespace',
-                'namespace-suggest',
                 'name',
                 'status'
             ),
