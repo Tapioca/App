@@ -416,6 +416,8 @@ class Document
 			->select( $this->select )
 			->where( $this->where )
 			->order_by( $this->sort )
+			->limit( $this->limit )
+			->offset( $this->skip )
 			->hash( static::$dbCollectionName, true );
 // \Debug::dump( $this->last_query() );
 // \Debug::dump( $result );
