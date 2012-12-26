@@ -284,7 +284,7 @@ formFactory.prototype.input = function(item, prefix, key)
     str += (item.type =='date') ? ' data-' : ' ';
     str += 'name="' + this.getName(item, prefix) + '"';
     str += (item.type =='date') ? ' readonly="readonly"' : ' ';
-    str += (item.type =='date') ? ' value="{{dateFromTimestamp ' + id + ' format="DD/MM/YYYY"}}"' : ' value="{{' + id + '}}"';
+    str += (item.type =='date') ? ' value="{{dateFromTimestamp ' + id + '}}"' : ' value="{{' + id + '}}"';
     str += '>';
 
     if(item.type =='date')
