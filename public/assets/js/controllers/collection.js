@@ -25,18 +25,19 @@ $.Tapioca.Controllers.Collection = {
     {
         $.Tapioca.appslug = appslug;
 
-        var params = Backbone.history.getQueryParameters();
+        var params = Backbone.history.getQueryParameters(),
+            app    = $.Tapioca.UserApps[ appslug ];
 
         // get locale
         if(!_.isUndefined(params.l))
         {
-            $.Tapioca.UserApps[ appslug ].app.setWorkingLocale( params.l );
+            app.app.setWorkingLocale( params.l );
         }
 
-        var collection   = $.Tapioca.UserApps[ appslug ].collections.get( namespace ),
-            abstracts    = $.Tapioca.UserApps[ appslug ].data[ namespace ].abstracts,
-            users        = $.Tapioca.UserApps[ appslug ].users,
-            locale       = $.Tapioca.UserApps[ appslug ].app.getWorkingLocale(),
+        var collection   = app.collections.get( namespace ),
+            abstracts    = app.data[ namespace ].abstracts,
+            users        = app.users,
+            locale       = app.app.getWorkingLocale(),
             baseUri      = $.Tapioca.app.setRoute('appCollectionRef', [ appslug, namespace, ref ] );
             isNew        = ( ref === 'new' ),
             fetchOptions = $.param( $.extend({}, params) ),

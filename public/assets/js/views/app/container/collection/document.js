@@ -42,7 +42,7 @@ $.Tapioca.Views.Document = $.Tapioca.Views.FormView.extend(
         else
             ++this.loaded;
 
-        if( this.schema.hasSchema() )
+        if( !this.schema.hasSchema() )
             this.schema.fetch({
                 success: _.bind( this.ressourcesLoaded, this )
             });

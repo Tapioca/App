@@ -651,20 +651,21 @@ class Tapioca
 
 	public static function genApiKey($app_id, $slug)
 	{
-		$api_conf  = Config::get('tapioca.api');
-		$db_prefix = $api_conf['db_prefix'];
-		$salts     = $api_conf['salts'];
+		$api_conf   = Config::get('tapioca.api');
+		$db_prefix  = $api_conf['db_prefix'];
+		$salts      = $api_conf['salts'];
 		
-		$salt      = $salts[ array_rand( $salts ) ];
-		$str       = $slug.':'.$salt.':'.$app_id;
-		$key       = substr( hash('sha256', $str), 16, 16 );
+		$salt       = $salts[ array_rand( $salts ) ];
+		$str        = $slug.':'.$salt.':'.$app_id;
+		$secret     = hash('sha256', $str); //substr( , 16, 16 );
 
-		$db        = new \stdClass;
-		$db->name  = $db_prefix.$slug;
-		$db->user  = $slug;
-		$db->pass  = \Str::random('alnum', 16);
-		$db->host  = 'localhost';
-		$db->key   = $key;
+		$db         = new \stdClass;
+		$db->name   = $db_prefix.$slug;
+		$db->user   = $slug;
+		$db->pass   = \Str::random('alnum', 16);
+		$db->host   = 'localhost';
+		$db->key    = \Str::random('alnum', 16);
+		$db->secret = $secret;
 
 		return $db;
 	}
