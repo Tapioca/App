@@ -18,6 +18,17 @@ class Controller_Api_Library extends Controller_Api
 			return;
 		}
 
+		// set permission
+        try
+        {
+            Permissions::set( static::$user, static::$app );
+        }
+        catch( PermissionsException $e )
+        {
+            static::error($e->getMessage());
+            return;
+        }
+
 		// filename
 		$filename  = $this->param('filename', null);
 		$extension = Input::extension();
@@ -47,64 +58,92 @@ class Controller_Api_Library extends Controller_Api
 	// get file listing
 	public function get_index()
 	{
-		if( static::$granted )
+        try
+        {
+            Permissions::isGranted( 'list_files' );
+        }
+        catch( PermissionsException $e)
+        {
+            static::error( $e->getMessage() , 401 );
+            return;
+        }
+
+		if( !static::$filename )
 		{
-			if( !static::$filename )
-			{
-				// filters
-				$category = Input::get('category', null);
-				$tag      = Input::get('tag', null);
+			// filters
+			$category = Input::get('category', null);
+			$tag      = Input::get('tag', null);
 
-				$ret  = static::$file->getAll( $category, $tag );				
-			}
-			else
-			{
-				$ret  = static::$file->get();
-			}
-
-			static::$data   = $ret;
-			static::$status = 200;
+			$ret  = static::$file->getAll( $category, $tag );				
 		}
+		else
+		{
+			$ret  = static::$file->get();
+		}
+
+		static::$data   = $ret;
+		static::$status = 200;
 	}
 
 	// add a file to the library
 	// OR update file
 	public function post_index()
 	{
-		if( static::$granted )
-		{
-			$update = (bool) static::$filename;
-			
-			static::$data   = static::$file->save( static::$user, $update );
-			static::$status = 200;
-		} 
+        try
+        {
+            Permissions::isGranted( 'upload_files' );
+        }
+        catch( PermissionsException $e)
+        {
+            static::error( $e->getMessage() , 401 );
+            return;
+        }
+
+		$update = (bool) static::$filename;
+		
+		static::$data   = static::$file->save( static::$user, $update );
+		static::$status = 200;
 	}
 
 	// update a file meta
 	public function put_index()
 	{
-		if( static::$granted && static::$filename )
-		{
-			$meta = Input::json();
+        try
+        {
+            Permissions::isGranted( 'edit_files' );
+        }
+        catch( PermissionsException $e)
+        {
+            static::error( $e->getMessage() , 401 );
+            return;
+        }
 
-			static::$data   = static::$file->update( static::$user, $meta );
-			static::$status = 200;
-		} 
+		$meta = Input::json();
+
+		static::$data   = static::$file->update( static::$user, $meta );
+		static::$status = 200;
 	}
 
 	public function delete_index()
 	{
-		if( static::$granted && static::$filename && static::isAppAdmin() )
+        try
+        {
+            Permissions::isGranted( 'delete_files' );
+        }
+        catch( PermissionsException $e)
+        {
+            static::error( $e->getMessage() , 401 );
+            return;
+        }
+
+		if( ! static::deleteToken( 'library', static::$filename ))
 		{
-			if( ! static::deleteToken( 'library', static::$filename ))
-			{
-				return;
-			}
+			return;
+		}
 
-			$list = static::$file->delete();
+		$list = static::$file->delete();
 
-			static::$data   = array('status' => 'ok');
-			static::$status = 200;
-		} // if granted
+		static::$data   = array('status' => 'ok');
+		static::$status = 200;
 	}
 }
