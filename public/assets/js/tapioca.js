@@ -204,6 +204,7 @@
         Handlebars.registerPartial('docStatusList', docStatusList);
         Handlebars.registerPartial('locale-list',   $.Tapioca.Tpl.components.locales );
         Handlebars.registerPartial('preview-edit',  $.Tapioca.Tpl.app.container.collection['preview-edit'] );
+        Handlebars.registerPartial('tag-edit',      $.Tapioca.Tpl.components['tag-edit'] );
 
         // All navigation should be passed through the navigate method, 
         // to be processed by the router.  If the link has a data-bypass

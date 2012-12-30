@@ -66,7 +66,7 @@ return array(
     'not_found_in_document_object'        => '":field" does not exist in "document" object.',
 
     /** File Exception Messages **/
-    'file_already_exists'          => 'The file name ":name" already exists.',
+    'file_already_exists'          => 'The file ":name" already exists, maybe under another name.',
     'no_file_selected'             => 'No file is selected.',
     'fail_to_store_file'           => 'Tapioca can not store :filename into GridFs, error: :error',
     'file_not_found'               => 'file ":file" does not exist.',
@@ -138,6 +138,7 @@ return array(
             'add_collections'    => 'Add a collection',
             'app_library'        => 'Library',
             'add_file'           => 'Upload a file',
+            'update_file'        => 'Update file',
             'app_documents'      => 'Documents',
             'add_document'       => 'Add a new document',
             'document_status'    => 'Status',

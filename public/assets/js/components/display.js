@@ -246,6 +246,37 @@ $.Tapioca.Components.Display = {
 
     },
 
+    fileSize: function( bytes )
+    {
+        var to = 'ko';
+
+        if( bytes >= 1048576)
+            to = 'mo';
+
+        if( bytes >= 1073741824)
+            to = 'go';
+
+        switch( to )
+        {
+            case 'ko':
+                    return Math.round(( bytes / 1024), 2) + ' ko';
+                break;
+
+            case 'mo':
+                    return Math.round(( bytes / 1024)/1024, 2)  + ' mo';
+                break;
+           
+            case 'go':
+                    return Math.round(( bytes / 1024)/1024/1024, 2) + ' go';
+                break;
+        }
+    },
+
+    imageSize: function( size )
+    {
+        return size.width + '*' + size.height;
+    },
+
     printR: function( obj )
     {
         var str  = '<pre>';
@@ -266,4 +297,6 @@ Handlebars.registerHelper( 'roleSelector',      $.Tapioca.Components.Display.rol
 Handlebars.registerHelper( 'docStatus',         $.Tapioca.Components.Display.status );
 Handlebars.registerHelper( 'jobStatusText',     $.Tapioca.Components.Display.jobStatusText );
 Handlebars.registerHelper( 'jobStatusLabel',    $.Tapioca.Components.Display.jobStatusLabel );
+Handlebars.registerHelper( 'fileSize',          $.Tapioca.Components.Display.fileSize );
+Handlebars.registerHelper( 'imageSize',         $.Tapioca.Components.Display.imageSize );
 Handlebars.registerHelper( 'printR',            $.Tapioca.Components.Display.printR );

@@ -112,7 +112,6 @@ $.Tapioca.Components.FileUpload = {
             progress: function (e, data)
             {
                 var progress = parseInt(data.loaded / data.total * 100, 10);
-                console.log(progress)
             },
             done: function (e, data)
             {

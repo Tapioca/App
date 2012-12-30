@@ -16,7 +16,7 @@ $.Tapioca.Views.AdminAppEdit = $.Tapioca.Views.FormView.extend(
 
     addRepeatNode: function()
     {
-        this.$el.find('ul.input-repeat-list').append( this.tplLocale({}));
+        this.$el.find('ul.input-repeat-list').append( this.tplLocale({}) );
     },
 
     render: function()

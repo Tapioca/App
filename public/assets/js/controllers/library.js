@@ -30,17 +30,31 @@ $.Tapioca.Controllers.Library = {
         
         var library  = $.Tapioca.UserApps[ appslug ].library,
             filename = basename + '.' + ext,
-            file     = new $.Tapioca.Models.File({
-                            filename: filename
-                        });
+            display = function()
+            {
+                var file = library.get( filename);
+
+                if( _.isUndefined( file) )
+                {
+                    // TODO: trigger 404
+                    return;
+                }
+
+                $.Tapioca.view = new $.Tapioca.Views.EditFile({
+                    model:   file,
+                    appslug: appslug
+                }).render();
+            };
 
         if( !library.isFetched() )
         {
-            library.fetch();
+            library.fetch({
+                success: display
+            });
         }
-
-        $.Tapioca.view = new $.Tapioca.Views.EditFile({
-            model: file
-        });
+        else
+        {
+            display();
+        }
     }
 };

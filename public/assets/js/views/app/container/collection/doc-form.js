@@ -82,16 +82,16 @@ $.Tapioca.Views.DocForm = Backbone.View.extend(
 
     events:
     {
-        'click a.array-repeat-trigger'                                       : 'addNode',
-        'click .input-repeat-list li:last-child .input-repeat-trigger'       : 'addInput',
-        'click .input-repeat-list li:not(:last-child) .input-repeat-trigger' : 'removeInput',
-        'click a.doc-list-trigger'                                           : 'docList',
-        'click a.doc-remove-trigger'                                         : 'docRemove',
-        'click a.file-list-trigger'                                          : 'fileList',
-        'click a.file-remove-trigger'                                        : 'fileRemove',
-        'click a.btn-upload-trigger'                                         : 'upload',
-        'document:addFile'                                                   : 'addFile',
-        'document::addDoc'                                                   : 'addDoc'
+        'click a.array-repeat-trigger'                                          : 'addNode',
+        'click ul.input-repeat-list li:last-child a.input-repeat-trigger'       : 'addInput',
+        'click ul.input-repeat-list li:not(:last-child) a.input-repeat-trigger' : 'removeInput',
+        'click a.doc-list-trigger'                                              : 'docList',
+        'click a.doc-remove-trigger'                                            : 'docRemove',
+        'click a.file-list-trigger'                                             : 'fileList',
+        'click a.file-remove-trigger'                                           : 'fileRemove',
+        'click a.btn-upload-trigger'                                            : 'upload',
+        'document:addFile'                                                      : 'addFile',
+        'document::addDoc'                                                      : 'addDoc'
     },
 
     change: function()

@@ -508,7 +508,7 @@ class Library
 
 			$presets = $previous['presets'];
 
-			$this->delete(true);
+			$this->delete();
 		}
 
 		try
