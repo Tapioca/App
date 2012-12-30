@@ -456,7 +456,7 @@ class Document
 		Hook::register(static::$app, $collectionData);
 
 		// Global before hooks
-		Hook::trigger('before', $document);
+		Hook::trigger('document::before', $document);
 
 		// Get document digest
 		try
@@ -471,7 +471,7 @@ class Document
 		// new document
 		if( is_null( static::$ref ) )
 		{
-			Hook::trigger('before::new', $document);
+			Hook::trigger('document::before::new', $document);
 
 			$ret = $this->create($document, $digest, $user);
 
@@ -480,18 +480,18 @@ class Document
 				static::$collection->inc_document();
 			}
 			
-			Hook::trigger('after::new', $document);
+			Hook::trigger('document::after::new', $document);
 		}
 		else // update Document
 		{
-			Hook::trigger('before::update', $document);
+			Hook::trigger('document::before::update', $document);
 
 			$this->update($document, $digest, $user);
 
-			Hook::trigger('after::update', $document);
+			Hook::trigger('document::after::update', $document);
 		}
 
-		Hook::trigger('after', $document);
+		Hook::trigger('document::after', $document);
 
 		return $this->get( static::$revisionLast );
 	}
@@ -672,6 +672,13 @@ class Document
 		$revision = (int) $revision;
 
 		$set_out_of_date = ($status == 100);
+		$document        = $this->get( $revision );
+		$collectionData  = static::$collection->data();
+
+		Hook::register(static::$app, $collectionData );
+
+		// Before status update hooks
+		Hook::trigger('status::before', $document, $status);
 
 		foreach ($this->abstract['revisions']['list'] as &$value)
 		{
@@ -691,9 +698,6 @@ class Document
 		// Update abstract digest
 		if($revision != static::$revisionActive && $set_out_of_date)
 		{
-			$document       = $this->get( $revision );
-			$collectionData = static::$collection->data();
-
 			try
 			{
 				$digest = $this->set_digest($collectionData['digest']['fields'], $document);
@@ -766,11 +770,12 @@ class Document
 			);
 			
 			Jobs::push( static::$app->get('slug'), '\\Tapioca\\Jobs\\Dependency', $resqueArgs, null);
-			
-			// \Resque::enqueue( Config::get('resque.queue'), '\\Tapioca\\Jobs\\Dependency', $resqueArgs, true);
 		}
 
-		return $this->abstract; //$this->set_locale_revision($revision);
+		// After status update hooks
+		Hook::trigger('status::after', $document, $status);
+
+		return $this->abstract;
 	}
 
 	/**

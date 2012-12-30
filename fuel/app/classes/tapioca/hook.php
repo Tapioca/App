@@ -26,13 +26,13 @@ class Hook
 		}
 	}
 
-	public static function trigger($event, &$data)
+	public static function trigger($event, &$data, $status = null)
 	{
 		if( isset( static::$hooks[$event] ) )
 		{
 			foreach( static::$hooks[$event] as $cb)
 			{
-				$data = call_user_func_array('\\'.static::$namespace .'\\'.$cb, array($data));
+				$data = call_user_func_array('\\'.static::$namespace .'\\'.$cb, array($data, $status));
 			}
 		}
 	}
