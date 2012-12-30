@@ -165,7 +165,7 @@ return array(
 	 */
 	'module_paths' => array(
 		//APPPATH.'modules'.DS
-		APPPATH.'..'.DS.'..'.DS.'modules'.DS
+		APPPATH.'..'.DS.'..'.DS.'hooks'.DS
 	),
 
 

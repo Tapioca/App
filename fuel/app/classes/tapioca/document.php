@@ -70,7 +70,7 @@ class Document
 	protected $errors = array();
 
 	/**
-	 * @var  array  Events list for callbacks
+	 * @var  array  Events list for hooks
 	 */
 	protected $events = array();
 
@@ -187,7 +187,7 @@ class Document
 		$this->abstract           = null;
 		$this->errors             = array();
 
-		Callback::reset();
+		Hook::reset();
 	}
 
 	/**
@@ -453,10 +453,10 @@ class Document
 		// Cast document's values
 		Cast::set($collectionData['cast'], $document);
 
-		Callback::register(static::$app, $collectionData);
+		Hook::register(static::$app, $collectionData);
 
-		// Global before callback
-		Callback::trigger('before', $document);
+		// Global before hooks
+		Hook::trigger('before', $document);
 
 		// Get document digest
 		try
@@ -471,7 +471,7 @@ class Document
 		// new document
 		if( is_null( static::$ref ) )
 		{
-			Callback::trigger('before::new', $document);
+			Hook::trigger('before::new', $document);
 
 			$ret = $this->create($document, $digest, $user);
 
@@ -480,18 +480,18 @@ class Document
 				static::$collection->inc_document();
 			}
 			
-			Callback::trigger('after::new', $document);
+			Hook::trigger('after::new', $document);
 		}
 		else // update Document
 		{
-			Callback::trigger('before::update', $document);
+			Hook::trigger('before::update', $document);
 
 			$this->update($document, $digest, $user);
 
-			Callback::trigger('after::update', $document);
+			Hook::trigger('after::update', $document);
 		}
 
-		Callback::trigger('after', $document);
+		Hook::trigger('after', $document);
 
 		return $this->get( static::$revisionLast );
 	}

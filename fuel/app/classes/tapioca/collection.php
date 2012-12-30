@@ -50,9 +50,9 @@ class Collection
 	protected static $summaryWhere = array();
 
 	/**
-	 * @var  array  Events list for callbacks
+	 * @var  array  Events list for hooks
 	 */
-	protected $callback = array();
+	protected $hook = array();
 
 	/**
 	 * @var  array  List of fields who need to be cast, get from config
@@ -124,9 +124,9 @@ class Collection
 				$this->namespace = $summary[0]['namespace'];
 				$this->name      = $summary[0]['name'];
 
-				if(isset($summary[0]['callback']))
+				if(isset($summary[0]['hook']))
 				{
-					$this->callback = $summary[0]['callback'];
+					$this->hook = $summary[0]['hook'];
 				}
 
 				$this->set_summary_where();
@@ -436,7 +436,7 @@ class Collection
 			'cast'         => $this->castablePath,
 			'rules'        => $this->rulesPath,
 			'schema'       => $fields['schema'],
-			'callback'     => ( isset( $fields['callback'] ))     ? $fields['callback']     : $defaults,
+			'hooks'        => ( isset( $fields['hooks'] ))        ? $fields['hooks']        : '',
 			'indexes'      => ( isset( $fields['indexes'] ))      ? $fields['indexes']      : $defaults,
 			'dependencies' => ( isset( $fields['dependencies'] )) ? $fields['dependencies'] : $defaults,
 			'template'     => ( isset( $fields['template'] ))     ? $fields['template']     : $defaults,

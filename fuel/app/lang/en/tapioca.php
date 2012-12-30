@@ -147,7 +147,7 @@ return array(
             'edit_desc'          => 'Description',
             'edit_schema'        => 'Schema',
             'edit_digest'        => 'Digest',
-            'edit_callback'      => 'Callback',
+            'edit_hooks'         => 'Hooks',
             'edit_preview'       => 'Preview',
             'col_namespace'      => 'Namespace',
             'col_name'           => 'Name',

@@ -12,7 +12,7 @@
                             <a href="#collection-digest" data-toggle="tab" data-bypass="true"><?= __('tapioca.ui.label.edit_digest'); ?></a>
                         </li>
                         <li>
-                            <a href="#collection-callback" data-toggle="tab" data-bypass="true"><?= __('tapioca.ui.label.edit_callback'); ?></a>
+                            <a href="#collection-hooks" data-toggle="tab" data-bypass="true"><?= __('tapioca.ui.label.edit_hooks'); ?></a>
                         </li>
                         <li>
                             <a href="#collection-preview" data-toggle="tab" data-bypass="true"><?= __('tapioca.ui.label.edit_preview'); ?></a>
@@ -72,9 +72,9 @@
                                 </p>
                             </div>
                         </fieldset>
-                        <fieldset id="collection-callback" class="tab-pane">
+                        <fieldset id="collection-hooks" class="tab-pane">
                             <div class="controls">
-                                <textarea id="callback" name="callback" rows="15" class="span10 _lined">{{ callback }}</textarea>
+                                <textarea id="hooks" name="hooks" rows="15" class="span10 _lined">{{ hooks }}</textarea>
                             </div>
                         </fieldset>
                         <fieldset id="collection-preview" class="tab-pane">

@@ -7,7 +7,7 @@ fuel/app/logs/*/*/*
 fuel/app/cache/*/*
 fuel/app/config/production/*
 fuel/app/tmp/*
-modules/*
+hooks/*
 public/assets/cache/*
 public/client_test
 public/temp

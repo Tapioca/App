@@ -5,37 +5,32 @@ namespace Tapioca;
 use FuelException;
 use Config;
 
-class CallbackException extends FuelException {}
+class HookException extends FuelException {}
 
-class Callback
+class Hook
 {
 	private static $namespace;
 	private static $slug;
 	private static $events;
-	private static $callbacks = null;
+	private static $hooks = null;
 
 	public static function register(App $app, $collection)
 	{
-		if( count($collection['callback']) > 0)
+		if( !empty( $collection['hooks'] ) )
 		{
-			static::$callbacks = $collection['callback'];
+			static::$hooks     = $collection['hooks'];
 			static::$slug      = $app->get('slug');
 			static::$namespace = ucfirst( static::$slug );
 
 			\Module::load(static::$slug);
-
-// \Debug::show($collection['callback']);
-// call_user_func_array('\\'.static::$namespace .'\\'.$collection['callback']['before'][0], array('Hannes'));
-//\Bdn\Season::interval('params');
-
 		}
 	}
 
 	public static function trigger($event, &$data)
 	{
-		if(isset(static::$callbacks[$event]))
+		if( isset( static::$hooks[$event] ) )
 		{
-			foreach(static::$callbacks[$event] as $cb)
+			foreach( static::$hooks[$event] as $cb)
 			{
 				$data = call_user_func_array('\\'.static::$namespace .'\\'.$cb, array($data));
 			}
@@ -44,6 +39,6 @@ class Callback
 
 	public static function reset()
 	{
-		static::$callbacks = null;
+		static::$hooks = null;
 	}
 }

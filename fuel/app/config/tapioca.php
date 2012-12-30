@@ -191,7 +191,7 @@ return array(
                 'digest',
                 'dependencies',
                 'indexes',
-                'callback',
+                'hooks',
                 'template'
             )
         ),

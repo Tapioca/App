@@ -42,7 +42,7 @@ $.Tapioca.Views.CollectionEdit = $.Tapioca.Views.FormView.extend(
         {
             model.schema        = JSON.stringify( model.schema,        null, ' ');
             model.digest.fields = JSON.stringify( model.digest.fields, null, ' ');
-            model.callback      = JSON.stringify( model.callback,      null, ' ');            
+            model.hooks         = JSON.stringify( model.hooks,      null, ' ');            
         }
 
         model.isNew     = this.isNew;
@@ -105,7 +105,7 @@ $.Tapioca.Views.CollectionEdit = $.Tapioca.Views.FormView.extend(
                     fields: jQuery.parseJSON( $('#digest').val() ),
                     edited: $('#digest-edit').is(':checked')
                 },
-                callback : jQuery.parseJSON( $('#callback').val() ),
+                hooks : jQuery.parseJSON( $('#hooks').val() ),
                 preview:   previews,
             };
 

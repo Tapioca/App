@@ -79,15 +79,15 @@ class Preview
 			}
 		}
 
-		Callback::register( $app, $collectionData );
+		Hook::register( $app, $collectionData );
 
 		// Cast document's values
 		Cast::set($collectionData['cast'], $document);
 
-		// Global before callback
-		Callback::trigger('before', $document);
+		// Global before hooks
+		Hook::trigger('before', $document);
 
-		Callback::trigger('before::new', $document);
+		Hook::trigger('before::new', $document);
 
 		$limitDate  = ( time() + \Config::get('tapioca.previewLimit') );
 
@@ -97,9 +97,9 @@ class Preview
 
 		$ret = static::$db->insert( static::$dbCollectionName, $document );
 		
-		Callback::trigger('after::new', $document);
+		Hook::trigger('after::new', $document);
 
-		Callback::trigger('after', $document);
+		Hook::trigger('after', $document);
 
 		// clean return
 		return static::clean( $document );
