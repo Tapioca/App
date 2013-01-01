@@ -769,7 +769,8 @@ class Document
 				'revision'   => $revision
 			);
 			
-			Jobs::push( static::$app->get('slug'), '\\Tapioca\\Jobs\\Dependency', $resqueArgs, null);
+			// check for documents to update
+			Tapioca::enqueueJob( static::$app->get('slug'), '\\Tapioca\\Jobs\\Dependency', $resqueArgs, null);
 		}
 
 		// After status update hooks

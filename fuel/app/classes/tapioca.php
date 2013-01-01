@@ -43,6 +43,11 @@ class Tapioca
 	 */
 	protected static $rulesErrors = array();
 
+	/**
+	 * @var  string   Background worker
+	 */
+	private static $worker = null;
+
 
 	/**
 	 * Prevent instantiation
@@ -62,6 +67,7 @@ class Tapioca
 
 		// set static vars for later use
 		static::$suspend = trim( Config::get('tapioca.limit.enabled') );
+		static::$worker  = Config::get('tapioca.worker');
 	}
 
 	/**
@@ -595,6 +601,30 @@ class Tapioca
 	public static function getFailedRules()
 	{
 		return static::$rulesErrors;
+	}
+
+	/**
+	 * Add a new background job to the queue
+	 *
+	 *
+     * @param   string       App Slug
+     * @param   string       Class to perform
+     * @param   array        Method Arguments 
+     * @param   int          Job priority (Mongo Only)
+	 * @return  string       job token
+	 */
+	public static function enqueueJob( $slug, $class, $args, $priority)
+	{
+		if( static::$worker == 'Mongo' )
+		{
+			$token = Jobs::push( $slug, $class, $args, $priority);
+		}
+		else
+		{
+			$token = \Resque::enqueue( Config::get('resque.queue'), $class, $args, true);
+		}
+
+		return $token;
 	}
 
 	/**

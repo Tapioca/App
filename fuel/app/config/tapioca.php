@@ -78,6 +78,13 @@ return array(
      */
 
     'cleanQueue' => 172800, // 2 days
+
+    /*
+     * Background Workers
+     * use Mongo|Resque
+     */
+
+    'worker' => 'Mongo', 
     
     /*
      * Remember Me settings
