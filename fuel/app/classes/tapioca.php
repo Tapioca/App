@@ -13,6 +13,11 @@ class AuthException extends FuelException {}
 
 class Tapioca 
 {
+    /**
+     * @var  Tapioca version
+     */
+    protected static $version = '0.8.0';
+
 	/**
 	 * @var  string  Database instance
 	 */
@@ -44,7 +49,7 @@ class Tapioca
 	protected static $rulesErrors = array();
 
 	/**
-	 * @var  string   Background worker
+	 * @var  string   Background worker type
 	 */
 	private static $worker = null;
 
@@ -138,17 +143,17 @@ class Tapioca
 		}
 	}
 
-	public static function set_status($status = array())
-	{
-		$defaults = Config::get('tapioca.status');
+	// public static function set_status($status = array())
+	// {
+	// 	$defaults = Config::get('tapioca.status');
 
-		if(count($status) > 1)
-		{
-			return array_merge($defaults, $status);
-		}
+	// 	if(count($status) > 1)
+	// 	{
+	// 		return array_merge($defaults, $status);
+	// 	}
 
-		return $defaults;
-	}
+	// 	return $defaults;
+	// }
 
 	/**
 	 * @return  Bool
