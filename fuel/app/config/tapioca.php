@@ -196,7 +196,6 @@ return array(
             'data' => array(
                 'schema', 
                 'digest',
-                'dependencies',
                 'indexes',
                 'hooks',
                 'template'
@@ -217,6 +216,16 @@ return array(
     'cast' => array(
         'date',
         'number'
+    ),
+
+    /*
+     * Cast
+     * fields type that needs to cast for mongodb
+     */
+
+    'dependencies' => array(
+        'dbref',
+        'file',
     ),
 
     /*

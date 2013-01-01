@@ -65,6 +65,16 @@ class Collection
 	protected $castablePath = array();
 
 	/**
+	 * @var  array  List of fields who need dependencies, get from config
+	 */
+	protected static $dependencies = array();
+
+	/**
+	 * @var  array  path to dependencies
+	 */
+	protected $dependenciesPath = array();
+
+	/**
 	 * @var  array  path and label of digest fields
 	 */
 	protected $digestPath = array();
@@ -412,7 +422,8 @@ class Collection
 		
 		self::validation($fields, $check_list);
 
-		static::$castable = Config::get('tapioca.cast');
+		static::$castable     = Config::get('tapioca.cast');
+		static::$dependencies = Config::get('tapioca.dependencies');
 
 		$this->digestEdit = \Arr::get($fields, 'digest.edited', false);
 
@@ -436,9 +447,9 @@ class Collection
 			'cast'         => $this->castablePath,
 			'rules'        => $this->rulesPath,
 			'schema'       => $fields['schema'],
+			'dependencies' => $this->dependenciesPath, //( isset( $fields['dependencies'] )) ? $fields['dependencies'] : $defaults,
 			'hooks'        => ( isset( $fields['hooks'] ))        ? $fields['hooks']        : '',
 			'indexes'      => ( isset( $fields['indexes'] ))      ? $fields['indexes']      : $defaults,
-			'dependencies' => ( isset( $fields['dependencies'] )) ? $fields['dependencies'] : $defaults,
 			'template'     => ( isset( $fields['template'] ))     ? $fields['template']     : $defaults,
 		);
 
@@ -631,6 +642,29 @@ class Collection
 					if(!in_array('numeric', $item['rules']))
 					{
 						$item['rules'][] = 'numeric';
+					}
+				}
+
+				// dependencies
+				if(in_array($item['type'], static::$dependencies))
+				{
+					$obj       = new \stdClass;
+					$obj->path = substr(str_replace('/', '.', $tmp_path), 1);
+
+					if( $item['type'] != 'file' && isset( $item['embedded'] ) )
+					{
+						$obj->collection = $item['collection'];
+						$obj->fields     = $item['embedded'];
+					}
+
+					if( $item['type'] == 'file' )
+					{
+						$obj->collection = static::$app->get('slug').'--library';
+					}
+
+					if( isset( $obj->collection ) )
+					{
+						$this->dependenciesPath[] = $obj;
 					}
 				}
 
