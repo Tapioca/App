@@ -6,7 +6,9 @@ $.Tapioca.Bootstrap = function()
     $.Tapioca.Apps  = new $.Tapioca.Collections.Apps();
     $.Tapioca.Users = new $.Tapioca.Collections.Users();
 
-    if( $.Tapioca.Session.isAdmin() )
+    var isAdmin = $.Tapioca.Session.isAdmin();
+
+    if( isAdmin )
     {
         $.Tapioca.Apps.fetch({async: false});
 
@@ -31,6 +33,7 @@ $.Tapioca.Bootstrap = function()
 
     var userApps = new $.Tapioca.Collections.Apps(),
         loaded   = 0,
+        users    = [],
         total;
 
     userApps.fetch({
@@ -46,14 +49,22 @@ $.Tapioca.Bootstrap = function()
                 var appslug = app.get('slug'),
                     appTeam = app.get('team');
 
+                users = _.union(users, appTeam);
+
                 $.Tapioca.UserApps[ appslug ].app     = app;
-                $.Tapioca.UserApps[ appslug ].users   = new $.Tapioca.Collections.Users( appTeam );
+                // $.Tapioca.UserApps[ appslug ].users   = new $.Tapioca.Collections.Users( appTeam );
                 $.Tapioca.UserApps[ appslug ].library = new $.Tapioca.Collections.Files( {
                     appslug: appslug
                 });
                 
                 loadCollection( appslug );
             });
+
+            // load apps's users
+            if( !isAdmin )
+            {
+                $.Tapioca.Users.add( users ).fetch();
+            }
         },
         error: function( collection, response )
         {

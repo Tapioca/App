@@ -36,7 +36,7 @@ $.Tapioca.Controllers.Collection = {
 
         var collection   = app.collections.get( namespace ),
             abstracts    = app.data[ namespace ].abstracts,
-            users        = app.users,
+            // users        = app.users,
             locale       = app.app.getWorkingLocale(),
             baseUri      = $.Tapioca.app.setRoute('appCollectionRef', [ appslug, namespace, ref ] );
             isNew        = ( ref === 'new' ),
@@ -68,7 +68,6 @@ $.Tapioca.Controllers.Collection = {
             schema:     collection,
             abstracts:  abstracts,
             doc:        doc,
-            users:      users,
             docOptions: fetchOptions
 
         });

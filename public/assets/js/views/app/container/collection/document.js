@@ -20,7 +20,7 @@ $.Tapioca.Views.Document = $.Tapioca.Views.FormView.extend(
         this.schema    = options.schema;
         this.abstracts = options.abstracts;
         // this.doc       = options.doc;
-        this.users     = options.users;
+        this.users     = $.Tapioca.Users;
 
         // is that bad???
         // `this.model` is required for `change()`
