@@ -91,6 +91,7 @@ class App
 		unset( $this->app['_id'] );
 		unset( $this->app['locales_keys'] );
 		unset( $this->app['locale_default'] );
+		unset( $this->app['api'] );
 	}
 
 
