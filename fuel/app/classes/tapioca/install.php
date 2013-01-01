@@ -14,7 +14,7 @@ class Install
 		try
 		{
 			// create regular account
-			$masterId = Tapioca::user()->create( $master );
+			$masterId = Tapioca::user()->create( $master, false, true );
 		}
 		catch (UserException $e)
 		{
@@ -22,9 +22,6 @@ class Install
 		}
 
 		$masterObject = Tapioca::user( $master['email'] );
-		
-		// then grant him admin
-		$masterObject->granted_admin('master');
 
 
 		// create first app

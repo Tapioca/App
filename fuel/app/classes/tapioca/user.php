@@ -137,13 +137,15 @@ class User
 
 
 	/**
-	 * Create's a new user.  Returns user '_id'.
+	 * Create's a new user.
 	 *
 	 * @param   array  User array for creation
-	 * @return  int
+	 * @param   bool   ask for user's activation token
+	 * @param   bool   create master
+	 * @return  string User Id
 	 * @throws  UserException
 	 */
-	public function create(array $user, $activation = false)
+	public function create(array $user, $activation = false, $master = false)
 	{
 		// check for required fields
 		if (empty($user['email']) or empty($user['password']))
@@ -198,6 +200,23 @@ class User
 			'admin'               => 0,
 			'apps'                => array()
 		) + $user;
+
+		if( $master )
+		{
+			//query database for master user
+			$hasMaster = static::$db->where(array(
+							'amin' => 'master'
+						))->count(static::$dbCollectionName);
+
+			if( $hasMaster )
+			{
+				throw new \UserException(__('tapioca.master_alreday_set'));
+			}
+			else
+			{
+				$new_user['admin'] = 'master';
+			}
+		}
 
 		// set activation hash if activation = true
 		if ($activation)
@@ -440,6 +459,7 @@ class User
 		{
 			$roles = Config::get('tapioca.roles');
 
+			// prevent set user as master
 			if( $this->user['admin'] === reset( $roles ) )
 			{
 				unset($fields['admin']);
