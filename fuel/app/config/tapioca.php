@@ -375,14 +375,48 @@ return array(
 
             'list_apps',
             'create_apps',
+            'read_apps',
             'delete_apps',
             'disable_apps',
 
             'list_jobs',
-            
+
+            'app_edit_settings',
+
             'app_invite_users',
             'app_remove_users',
             'app_promote_users',
+
+            'app_list_jobs',
+
+            'app_list_collections',
+            'app_read_collections_public',
+            'app_read_collections_private',
+            'app_read_collections_draft',
+            'app_create_collections',
+            'app_delete_collections',
+            'app_empty_collections',
+            'app_edit_collections',
+
+            'app_list_documents',
+            'app_read_documents',
+            'app_create_documents',
+            'app_edit_documents',
+            'app_publish_documents',
+            'app_delete_documents',
+            'app_delete_published_documents',
+
+            'app_edit_others_documents',
+            'app_publish_others_documents',
+            'app_delete_others_documents',
+            'app_delete_others_published_documents',
+
+            'list_files',
+            'upload_files',
+            'delete_files',
+            'edit_files',
+            'delete_others_files',
+            'edit_others_files',
         ),
         'admin' => array(
             'list_users',
