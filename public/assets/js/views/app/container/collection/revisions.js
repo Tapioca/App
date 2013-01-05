@@ -4,7 +4,7 @@ $.Tapioca.Views.Revisions = $.Tapioca.Views.Content.extend(
     tagName:      'ul',
     id:           'revisions',
     className:    '',
-    viewPointers: [],
+    viewpointer: [],
 
     initialize: function( options )
     {

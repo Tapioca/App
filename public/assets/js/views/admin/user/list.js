@@ -1,7 +1,7 @@
 
 $.Tapioca.Views.AdminUserList = $.Tapioca.Views.Content.extend(
 {
-    viewPointers: [],
+    viewpointer: [],
 
     render: function()
     {
@@ -26,7 +26,7 @@ $.Tapioca.Views.AdminUserList = $.Tapioca.Views.Content.extend(
 
     display: function( model )
     {
-        this.viewPointers[ model.cid ] = new $.Tapioca.Views.AdminUserListRow({
+        this.viewpointer[ model.cid ] = new $.Tapioca.Views.AdminUserListRow({
             model:       model,
             isMaster:    this.isMaster,
             parent:      this.$table,
@@ -36,9 +36,9 @@ $.Tapioca.Views.AdminUserList = $.Tapioca.Views.Content.extend(
 
     onClose: function()
     {
-        _.each(this.viewPointers, function( view )
+        for( var i in this.viewpointer)
         {
-            view.close();
-        }, this);
+            this.viewpointer[ i ].close();  
+        }
     }
 })

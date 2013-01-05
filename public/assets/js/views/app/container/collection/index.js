@@ -72,9 +72,13 @@ $.Tapioca.Views.Collection = $.Tapioca.Views.Content.extend(
     {
         this.abstracts.unbind('reset', this.display);
 
-        _.each( this.viewpointer, function( view )
+        // _.each( this.viewpointer, function( view )
+        // {
+        //     view.close();
+        // }, this);
+        for( var i in this.viewpointer)
         {
-            view.close();
-        }, this);
+            this.viewpointer[ i ].close();  
+        }
     }
 });

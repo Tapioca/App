@@ -135,10 +135,10 @@ $.Tapioca.Views.Library = $.Tapioca.Views.Content.extend(
 
     clearList: function()
     {
-        _.each( this.viewpointer, function( view )
+        for( var i in this.viewPointer)
         {
-            view.close();
-        }, this);
+            this.viewPointer[ i ].close();  
+        }
     },
 
     onClose: function()

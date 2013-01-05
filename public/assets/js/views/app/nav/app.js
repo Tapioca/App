@@ -3,7 +3,7 @@ $.Tapioca.Views.NavApp = Backbone.View.extend(
 {
     className:    'app-nav app-nav-active',
     tagName:      'div',
-    viewspointer: [],
+    viewpointer: [],
 
     initialize: function( options )
     {
@@ -46,7 +46,7 @@ $.Tapioca.Views.NavApp = Backbone.View.extend(
 
     displayCollection: function( model )
     {
-        this.viewspointer[ model.cid ] = new $.Tapioca.Views.NavAppCollection({
+        this.viewpointer[ model.cid ] = new $.Tapioca.Views.NavAppCollection({
             tpl:     this.tplRow,
             appslug: this.appslug,
             model:   model,
@@ -80,9 +80,9 @@ $.Tapioca.Views.NavApp = Backbone.View.extend(
 
     onClose: function()
     {
-        _.each( this.viewspointer, function( view )
+        for( var i in this.viewpointer)
         {
-            view.close();
-        })
+            this.viewpointer[ i ].close();  
+        }
     }
 });

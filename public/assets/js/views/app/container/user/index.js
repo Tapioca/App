@@ -1,7 +1,7 @@
 
 $.Tapioca.Views.AppAdminUsers = $.Tapioca.Views.Content.extend(
 {
-    viewspointer: [],
+    viewpointer: [],
 
     initialize: function()
     {
@@ -50,14 +50,14 @@ $.Tapioca.Views.AppAdminUsers = $.Tapioca.Views.Content.extend(
 
     displayUserRow: function( user )
     {
-        this.viewspointer[ user.id ] = new $.Tapioca.Views.AppAdminUserRow({
+        this.viewpointer[ user.id ] = new $.Tapioca.Views.AppAdminUserRow({
             user:     user,
             parent:   this.$table,
             tpl:      this.tplRow,
             operator: this.operator
         });
 
-        this.viewspointer[ user.id ].render();
+        this.viewpointer[ user.id ].render();
 
         ++this.index;
     },
@@ -66,10 +66,9 @@ $.Tapioca.Views.AppAdminUsers = $.Tapioca.Views.Content.extend(
     {
         this.collection.unbind('reset', this.displayUsers);
 
-        _.each( this.viewspointer, function( view )
+        for( var i in this.viewpointer)
         {
-            view.close();
-
-        }, this);
+            this.viewpointer[ i ].close();  
+        }
     }
 });

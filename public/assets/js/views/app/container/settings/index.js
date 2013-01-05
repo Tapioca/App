@@ -1,7 +1,7 @@
 
 $.Tapioca.Views.AppAdminSettings = $.Tapioca.Views.FormView.extend(
 {
-    viewspointer: [],
+    viewpointer: [],
 
     initialize: function()
     {

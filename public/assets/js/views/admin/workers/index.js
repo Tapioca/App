@@ -43,9 +43,9 @@ $.Tapioca.Views.AdminWorkers = $.Tapioca.Views.Content.extend(
 
     onClose: function()
     {
-        _.each(this.viewPointers, function( view )
+        for( var i in this.viewpointer)
         {
-            view.close();
-        }, this);
+            this.viewpointer[ i ].close();  
+        }
     }
 })
