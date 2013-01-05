@@ -10,15 +10,11 @@ $.Tapioca.Views.AppAdminUsers = $.Tapioca.Views.Content.extend(
         this.appslug  = $.Tapioca.appslug;
         this.operator = $.Tapioca.Session.get('id');
         this.tplRow   = Handlebars.compile( $.Tapioca.Tpl.app.container.user.row );
-
-        this.collection.bind('reset', this.displayUsers, this);
-        
-        // $.Tapioca.UserApps[ $.Tapioca.appslug ].app.bind( 'change:team', this.displayUsers, this);
     },
 
     render: function()
     {
-        var appName = $.Tapioca.UserApps[ this.appslug ].app.get('name'),
+        var appName = this.model.get('name'),
             data = {
                 pageTitle: $.Tapioca.I18n.get('title.app_users', appName),
                 appslug:   this.appslug
@@ -31,44 +27,36 @@ $.Tapioca.Views.AppAdminUsers = $.Tapioca.Views.Content.extend(
 
         this.$table = this.$el.find('tbody');
 
-        if( this.collection.isFetched() )
-        {
-            this.displayUsers();
-        }
+        this.displayUsers();
 
         return this;
     },
 
     displayUsers: function()
     {
-        this.$table.empty();
+        this.clearUsers();
 
-        var team  = $.Tapioca.UserApps[ this.appslug ].app.get('team');
-        
-        _.each( team, this.displayUserRow, this);
+        _.each( this.model.get('team'), function( user )
+        {
+            this.viewpointer[ user.id ] = new $.Tapioca.Views.AppAdminUserRow({
+                                                user:     user,
+                                                parent:   this.$table,
+                                                tpl:      this.tplRow,
+                                                operator: this.operator
+                                            }).render();
+        }, this);
     },
 
-    displayUserRow: function( user )
+    clearUsers: function()
     {
-        this.viewpointer[ user.id ] = new $.Tapioca.Views.AppAdminUserRow({
-            user:     user,
-            parent:   this.$table,
-            tpl:      this.tplRow,
-            operator: this.operator
-        });
-
-        this.viewpointer[ user.id ].render();
-
-        ++this.index;
-    },
-
-    onClose: function()
-    {
-        this.collection.unbind('reset', this.displayUsers);
-
         for( var i in this.viewpointer)
         {
             this.viewpointer[ i ].close();  
         }
+    },
+
+    onClose: function()
+    {
+        this.clearUsers();
     }
 });

@@ -16,11 +16,11 @@ $.Tapioca.Views.AppAdminUserRow = Backbone.View.extend(
     },
 
     events: {
-        'click .btn-delete-trigger': 'remove',
+        'click .btn-delete-trigger': 'revoke',
         'click .dropdown-menu a':    'role'
     },
 
-    remove: function(event)
+    revoke: function(event)
     {
         var self  = this;
 
@@ -42,7 +42,7 @@ $.Tapioca.Views.AppAdminUserRow = Backbone.View.extend(
     {
         this.tokenObj = tokenObj;
 
-        var user = $.Tapioca.UserApps[ $.Tapioca.appslug ].users.get( this.user.id ),
+        var user = $.Tapioca.Users.get( this.user.id ),
             text = $.Tapioca.I18n.get('delete.question_remove', user.get('name')),
             self = this;
 
@@ -96,7 +96,7 @@ $.Tapioca.Views.AppAdminUserRow = Backbone.View.extend(
 
     render: function()
     {
-        var user = $.Tapioca.UserApps[ $.Tapioca.appslug ].users.get( this.user.id );
+        var user = $.Tapioca.Users.get( this.user.id );
             data = {
                 name:     user.get('name'),
                 avatar:   user.get('avatar'),
@@ -108,9 +108,5 @@ $.Tapioca.Views.AppAdminUserRow = Backbone.View.extend(
         this.$el.html( this.tpl( data ) );
 
         return this;
-    },
-
-    onClose: function()
-    {
     }
 });

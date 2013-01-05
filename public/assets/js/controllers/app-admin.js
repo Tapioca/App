@@ -5,15 +5,8 @@ $.Tapioca.Controllers.AppAdmin = {
     {
         $.Tapioca.appslug = appslug;
 
-        var users = $.Tapioca.UserApps[ appslug ].users;
-
-        if( !users.isFetched() )
-        {
-            users.reload();
-        }
-
         $.Tapioca.view = new $.Tapioca.Views.AppAdminUsers({
-            collection: users
+            model: $.Tapioca.UserApps[ appslug ].app
         }).render();
     },
 
