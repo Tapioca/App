@@ -27,7 +27,7 @@ $.Tapioca.Views.EditFile = $.Tapioca.Views.FormView.extend(
 
     openUpload: function()
     {
-        $.Tapioca.Components.FileUpload.init({
+        $.Tapioca.FileUpload.init({
             appslug:           $.Tapioca.appslug,
             singleFileUploads: true,
             filename:          this.model.get('filename')

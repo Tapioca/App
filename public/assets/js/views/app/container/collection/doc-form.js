@@ -420,7 +420,7 @@ $.Tapioca.Views.DocForm = Backbone.View.extend(
     {
         this.target = event;
 
-        $.Tapioca.Components.FileUpload.init({
+        $.Tapioca.FileUpload.init({
                 appslug:           this.appslug,
                 singleFileUploads: true,
             },

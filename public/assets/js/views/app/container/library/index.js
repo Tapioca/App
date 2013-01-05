@@ -128,7 +128,7 @@ $.Tapioca.Views.Library = $.Tapioca.Views.Content.extend(
 
     upload: function()
     {
-        $.Tapioca.Components.FileUpload.init({
+        $.Tapioca.FileUpload.init({
             appslug: this.appslug
         });
     },

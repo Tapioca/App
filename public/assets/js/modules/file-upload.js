@@ -1,5 +1,5 @@
 
-$.Tapioca.Components.FileUpload = {
+$.Tapioca.FileUpload = {
 
     init: function(_settings, _success, _error)
     {
@@ -48,7 +48,7 @@ $.Tapioca.Components.FileUpload = {
         $('#fileupload-trigger').click($fileupload.click);
         $('#close-upload').click(function()
         {
-            $.Tapioca.Components.FileUpload.clean();
+            $.Tapioca.FileUpload.clean();
             $.Tapioca.Dialog.close();
         });
         $('#fileinput-clear').click(function()
