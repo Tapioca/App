@@ -5,7 +5,8 @@ $.Tapioca.Views.AdminUserList = $.Tapioca.Views.Content.extend(
 
     render: function()
     {
-        this.tplRow = Handlebars.compile( $.Tapioca.Tpl.admin.user['list-row'] );
+        this.tplRow   = Handlebars.compile( $.Tapioca.Tpl.admin.user['list-row'] );
+        this.isMaster = $.Tapioca.Session.isMaster();
 
         this.html( $.Tapioca.Tpl.admin.user.list );
         
@@ -27,6 +28,7 @@ $.Tapioca.Views.AdminUserList = $.Tapioca.Views.Content.extend(
     {
         this.viewPointers[ model.cid ] = new $.Tapioca.Views.AdminUserListRow({
             model:       model,
+            isMaster:    this.isMaster,
             parent:      this.$table,
             tpl:         this.tplRow
         }).render();

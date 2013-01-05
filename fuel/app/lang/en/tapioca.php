@@ -174,6 +174,7 @@ return array(
             'label'              => 'label',
             'key'                => 'key',
             'url'                => 'url',
+            'cannot_edit_admin'  => 'You can not edit another admin profile.',
         ),
         'dialog' => array(
             'beforeunload' => 'Are you sure you want to leave with out save?',

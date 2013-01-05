@@ -3,7 +3,8 @@ $.Tapioca.Views.AdminUserEdit = $.Tapioca.Views.FormView.extend(
 {
     initialize: function( options )
     {
-        this.isNew = options.isNew;
+        this.isNew    = options.isNew;
+        this.isMaster = $.Tapioca.Session.isMaster();
         
         return this;
     },
@@ -12,12 +13,28 @@ $.Tapioca.Views.AdminUserEdit = $.Tapioca.Views.FormView.extend(
         'click #password-generator': 'generatePassword'
     }, $.Tapioca.Views.FormView.prototype.events),
 
+    // admin can not edit admin profile
+    // except Master admin
+    isRestricted: function()
+    {
+        if( this.isMaster )
+            return false;
+
+        if( this.model.get('admin') )
+            return true;
+    },
+
     render: function()
     {
         this.$el.appendTo('#app-content');
 
-        var tpl  = Handlebars.compile( $.Tapioca.Tpl.admin.user.edit ),
-            html = tpl( this.model.toJSON() );
+        var model    = this.model.toJSON();
+
+        model.isMaster   = this.isMaster;
+        model.restricted = this.isRestricted();
+
+        var tpl      = Handlebars.compile( $.Tapioca.Tpl.admin.user.edit ),
+            html     = tpl( model );
 
         this.html( html, 'app-form');
 
@@ -76,13 +93,17 @@ $.Tapioca.Views.AdminUserEdit = $.Tapioca.Views.FormView.extend(
         {
             var _data = {
                     email: $('#email').val(), 
-                    name:  $('#name').val(),
-                    admin: $('#admin').is(':checked')
+                    name:  $('#name').val()
                 },
                 password = $('#password').val(),
                 $btn     = $('#profile-form-save'),
                 valid    = true, // flag for pasword
                 self     = this;
+
+            if( this.isMaster )
+            {
+                _data.admin = $('#admin').is(':checked');
+            }
 
             if( !_.isBlank( password ) )
             {

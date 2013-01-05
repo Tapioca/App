@@ -368,9 +368,9 @@ return array(
             'list_users',
             'create_users',
             'edit_users',
-            'delete_users',
+            // 'delete_users',
             'disable_users',
-            'promote_users',
+            // 'promote_users',
             'read_users',
 
             'list_apps',

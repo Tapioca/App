@@ -14,5 +14,10 @@ $.Tapioca.Models.Session = $.Tapioca.Models.User.extend({
     isAdmin: function()
     {
         return this.get('admin');
+    },
+
+    isMaster: function()
+    {
+        return (this.get('admin') === 'master');
     }
 });

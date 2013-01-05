@@ -1,19 +1,14 @@
 
                 <div class="pane-content">
-                    <h2 class="page-name"><?= __('tapioca.ui.title.edit_account'); ?></h2>
-                    <ul class="nav nav-tabs clear-both">
-                        <li class="active">
-                            <a href="#account-form" data-toggle="tab" data-bypass="true"><?= __('tapioca.ui.session.edit_account'); ?></a>
-                        </li>
-                        <li>
-                            <a href="#password-form" data-toggle="tab" data-bypass="true"><?= __('tapioca.ui.session.edit_password'); ?></a>
-                        </li>
-                        <li>
-                            <a href="#apps-form" data-toggle="tab" data-bypass="true"><?= __('tapioca.ui.session.edit_apps'); ?></a>
-                        </li>
-                    </ul>
-                    <?= Form::open(array('class' => 'form-horizontal tab-content', 'id' => 'tapioca-user-form')); ?>
-                        <fieldset id="account-form" class="tab-pane active">
+                    <h2 class="page-name" style="margin-bottom: 30px"><?= __('tapioca.ui.title.edit_account'); ?></h2>
+                    {{#if restricted}}
+                        <p class="clear-both">
+                            <?= __('tapioca.ui.label.cannot_edit_admin'); ?>
+                        </p>
+                    {{else}}
+                    <?= Form::open(array('class' => 'form-horizontal clear-both', 'id' => 'tapioca-user-form')); ?>
+                        <fieldset id="account-form" style="margin-bottom: 30px">
+                            <legend><?= __('tapioca.ui.session.edit_account'); ?></legend>
                             <div class="control-group">
                                 <label class="control-label"><?= __('tapioca.ui.label.user_name'); ?></label>
                                 <div class="controls">
@@ -26,17 +21,18 @@
                                     <input id="email" name="email" type="text" value="{{ email }}" class="span7">
                                 </div>
                             </div>
+                            {{#isMaster}}
                             <div class="control-group">
                                 <label class="control-label"><?= __('tapioca.ui.label.is_tapp_admin'); ?></label>
                                 <div class="controls">
-                                    <input id="admin" type="checkbox" value="1" {{isSelected admin default=1 attribute="checked"}}>
+                                    <input id="admin" type="checkbox" value="1" {{isSelected admin default=true attribute="checked"}}>
                                 </div>
                             </div>
-
+                            {{/isMaster}}
                         </fieldset>
 
-                        <fieldset id="password-form" class="tab-pane">
-
+                        <fieldset id="password-form" style="margin-bottom: 30px">
+                            <legend><?= __('tapioca.ui.session.edit_password'); ?></legend>
                             <div class="control-group">
                                 <label for="password" name="password" class="control-label"><?= __('tapioca.ui.label.new_password'); ?></label>
                                 <div class="controls">
@@ -54,7 +50,8 @@
                                 </div>
                             </div>
                         </fieldset>
-                        <fieldset id="apps-form" class="tab-pane">
+                        <fieldset id="apps-form">
+                            <legend><?= __('tapioca.ui.session.edit_apps'); ?></legend>
                             <ul>
                                 {{#apps}}
                                 <li>{{name}}</li>
@@ -62,6 +59,7 @@
                             </ul>
                         </fieldset>
                     <?= Form::close(); ?>
+                    {{/if}}
                 </div><!-- /.pane-content -->
                 <div class="form-actions form-footer">
                     <button type="submit" id="profile-form-save" class="btn btn-primary disabled" disabled="disabled" data-loading-text="<?= __('tapioca.ui.label.saving'); ?>">
