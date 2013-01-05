@@ -1,17 +1,23 @@
 
 $.Tapioca.Views.AdminAppEdit = $.Tapioca.Views.FormView.extend(
 {
+    viewpointer: [],
+
     initialize: function( options )
     {
         this.isNew     = options.isNew;
         this.tplLocale = Handlebars.compile( $.Tapioca.Tpl.components.locales );
+        this.tplRow    = Handlebars.compile( $.Tapioca.Tpl.admin.app['team-row'] );
+        this.appslug   = this.model.get('slug');
+
+        this.model.bind('change:team', this.team, this);
 
         return this;
     },
 
     events: _.extend({
-        'keyup #slug'                                                        : 'slugify',
-        'keyup #name'                                                        : 'slugify'
+        'keyup #slug': 'slugify',
+        'keyup #name': 'slugify'
     }, $.Tapioca.Views.FormView.prototype.events),
 
     addRepeatNode: function()
@@ -31,22 +37,6 @@ $.Tapioca.Views.AdminAppEdit = $.Tapioca.Views.FormView.extend(
                             __('label.add_app') :
                             $.Tapioca.I18n.get('title.edit_app', this.model.get('name'));
 
-        // Team users's name
-        _.each(model.team, function(user)
-        {
-            var userModel = $.Tapioca.Users.get( user.id );
-
-            if( user.role == '_REVOKED_ACCESS_' )
-            {
-                user.disabled = true;
-            }
-
-            user.avatar      = userModel.get('avatar');
-            user.name        = userModel.get('name');
-            user.roleDisplay = __('roles.'+ user.role);
-
-        }, this);
-
         var tpl  = Handlebars.compile( $.Tapioca.Tpl.admin.app.edit ),
             self = this,
             html = tpl( model );
@@ -54,8 +44,10 @@ $.Tapioca.Views.AdminAppEdit = $.Tapioca.Views.FormView.extend(
         this.html( html, 'app-form');
 
         this.$slug = $('#slug');
+        this.$team = $('#app-team').find('tbody');
 
         var userEmails = $.Tapioca.Users.pluck( 'email' );
+        // var userNames  = $.Tapioca.Users.pluck( 'name' );
 
         $('#new-user')
             .keypress(function(event)
@@ -69,17 +61,18 @@ $.Tapioca.Views.AdminAppEdit = $.Tapioca.Views.FormView.extend(
             })
             .autocomplete(
             {
-                source : userEmails,
+                source : userEmails, //.concat(userNames),
                 minLength : 2,
                 select: function(event, ui)
                 {
+                    // TODO: prevent add user already in app;
                     var selectedModel = $.Tapioca.Users.where( { email: ui.item.value } )[0];
-                    console.log( selectedModel );
-                    // var view = new SelectionView({model: selectedModel});
-                    // view.render();
+
+                    self.user('POST', selectedModel.get('id'));
                 }
             });
 
+        this.team();
         this.$el.find('.dropdown-toggle').dropdown();
 
         return this;
@@ -93,10 +86,57 @@ $.Tapioca.Views.AdminAppEdit = $.Tapioca.Views.FormView.extend(
         }
     },
 
+    user: function( method, userId )
+    {
+        var url  = this.model.url() + '/user/' + userId,
+            self = this,
+            hxr  = $.ajax({
+                url:      url,
+                dataType: 'json',
+                type:     method,
+                success: function(data)
+                {
+                    self.model.fetch()
+                }
+            });
+    },
+
+    team: function()
+    {
+        this.closeTeam();
+
+        // Team users's name
+        _.each(this.model.get('team'), function(user)
+        {
+            var userModel    = $.Tapioca.Users.get( user.id );
+
+            user.disabled    = ( user.role == '_REVOKED_ACCESS_' );
+            user.avatar      = userModel.get('avatar');
+            user.name        = userModel.get('name');
+            user.roleDisplay = __('roles.'+ user.role);
+
+            this.viewpointer[ user.id ] = new $.Tapioca.Views.AdminAppTeamRow({
+                user:        user,
+                parent:      this,
+                $parent:     this.$team,
+                appslug:     this.appslug,
+                tpl:         this.tplRow
+            }).render();
+
+        }, this);
+
+    },
+
+    closeTeam: function()
+    {
+        for( var i in this.viewpointer)
+        {
+            this.viewpointer[ i ].close();  
+        }
+    },
+
     submit: function()
     {
-
-        console.log( this.model )
         // reset warning and feedback
         this.$el.find('input').removeClass('warning');
 
@@ -148,5 +188,10 @@ $.Tapioca.Views.AdminAppEdit = $.Tapioca.Views.FormView.extend(
             this.model.set( this.model.previousAttributes() );
             self.resetForm();
         }
+    },
+
+    onClose: function()
+    {
+        this.closeTeam();
     }
 });

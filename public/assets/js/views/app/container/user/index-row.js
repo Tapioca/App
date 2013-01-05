@@ -61,6 +61,14 @@ $.Tapioca.Views.AppAdminUserRow = Backbone.View.extend(
         post.done(function( p )
         {
             $.Tapioca.UserApps[ $.Tapioca.appslug ].app.set( 'team', p );
+
+            // TODO: to clean, as users, one collection
+            if( $.Tapioca.Session.isAdmin() )
+            {
+                var app = $.Tapioca.Apps.get( $.Tapioca.appslug );
+                app.set( 'team', p );
+            }
+
             self.render()
         });
 
@@ -84,7 +92,13 @@ $.Tapioca.Views.AppAdminUserRow = Backbone.View.extend(
 
         post.done(function( p )
         {
+            // TODO: to clean, as users, one collection
             $.Tapioca.UserApps[ $.Tapioca.appslug ].app.set( 'team', p );
+            if( $.Tapioca.Session.isAdmin() )
+            {
+                var app = $.Tapioca.Apps.get( $.Tapioca.appslug );
+                app.set( 'team', p );
+            }
             self.render()
         });
 

@@ -34,11 +34,11 @@
                             <div class="control-group">
                                 <label for="new_user" class="control-label"><?= __('tapioca.ui.label.add_user'); ?></label>
                                 <div class="controls">
-                                    <input type="text" id="new-user">
+                                    <input type="text" id="new-user" data-bypass="true">
                                 </div>
                             </div>
 
-                            <table class="table table-striped">
+                            <table class="table table-striped" id="app-team">
                                 <thead>
                                     <tr>
                                         <th width="60"></th>
@@ -47,30 +47,7 @@
                                         <th width="100"></th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                {{#team}}
-                                    <tr{{#disabled}} class="warning"{{/disabled}}>
-                                        <td>
-                                            <a href="<?= Uri::create('app/admin/user/'); ?>{{ id }}">
-                                                <img src="{{ avatar }}" alt="" width="50">
-                                            </a>
-                                        </td>
-                                        <td>
-                                            <a href="<?= Uri::create('app/admin/user/'); ?>{{ id }}">
-                                                {{ name }}
-                                            </a>
-                                        </td>
-                                        <td>
-                                            {! roleSelector ../slug id  ../operator}}
-                                        </td>
-                                        <td>
-                                            <a href="javascript:;" class="btn btn-mini btn-danger btn-delete-trigger">
-                                                <i class="icon-trash"></i>
-                                            </a>
-                                        </td>
-                                    </tr>
-                                {{/team}}
-                                </tbody>
+                                <tbody></tbody>
                             </table>
                         </fieldset>
                         <fieldset id="locales-form" class="tab-pane">

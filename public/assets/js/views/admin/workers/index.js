@@ -34,18 +34,5 @@ $.Tapioca.Views.AdminWorkers = $.Tapioca.Views.Content.extend(
                     self.$table.html( html );
                 }
             });
-    // },
-
-    // display: function( jobs )
-    // {
-
-    // },
-
-    // onClose: function()
-    // {
-    //     for( var i in this.viewpointer)
-    //     {
-    //         this.viewpointer[ i ].close();  
-    //     }
     }
 })
