@@ -4980,7 +4980,7 @@ $.widget( "ui.autocomplete", {
 
 	_renderItem: function( ul, item ) {
 		return $( "<li>" )
-			.append( $( "<a>" ).text( item.label ) )
+			.append( $( "<a>" ).attr('href', 'javascript:;').text( item.label ) )
 			.appendTo( ul );
 	},
 
