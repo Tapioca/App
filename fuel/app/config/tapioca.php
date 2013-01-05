@@ -379,6 +379,10 @@ return array(
             'disable_apps',
 
             'list_jobs',
+            
+            'app_invite_users',
+            'app_remove_users',
+            'app_promote_users',
         ),
         'admin' => array(
             'list_users',

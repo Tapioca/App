@@ -465,6 +465,7 @@ class App
 		}
 
 		$roles = Config::get('tapioca.roles');
+		$where = array('_id' => $this->app['_id']);
 
 		if( is_null( $role ) || !in_array($role, $roles))
 		{
@@ -482,9 +483,7 @@ class App
 					'role' => $role,
 				);
 
-			$update = array('$push' => array('team' => $user_info));			
-
-			$where = array('_id' => $this->app['_id']);
+			$update = array('$push' => array('team' => $user_info));
 
 			$query = static::$db
 						->where($where)
