@@ -351,12 +351,11 @@ class Document
 		}
 
 		$result = static::$db
-			->select( $this->select, array('_id') )
+			->select( $this->select, array('_id', '_tapioca') )// always exclude _id && _tapioca properties
 			->where( $this->where )
 			->order_by( $this->sort )
 			->get( static::$dbCollectionName );
-// \Debug::dump( $this->last_query() );
-// exit;
+
 		if( $result )
 		{
 			if( isset( $result[0]['_id'] ) )
@@ -393,10 +392,10 @@ class Document
 			throw new \DocumentException(__('tapioca.no_collection_selected'));
 		}
 
-		// always return _ref && _tapioca properties
+		// always return _ref property
 		if( count($this->select) > 0)
 		{
-			$this->set('select', array_merge($this->select, array('_ref', '_tapioca')) );
+			$this->set('select', array_merge($this->select, array('_ref')) );
 		}
 
 		// if query contains more than sort $natural, remove it
@@ -413,15 +412,13 @@ class Document
 				));
 
 		$result = static::$db
-			->select( $this->select )
+			->select( $this->select, array('_tapioca') ) // always exclude _tapioca property
 			->where( $this->where )
 			->order_by( $this->sort )
 			->limit( $this->limit )
 			->offset( $this->skip )
 			->hash( static::$dbCollectionName, true );
-// \Debug::dump( $this->last_query() );
-// \Debug::dump( $result );
-// exit;
+
 		return $result;
 	}
 
