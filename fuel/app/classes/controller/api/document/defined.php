@@ -88,6 +88,16 @@ class Controller_Api_Document_Defined extends Controller_Api
 			{
 				$revision = (int) $revision;
 			}
+            
+            $query = Input::get('q', null);
+
+            // decode query
+            if( !is_null( $query ) )
+            {
+                $query = json_decode($query, true);
+
+                static::$document->set( $query );
+            }
 
 			static::$data   = static::$document->get( $revision );
 			static::$status = 200;
