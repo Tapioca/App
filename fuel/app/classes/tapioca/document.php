@@ -80,7 +80,7 @@ class Document
 	protected static $operators = array('select', 'where', 'sort', 'limit', 'skip');
 	protected $select = array();
 	protected $where  = array('_tapioca.status' => array('$ne' => -1));
-	protected $sort   = array('$natural' => 1);	
+	protected $sort   = array('_tapioca.created' => 'DESC');	
 	protected $limit  = 99999;
 	protected $skip   = 0;
 
@@ -398,10 +398,12 @@ class Document
 			$this->set('select', array_merge($this->select, array('_ref')) );
 		}
 
-		// if query contains more than sort $natural, remove it
+		// if query contains more than sort _tapioca.created, remove it
+		// then add it back as last option for sorting.
 		if( count($this->sort) > 1)
 		{
-			$this->_unset('sort', '$natural');
+			$this->_unset('sort', '_tapioca.created');
+			$this->set('sort', array('_tapioca.created' => 'DESC'));
 		}
 
 		$this->set('where', array(
@@ -505,6 +507,8 @@ class Document
 				'revision' => (int) 1,
 				'status'   => (int) 1,
 				'active'   => (bool) true,
+				'created'  => $date,
+				'updated'  => $date,
 				'locale'   => static::$locale
 			)
 		) + $document;
@@ -512,6 +516,8 @@ class Document
 		$abstract = array(
 			'_ref'      => $ref,
 			'_abstract' => (bool) true, 
+			'created'   => $date,
+			'updated'   => $date,
 			'revisions' => array(
 				'total'   => (int) 1,
 				'active'  => array(static::$locale => (int) 1),
@@ -550,12 +556,16 @@ class Document
 		
 		$is_active = $this->is_active();
 
+		$date = new \MongoDate();
+
 		$data = array(
 			'_ref'   => static::$ref,
 			'_tapioca' => array(
 				'revision' => (int) static::$revisionLast,
 				'status'   => (int) 1,
 				'active'   => (bool) $is_active,
+				'created'  => $this->abstract['created'],
+				'updated'  => $date,
 				'locale'   => static::$locale
 			)
 		) + $document;
@@ -568,9 +578,10 @@ class Document
 			$this->abstract['digest'] = $digest['digest'];			
 		}
 
+		$this->abstract['updated']             = $date;
 		$this->abstract['revisions']['list'][] = array(
 													'revision' => (int) static::$revisionLast,
-													'date'     => new \MongoDate(),
+													'date'     => $date,
 													'status'   => (int) 1,
 													'locale'   => static::$locale,
 													'user'     => $user->get('id'),
