@@ -66,7 +66,7 @@
                                 <textarea id="digest" name="digest" rows="15" class="span10 _lined">{{ digest.fields }}</textarea>
                                 <p class="help-block">
                                     <label>
-                                        <input type="checkbox" id="summary-edit" value="1" {{isSelected digest.edited default=1 attribute="checked"}}>
+                                        <input type="checkbox" id="digest-edit" value="1" {{isSelected digest.edited default=1 attribute="checked"}}>
                                         Editer manullement le résumé
                                     </label>
                                 </p>
