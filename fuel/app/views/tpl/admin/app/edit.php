@@ -1,44 +1,34 @@
 
                 <div class="pane-content">
-                    <h2 class="page-name">{{ pageTitle }}</h2>
-                    <ul class="nav nav-tabs clear-both">
-                        <li class="active">
-                            <a href="#profile-form" data-toggle="tab" data-bypass="true"><?= __('tapioca.ui.label.edit_app_profile'); ?></a>
-                        </li>
-                        <li>
-                            <a href="#users-form" data-toggle="tab" data-bypass="true"><?= __('tapioca.ui.label.edit_app_user'); ?></a>
-                        </li>
-                        <li>
-                            <a href="#locales-form" data-toggle="tab" data-bypass="true"><?= __('tapioca.ui.label.edit_app_locale'); ?></a>
-                        </li>
-                    </ul>
-                    <?= Form::open(array('class' => 'form-horizontal tab-content')); ?>
-                        <fieldset id="profile-form" class="tab-pane active">
-                            <div class="control-group">
-                                <label class="control-label" for="slug"><?= __('tapioca.ui.label.app_slug'); ?></label>
-                                <div class="controls">
-                                    <input id="slug" type="text" value="{{ slug }}" class="span7" {{#unless isNew}} disabled{{/unless}}>
-                                </div>
-                            </div>
+                    <h2 class="page-name" id="app-name" style="margin-bottom: 30px">{{ pageTitle }}</h2>
+                    <?= Form::open(array('class' => 'form-horizontal clear-both')); ?>
+                        <fieldset id="profile-form" style="margin-bottom: 30px">
+                            <legend><?= __('tapioca.ui.label.edit_app_profile'); ?></legend>
                             <div class="control-group" for="name">
                                 <label class="control-label"><?= __('tapioca.ui.label.app_name'); ?></label>
                                 <div class="controls">
                                     <input id="name" type="text" value="{{ name }}" class="span7">
                                 </div>
                             </div>
+                            
+                            <div class="control-group">
+                                <label class="control-label" for="slug"><?= __('tapioca.ui.label.app_slug'); ?></label>
+                                <div class="controls">
+                                    <input id="slug" type="text" value="{{ slug }}" class="span7" {{#unless isNew}} disabled{{/unless}}>
+                                </div>
+                            </div>
 
                         </fieldset>
 
-                        <fieldset id="users-form" class="tab-pane">
-
+                        <fieldset id="users-form" style="margin-bottom: 30px">
+                            <legend><?= __('tapioca.ui.label.edit_app_user'); ?></legend>
                             <div class="control-group">
                                 <label for="new_user" class="control-label"><?= __('tapioca.ui.label.add_user'); ?></label>
                                 <div class="controls">
                                     <input type="text" id="new-user" data-bypass="true">
                                 </div>
                             </div>
-
-                            <table class="table table-striped" id="app-team">
+                            <table class="table table-striped {{#isNew}}hide{{/isNew}}" id="app-team">
                                 <thead>
                                     <tr>
                                         <th width="60"></th>
@@ -50,7 +40,8 @@
                                 <tbody></tbody>
                             </table>
                         </fieldset>
-                        <fieldset id="locales-form" class="tab-pane">
+                        <fieldset id="locales-form" style="margin-bottom: 30px">
+                            <legend><?= __('tapioca.ui.label.edit_app_locale'); ?></legend>
                             <ul class="input-repeat-list">
                                 {{#atLeastOnce locales}}
                                     {{> locale-list}}

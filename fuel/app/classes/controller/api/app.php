@@ -88,8 +88,8 @@ class Controller_Api_App extends Controller_Api
                 static::$app = Tapioca::app($appId);
 
                 // Create app's admin
-                static::$app->add_to_app( $userId, 100 );
-                static::$app->add_admin( $userId );
+                static::$app->add_to_app( $userId, 'admin' );
+                // static::$app->add_admin( $userId );
 
                 $user->add_to_app( $appId );
 

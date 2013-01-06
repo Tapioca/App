@@ -125,7 +125,7 @@ class App
 
 			$this->app    = $app;
 			$this->team   = $app['team'];
-			$this->admins = $app['admins'];
+			// $this->admins = $app['admins'];
 
 			$this->app['locales_keys'] = array();
 
@@ -197,10 +197,10 @@ class App
 			$app['team'] = array();
 		}
 
-		if ( ! array_key_exists('admins', $app))
-		{
-			$app['admins'] = array();
-		}
+		// if ( ! array_key_exists('admins', $app))
+		// {
+		// 	$app['admins'] = array();
+		// }
 
 		if ( ! array_key_exists('locales', $app))
 		{
@@ -689,7 +689,7 @@ class App
 
 		if($query)
 		{		
-			$this->admins[] = $userId;
+			// $this->admins[] = $userId;
 
 			return true;
 		}

@@ -68,7 +68,18 @@ $.Tapioca.Views.AdminAppEdit = $.Tapioca.Views.FormView.extend(
                     // TODO: prevent add user already in app;
                     var selectedModel = $.Tapioca.Users.where( { email: ui.item.value } )[0];
 
-                    self.user('POST', selectedModel.get('id'));
+                    if( !self.isNew )
+                    {
+                        // add new user
+                        self.user('POST', selectedModel.get('id'));
+                    }
+                    else
+                    {
+                        // define admin
+                        self.adminId = selectedModel.get('id');
+                    }
+
+                    $('#new-user').val('');
                 }
             });
 
@@ -143,13 +154,51 @@ $.Tapioca.Views.AdminAppEdit = $.Tapioca.Views.FormView.extend(
         var _data = {
                 name:  $('#name').val()
             },
-            $btn     = $('#app-form-save'),
-            valid    = true, // flag for first admin
-            self     = this;
+            $btn          = $('#app-form-save'),
+            valid         = true, // flag for first admin
+            self          = this,
+            locales       = [],
+            defaultLocale = false;
 
         if( this.isNew )
         {
             _data['slug-suggest'] = $('#slug').val();
+            _data['user']         = this.adminId;
+        }
+
+        $('#locales-form').find('input[name="locale-key"]').each(function( index )
+        {
+            var $this    = $(this),
+                $parent  = $this.parents('li'),
+                _label   = $parent.find('input[name="locale-label"]').val(),
+                _default = $parent.find('input[name="locale-default"]').is(':checked'),
+                _key     = $this.val();
+
+            if( !_.isBlank( _label ) && !_.isBlank( _key ) )
+            {
+                var _obj = {
+                    label: _label,
+                    key:   _key
+                };
+
+                if( _default )
+                {
+                    defaultLocale = true;
+                    _obj.default = true;
+                }
+
+                locales.push( _obj )
+            }
+        });
+
+        if( locales.length > 0 )
+        {
+            if(!defaultLocale)
+            {
+                locales[0].default = true;
+            }
+
+            _data['locales'] = locales;
         }
 
         this.model.set(_data);
@@ -172,6 +221,16 @@ $.Tapioca.Views.AdminAppEdit = $.Tapioca.Views.FormView.extend(
                         var href = $.Tapioca.app.setRoute('adminAppEdit', [ model.get('slug') ] )
 
                         Backbone.history.navigate( href );
+
+                        $('#app-team').show();
+
+                        self.team();
+
+                        var title = $.Tapioca.I18n.get('title.edit_app', model.get('name'))
+
+                        $('#app-name').text( title );
+
+                        self.isNew = false;
                     }
 
                 },
