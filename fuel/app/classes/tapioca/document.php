@@ -864,6 +864,8 @@ class Document
 		}
 
 		$summary = array('digest' => array());
+		
+		$preventDuplicateKey = 0;
 
 		foreach($structure as $v)
 		{
@@ -875,6 +877,11 @@ class Document
 				// deep.nested.key
 				$arrK = explode('.', $v['path']);
 				$storedKey = (count($arrK) > 1) ? end($arrK) : $v['path'];
+
+				if( array_key_exists( $storedKey, $summary['digest']) )
+				{
+					$storedKey = $storedKey. ++$preventDuplicateKey;
+				}
 
 				$summary['digest'][$storedKey] = $value;
 			}
