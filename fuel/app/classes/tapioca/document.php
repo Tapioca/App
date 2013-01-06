@@ -218,7 +218,7 @@ class Document
 					->select( array(), array('_abstract'))
 					->where($where)
 					->order_by(array(
-						'$natural' => 1
+						'created' => -1
 					));
 
 		if( !is_null( $ref ) )
