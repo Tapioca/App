@@ -1,5 +1,5 @@
 
-<table class="table" data-dbref="true">
+<table class="table embed-data" data-dbref="true">
 	<tr>
 		{{{displayDigest digest}}}
 		<td>

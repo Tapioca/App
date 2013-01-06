@@ -987,6 +987,9 @@ header#tapp {
 .embed-ref-list {
 }
 
+.table.embed-data .thumbnails {
+    display: none;
+}
 
 	/* Preview
 	------------------------------ */
