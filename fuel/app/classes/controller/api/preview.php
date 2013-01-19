@@ -29,7 +29,7 @@ class Controller_Api_Preview extends Controller_Api
         }
         catch ( PreviewException $e )
         {
-            static::error( $e->getMessage() );
+            static::error( $e->getMessage(), 400 );
         }
     }
 
