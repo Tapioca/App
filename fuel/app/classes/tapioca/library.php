@@ -322,7 +322,7 @@ class Library
 		$update['user']    = $user->get('id');
 
 		$ret = static::$db
-				->where(array('ref' => $this->file['ref']))
+				->where(array('_ref' => $this->file['_ref']))
 				->update(static::$dbCollectionName, $update);
 
 		if( $ret )
@@ -528,7 +528,7 @@ class Library
 		}
 
 		$new_file = array(
-			'ref'     => uniqid(),
+			'_ref'    => uniqid(),
 			'created' => new \MongoDate(),
 			'presets' => $presets,
 			'user'    => $user->get('id'),
@@ -733,7 +733,7 @@ class Library
 
 				$delete =  static::$db
 							->where(array(
-									'ref' => $this->file['ref']
+									'_ref' => $this->file['_ref']
 							))
 							->delete_all(static::$dbCollectionName);
 
