@@ -85,9 +85,9 @@ class Preview
 		Cast::set($collectionData['cast'], $document);
 
 		// Global before hooks
-		Hook::trigger('before', $document);
+		Hook::trigger('document::before', $document);
 
-		Hook::trigger('before::new', $document);
+		Hook::trigger('document::before::new', $document);
 
 		$limitDate  = ( time() + \Config::get('tapioca.previewLimit') );
 
@@ -97,9 +97,9 @@ class Preview
 
 		$ret = static::$db->insert( static::$dbCollectionName, $document );
 		
-		Hook::trigger('after::new', $document);
+		Hook::trigger('document::after::new', $document);
 
-		Hook::trigger('after', $document);
+		Hook::trigger('document::after', $document);
 
 		// clean return
 		return static::clean( $document );
