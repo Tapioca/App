@@ -1,0 +1,1 @@
+<a href="<?= Uri::create('app/'); ?>{{ appslug }}/{{ namespace }}">{{ name }}</a>
