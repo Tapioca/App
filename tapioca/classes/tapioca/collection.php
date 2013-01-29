@@ -217,11 +217,11 @@ class Collection
                 ->order_by( array( 'name' => 'ASC' ) )
                 ->hash( static::$dbCollectionName, true );
 
-        foreach( $ret->results as &$row)
-        {
-            $row['url']    = \Router::get('api_collection_defined', array('appslug' => $appslug, 'namespace' => $row['namespace']));
-            $row['digest'] = $row['digest']['fields'];
-        }
+        // foreach( $ret->results as &$row)
+        // {
+        //     $row['url']    = \Router::get('api_collection_defined', array('appslug' => $appslug, 'namespace' => $row['namespace']));
+        //     $row['digest'] = $row['digest']['fields'];
+        // }
 
         return $ret;
     }
