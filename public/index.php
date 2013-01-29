@@ -1,5 +1,28 @@
 <?php
 /**
+ * Tapioca: Schema Driven Data Engine 
+ * Flexible CMS build on top of MongoDB, FuelPHP and Backbone.js
+ *
+ * @package   Tapioca
+ * @version   v0.8
+ * @author    Michael Lefebvre
+ * @license   MIT License
+ * @copyright 2013 Michael Lefebvre
+ * @link      https://github.com/Tapioca/App
+ */
+
+/**
+ * Fuel is a fast, lightweight, community driven PHP5 framework.
+ *
+ * @package    Fuel
+ * @version    1.5
+ * @author     Fuel Development Team
+ * @license    MIT License
+ * @copyright  2010 - 2013 Fuel Development Team
+ * @link       http://fuelphp.com
+ */
+
+/**
  * Set error reporting and display errors settings.  You will want to change these when in production.
  */
 error_reporting(-1);
@@ -13,17 +36,17 @@ define('DOCROOT', __DIR__.DIRECTORY_SEPARATOR);
 /**
  * Path to the application directory.
  */
-define('APPPATH', realpath(__DIR__.'/../fuel/app/').DIRECTORY_SEPARATOR);
+define('APPPATH', realpath(__DIR__.'/../tapioca/').DIRECTORY_SEPARATOR);
 
 /**
  * Path to the default packages directory.
  */
-define('PKGPATH', realpath(__DIR__.'/../fuel/packages/').DIRECTORY_SEPARATOR);
+define('PKGPATH', realpath(__DIR__.'/../tapioca/packages/').DIRECTORY_SEPARATOR);
 
 /**
  * The path to the framework core.
  */
-define('COREPATH', realpath(__DIR__.'/../fuel/core/').DIRECTORY_SEPARATOR);
+define('COREPATH', realpath(__DIR__.'/../tapioca/core/').DIRECTORY_SEPARATOR);
 
 // Get the start time and memory for use later
 defined('FUEL_START_TIME') or define('FUEL_START_TIME', microtime(true));
@@ -40,9 +63,19 @@ try
 catch (HttpNotFoundException $e)
 {
 	$route = array_key_exists('_404_', Router::$routes) ? Router::$routes['_404_']->translation : Config::get('routes._404_');
-	if ($route)
+
+	if($route instanceof Closure)
 	{
-		$response = Request::forge($route)->execute()->response();
+		$response = $route();
+
+		if( ! $response instanceof Response)
+		{
+			$response = Response::forge($response);
+		}
+	}
+	elseif ($route)
+	{
+		$response = Request::forge($route, false)->execute()->response();
 	}
 	else
 	{
@@ -62,6 +95,3 @@ $response->body(
 );
 
 $response->send(true);
-
-// Fire off the shutdown event
-Event::shutdown();

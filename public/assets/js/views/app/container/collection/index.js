@@ -36,7 +36,7 @@ $.Tapioca.Views.Collection = $.Tapioca.Views.Content.extend(
                 baseUri:    this.baseUri,
                 name:       this.model.get('name'),
                 namespace:  this.model.get('namespace'),
-                digest:     this.model.get('digest')
+                digest:     this.model.get('digest.fields')
             });
 
         this.html( html );
