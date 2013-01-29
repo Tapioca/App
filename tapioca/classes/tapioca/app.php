@@ -166,7 +166,9 @@ class App
             static::$db->where_in( 'slug', explode(';', $set) );
         }
 
-        $apps = static::$db->hash( static::$dbCollectionName, true );
+        $apps = static::$db
+                    ->select(array(), array('api'))
+                    ->hash( static::$dbCollectionName, true );
 
         return $apps;
     }
