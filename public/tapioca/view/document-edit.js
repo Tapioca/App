@@ -792,7 +792,8 @@ define([
 						buttons: ['html', '|', 'bold', 'italic', 'link'],
 						airButtons: ['bold', 'italic', 'link'],
 						keyupCallback: self.change,
-						paragraphy: false
+						paragraphy: false,
+						cleanup: true 
 					}, config);
 
 				$this
