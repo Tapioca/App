@@ -248,27 +248,24 @@ $.Tapioca.Components.Display = {
 
     fileSize: function( bytes )
     {
-        var to = 'ko';
-
-        if( bytes >= 1048576)
-            to = 'mo';
-
-        if( bytes >= 1073741824)
-            to = 'go';
-
-        switch( to )
+        if ( bytes < 1024)
         {
-            case 'ko':
-                    return Math.round(( bytes / 1024), 2) + ' ko';
-                break;
+            return bytes;
+        }
 
-            case 'mo':
-                    return Math.round(( bytes / 1024)/1024, 2)  + ' mo';
-                break;
-           
-            case 'go':
-                    return Math.round(( bytes / 1024)/1024/1024, 2) + ' go';
-                break;
+        if ( bytes < 1024 * 1024)
+        {
+            return Math.round(bytes/1024, 2) + ' ko';
+        }
+
+        if ( bytes < 1024 * 1024 * 1024)
+        {
+            return Math.round( bytes/1024/1024, 2) + ' mo';
+        }
+
+        if ($bytes < 1024 * 1024 * 1024 * 1024)
+        {
+            return Math.round($bytes/1024/1024/1024, 2) + ' go';
         }
     },
 
