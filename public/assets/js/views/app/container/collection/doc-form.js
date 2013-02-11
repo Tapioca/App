@@ -20,10 +20,6 @@ $.Tapioca.Views.DocForm = Backbone.View.extend(
         this.tplEmbedRef = Handlebars.compile( $.Tapioca.Tpl.app.container.collection['embed-ref'] );
         this.tplThumb    = Handlebars.compile( $.Tapioca.Tpl.app.container.collection.thumb );
 
-        this.factory.walk( this.schema, '', '');
-
-        this.getDependencies();
-
         // Handlebars Helpers
 
         var self = this;
@@ -76,6 +72,10 @@ $.Tapioca.Views.DocForm = Backbone.View.extend(
                 return self.docPreview(context, abstract.get('digest'), prefix);
             }
         });
+
+        this.factory.walk( this.schema, '', '');
+
+        this.getDependencies();
 
         return this;
     },
