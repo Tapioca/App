@@ -126,6 +126,17 @@ $.Tapioca.Views.CollectionEdit = $.Tapioca.Views.FormView.extend(
                         var href = $.Tapioca.app.setRoute('appCollectionEdit', [ appslug, self.namespace ] )
 
                         Backbone.history.navigate( href );
+
+                        var _namespace = model.get('namespace'),
+                            _abstracts = new $.Tapioca.Collections.Abstracts({
+                                appslug:   appslug,
+                                namespace: self.namespace
+                            });
+
+                        $.Tapioca.UserApps[ appslug ].data[ self.namespace ] = {
+                            schema:    false, 
+                            abstracts: _abstracts
+                        };
                     }
 
                     self.resetForm();

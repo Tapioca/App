@@ -23,21 +23,24 @@ $.Tapioca.Views.NavApp = Backbone.View.extend(
     render: function()
     {
         var model = this.model.toJSON(),
-            tpl   = Handlebars.compile( $.Tapioca.Tpl.app.nav.app ),
-            cols  = $.Tapioca.UserApps[ this.appslug ].collections;
+            tpl   = Handlebars.compile( $.Tapioca.Tpl.app.nav.app );
+
+        this.cols  = $.Tapioca.UserApps[ this.appslug ].collections;
+
+        this.cols.bind('add', this.displayCollection, this);
 
         model.isAppAdmin = this.model.isAppAdmin();
     
         this.$el.html( tpl( model ));
 
-        if( cols.length > 0)
+        if( this.cols.length )
         {
             this.$el.find('li.app-nav-collections-empty').remove();
         }
 
         this.$list = $('#app-nav-collections-' + this.appslug );
 
-        _.each( $.Tapioca.UserApps[ this.appslug ].collections.models, this.displayCollection, this);
+        _.each( this.cols.models, this.displayCollection, this);
 
         this.$navLinks = this.$el.find('li a');
 
@@ -80,6 +83,8 @@ $.Tapioca.Views.NavApp = Backbone.View.extend(
 
     onClose: function()
     {
+        this.cols.unbind('add', this.displayCollection);
+
         for( var i in this.viewpointer)
         {
             this.viewpointer[ i ].close();  
