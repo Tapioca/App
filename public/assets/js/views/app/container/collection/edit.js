@@ -57,9 +57,9 @@ $.Tapioca.Views.CollectionEdit = $.Tapioca.Views.FormView.extend(
 
         this.$namespace = $('#namespace');
 
-        this.editor();
+        //this.editor();
         // this.$el.find('textarea.lined').linedtextarea();
-
+        this.resetForm();
 
         return this;
     },
@@ -139,7 +139,7 @@ $.Tapioca.Views.CollectionEdit = $.Tapioca.Views.FormView.extend(
                         };
                     }
 
-                    self.resetForm();
+                    self.render();
                 },
                 error: function(model, response)
                 {

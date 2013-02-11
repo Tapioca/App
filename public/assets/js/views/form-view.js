@@ -63,13 +63,19 @@ $.Tapioca.Views.FormView = $.Tapioca.Views.Content.extend({
 
         this.unLoadToken = $.Tapioca.BeforeUnload.set(true, this.unLoadToken);
 
+        this.getSubmitBtn();        
+    },
+
+    getSubmitBtn: function()
+    {
         if( !this.$btnSubmit )
         {
+            console.log('no btn defined')
             this.$btnSubmit = this.$el.find('button[type="submit"]');
+            console.log(this.$btnSubmit )
 
             this.$btnSubmit.removeClass('disabled').removeAttr('disabled');
         }
-        
     },
 
     onEnter: function(event)
@@ -103,6 +109,8 @@ $.Tapioca.Views.FormView = $.Tapioca.Views.Content.extend({
     {
         $.Tapioca.BeforeUnload.clean();
 
+        this.getSubmitBtn();
+        
         this.$btnSubmit.button('reset');
         this.$btnSubmit.attr('disabled', 'disabled').addClass('disabled');
     },
