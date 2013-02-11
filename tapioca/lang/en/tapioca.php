@@ -13,6 +13,8 @@
 
 return array(
 
+    'new_version_available'  => 'A Tapioca update is available. You are running Tapioca version <tt>:installed</tt>. The current version is :lastest. Visit <a href="http://tapioca.io">tapioca.io</a> for more information.',
+
     /** General Exception Messages **/
     'account_not_activated'  => 'User has not activated their account.',
     'account_is_disabled'    => 'This account has been disabled.',

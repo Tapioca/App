@@ -96,6 +96,26 @@ class Tapioca
     }
 
     /**
+     * Return version id
+     *
+     * @return  string
+     */
+    public static function getVersion()
+    {
+        return static::$version;
+    }
+
+    /**
+     * Return if we decide to skip update check
+     *
+     * @return  bool
+     */
+    public static function skipUpdateCheck()
+    {
+        return Config::get('tapioca.skip_update');
+    }
+
+    /**
      * @param   string app slug
      * @param   string Collection namespace.
      * @throws  TapiocaException

@@ -20,6 +20,9 @@
 
 return array(
 
+    'version_url' => 'https://raw.github.com/Tapioca/App/API_v2/VERSION',
+    'skip_update' => false,
+
     'default_password' => 'azerty',
 
     'date' => array(
