@@ -9,7 +9,8 @@ $.Tapioca.Views.CollectionEdit = $.Tapioca.Views.FormView.extend(
 
         this.tplPreview = Handlebars.compile( $.Tapioca.Tpl.app.container.collection['preview-edit'] );
 
-        this.model.bind('reset', this.render, this);
+        this.model.bind('reset',  this.render, this);
+        this.model.bind('change', this.displayJson, this);
 
         return this;
     },
@@ -38,12 +39,12 @@ $.Tapioca.Views.CollectionEdit = $.Tapioca.Views.FormView.extend(
     {
         var model       = this.model.toJSON();
 
-        if( !this.isNew )
-        {
-            model.schema        = JSON.stringify( model.schema,        null, ' ');
-            model.digest.fields = JSON.stringify( model.digest.fields, null, ' ');
-            model.hooks         = JSON.stringify( model.hooks,      null, ' ');            
-        }
+        // if( !this.isNew )
+        // {
+        //     model.schema        = JSON.stringify( model.schema,        null, ' ');
+        //     model.digest.fields = JSON.stringify( model.digest.fields, null, ' ');
+        //     model.hooks         = JSON.stringify( model.hooks,         null, ' ');            
+        // }
 
         model.isNew     = this.isNew;
         model.pageTitle = ( this.isNew ) ?
@@ -59,9 +60,19 @@ $.Tapioca.Views.CollectionEdit = $.Tapioca.Views.FormView.extend(
 
         //this.editor();
         // this.$el.find('textarea.lined').linedtextarea();
-        this.resetForm();
+
+        this.displayJson()
 
         return this;
+    },
+
+    displayJson: function()
+    {
+        var model = this.model.toJSON();
+
+        $('#schema').val( JSON.stringify( model.schema,        null, ' ') );
+        $('#digest').val( JSON.stringify( model.digest.fields, null, ' ') );
+        $('#hooks').val(  JSON.stringify( model.hooks,         null, ' ') );
     },
 
     editor: function()
@@ -139,7 +150,7 @@ $.Tapioca.Views.CollectionEdit = $.Tapioca.Views.FormView.extend(
                         };
                     }
 
-                    self.render();
+                    self.resetForm();
                 },
                 error: function(model, response)
                 {
@@ -153,5 +164,7 @@ $.Tapioca.Views.CollectionEdit = $.Tapioca.Views.FormView.extend(
     onClose: function()
     {
         // $('#form').off();
+        this.model.unbind('reset',  this.render);
+        this.model.unbind('change', this.displayJson);
     }
 });

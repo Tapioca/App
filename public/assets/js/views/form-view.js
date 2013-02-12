@@ -70,9 +70,7 @@ $.Tapioca.Views.FormView = $.Tapioca.Views.Content.extend({
     {
         if( !this.$btnSubmit )
         {
-            console.log('no btn defined')
             this.$btnSubmit = this.$el.find('button[type="submit"]');
-            console.log(this.$btnSubmit )
 
             this.$btnSubmit.removeClass('disabled').removeAttr('disabled');
         }
