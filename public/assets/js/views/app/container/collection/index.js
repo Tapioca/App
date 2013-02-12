@@ -39,6 +39,17 @@ $.Tapioca.Views.Collection = $.Tapioca.Views.Content.extend(
                 digest:     this.model.get('digest.fields')
             });
 
+        this.digest = {};
+
+        _.each( this.model.get('digest.fields'), function( entry )
+        {
+            var arr = entry.path.split('.')
+              , str = arr[ arr.length - 1 ];
+
+            this.digest[ str ] = str;
+
+        }, this);
+
         this.html( html );
 
         this.$table = this.$el.find('tbody');
@@ -59,12 +70,13 @@ $.Tapioca.Views.Collection = $.Tapioca.Views.Content.extend(
     displayRow: function( model )
     {
         this.viewpointer[ model.cid ] = new $.Tapioca.Views.CollectionRow({
-            model:     model,
-            appslug:   this.appslug,
-            namespace: this.namespace,
-            tpl:       this.tplRow,
-            locale:    this.locale,
-            parent:    this.$table
+            model:        model,
+            appslug:      this.appslug,
+            namespace:    this.namespace,
+            tpl:          this.tplRow,
+            locale:       this.locale,
+            parent:       this.$table,
+            digestSchema: this.digest
         });
     },
 

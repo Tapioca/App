@@ -5,10 +5,11 @@ $.Tapioca.Views.CollectionRow = Backbone.View.extend(
 
     initialize: function( options )
     {
-        this.appslug   = options.appslug;
-        this.namespace = options.namespace;
-        this.tpl       = options.tpl;
-        this.locale    = options.locale;
+        this.appslug      = options.appslug;
+        this.namespace    = options.namespace;
+        this.tpl          = options.tpl;
+        this.locale       = options.locale;
+        this.digestSchema = options.digestSchema;
 
         this.$el.appendTo( options.parent );
 
@@ -30,11 +31,12 @@ $.Tapioca.Views.CollectionRow = Backbone.View.extend(
         var model = this.model.toJSON(),
             args  = [ this.appslug, this.namespace, model._ref ];
 
-        model.appslug    = this.appslug;
-        model.namespace  = this.namespace;
-        model.locale     = this.locale;
-        model.isAppAdmin = $.Tapioca.Session.isAdmin();
-        model.uri        = $.Tapioca.app.setRoute('appCollectionRef', args);
+        model.appslug      = this.appslug;
+        model.namespace    = this.namespace;
+        model.locale       = this.locale;
+        model.isAppAdmin   = $.Tapioca.Session.isAdmin();
+        model.uri          = $.Tapioca.app.setRoute('appCollectionRef', args);
+        model.digestSchema = this.digestSchema;
 
         this.$el.html( this.tpl( model ) );
 

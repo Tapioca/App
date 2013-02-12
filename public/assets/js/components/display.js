@@ -111,17 +111,19 @@ $.Tapioca.Components.Display = {
     {
         var _html    = '',
             urlStart = '',
-            urlEnd   = '';
+            urlEnd   = '',
+            schema   = ( !_.isUndefined( options.hash.schema ) ) ? options.hash.schema : digest;
 
         if( !_.isUndefined( options.hash.uri ) )
         {
             urlStart = '<a href="' + options.hash.uri + '">';
             urlEnd   = '</a>';
         }
-
-        for(var i in digest)
+        
+        for(var i in schema)
         {
-            _html += '<td>' + urlStart + digest[i] +  urlEnd + '</td>';
+            var str = ( !_.isUndefined( digest[i] )) ? urlStart + digest[i] +  urlEnd : '';
+            _html += '<td>' + str + '</td>';
         }
 
         return _html;

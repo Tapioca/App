@@ -1,5 +1,5 @@
 
-                                {{{displayDigest digest uri=uri}}}
+                                {{{displayDigest digest schema=digestSchema uri=uri}}}
                                 <td>
                                     <div class="dropdown btn-group">
                                         {{{docStatus revisions locale.key }}}
