@@ -86,6 +86,7 @@ $.Tapioca.Views.LibraryRow = Backbone.View.extend(
     select: function()
     {
         var ret = {
+            _ref:     this.model.get('_ref'),
             filename: this.model.get('filename'),
             category: this.model.get('category')
         }
