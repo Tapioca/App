@@ -122,10 +122,10 @@ $.Tapioca.Views.EmbedFile = Backbone.View.extend(
 
     clearList: function()
     {
-        _.each( this.viewpointer, function( view )
+        for( var i in this.viewpointer)
         {
-            view.close();
-        }, this);
+            this.viewpointer[ i ].close();  
+        }
     }
 
 });
