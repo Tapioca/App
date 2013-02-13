@@ -340,6 +340,14 @@ class Library
         {
             // TODO: worker update dependencies
 
+            $resqueArgs = array(
+                'appslug'    => static::$app->get('slug'),
+                '_ref'       => $this->file['_ref']
+            );
+            
+            // check for documents to update
+            Tapioca::enqueueJob( static::$app->get('slug'), '\\Tapioca\\Jobs\\Dependency\\File', $resqueArgs, null);
+
             return array_merge( $this->file, $update );
         }
         else

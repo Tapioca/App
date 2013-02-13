@@ -11,11 +11,11 @@
  * @link      https://github.com/Tapioca/App
  */
 
-namespace Tapioca\Jobs;
+namespace Tapioca\Jobs\Dependency;
 
 use Tapioca;
 
-class Dependency
+class Document
 {
     public function perform()
     {
@@ -27,7 +27,7 @@ class Dependency
 
         $dbCollectionName = $this->args['appslug'].'-'.$this->args['collection'];
         $where = array(
-                        '_ref'              => $this->args['ref'],
+                        '_ref'              => $this->args['_ref'],
                         '_tapioca.revision' => $this->args['revision'],
                     );
 
@@ -84,7 +84,7 @@ class Dependency
 
                     $update = array('$set' => array($dependency['path'].'.embedded' => $set) );
 
-                    $where = array( $path             => $this->args['ref'],
+                    $where = array( $path             => $this->args['_ref'],
                                     '_tapioca.locale' => $this->args['locale'],
                                     '_tapioca.status' => 100
                                 );

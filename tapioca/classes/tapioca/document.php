@@ -783,13 +783,13 @@ class Document
             $resqueArgs = array(
                 'appslug'    => static::$app->get('slug'),
                 'collection' => static::$collection->namespace,
-                'ref'        => static::$ref,
+                '_ref'       => static::$ref,
                 'locale'     => static::$locale,
                 'revision'   => $revision
             );
             
             // check for documents to update
-            Tapioca::enqueueJob( static::$app->get('slug'), '\\Tapioca\\Jobs\\Dependency', $resqueArgs, null);
+            Tapioca::enqueueJob( static::$app->get('slug'), '\\Tapioca\\Jobs\\Dependency\\Document', $resqueArgs, null);
         }
 
         // After status update hooks
