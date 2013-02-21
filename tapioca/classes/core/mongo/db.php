@@ -14,6 +14,17 @@
 class Mongo_Db extends Fuel\Core\Mongo_Db
 {
     /**
+     * Magic get method to allow getting class properties but still having them protected
+     * to disallow writing.
+     *
+     * @return  mixed
+     */
+    public function __get( $name )
+    {
+        return $this->{ $name };
+    }
+
+    /**
     *   --------------------------------------------------------------------------------
     *   // Hash
     *   --------------------------------------------------------------------------------
@@ -66,5 +77,10 @@ class Mongo_Db extends Fuel\Core\Mongo_Db
     public function listCollections()
     {
         return $this->db->listCollections();
+    }
+
+    public function selectCollection( $collection )
+    {
+        return $this->db->selectCollection( $collection );
     }
 }

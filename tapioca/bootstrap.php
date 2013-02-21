@@ -15,8 +15,11 @@ Autoloader::add_classes(array(
     'Controller_Rest'   => APPPATH.'classes/core/controller/rest.php',
     'Form_Instance'     => APPPATH.'classes/core/form/instance.php',
 
-    'Mongo_Db'          => APPPATH.'classes/core/mongo/db.php',
-    'GridFs'            => APPPATH.'classes/core/mongo/gridfs.php', 
+    'Mongo_Db'               => APPPATH.'classes/core/mongo/db.php',
+    'GridFs'                 => APPPATH.'classes/core/mongo/gridfs.php', 
+    'GridFsException'        => APPPATH.'classes/core/mongo/gridfs.php', 
+    'MongoDbExport'          => APPPATH.'classes/core/mongo/export.php', 
+    'MongoDbExportException' => APPPATH.'classes/core/mongo/export.php', 
 
     'Phpredis'          => APPPATH.'classes/core/phpredis.php',
     'Set'               => APPPATH.'classes/core/set.php',
