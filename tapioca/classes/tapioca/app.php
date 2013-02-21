@@ -257,16 +257,21 @@ class App
      * Gets a given field (or array of fields).
      *
      * @param   string|array  Field(s) to get
+     * @param   array         Collections status to return
      * @return  mixed
      * @throws  AppException
      */
-    public function get($field = null)
+    public function get( $field = null, $collectionStatus = array('public'))
     {
         // make sure a app id is set
         if (empty($this->app['_id']))
         {
             throw new \AppException(__('tapioca.no_app_selected'));
         }
+
+        $collections = \Collection::getAll( $this->app['slug'], $collectionStatus );
+
+        $this->app['collections'] = $collections->results;
 
         // if no fields were passed - return entire app
         if ( is_null( $field ) )

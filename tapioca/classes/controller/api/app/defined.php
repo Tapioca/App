@@ -57,7 +57,25 @@ class Controller_Api_App_Defined extends Controller_Api
             return;
         }
 
-        static::$data   = static::$app->get();
+        // defined what kind of collection
+        // user can see
+        $availableStatus  = Config::get('tapioca.collection.status');
+        $userCapabilities = array();
+
+        foreach( $availableStatus as $status )
+        {
+            $permission = 'app_read_collections_' . $status;
+
+            try
+            {
+                Permissions::isGranted( $permission );
+
+                $userCapabilities[] = $status;
+            }
+            catch( PermissionsException $e){}
+        }
+
+        static::$data   = static::$app->get( null, $userCapabilities );
         static::$status = 200;
     }
 
