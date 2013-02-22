@@ -61,6 +61,11 @@ class Library
     /**
      * @var  string  app root storage path
      */
+    protected static $rootStorage = null;
+
+    /**
+     * @var  string  app preview storage
+     */
     protected static $appStorage = null;
 
     /**
@@ -81,7 +86,7 @@ class Library
      * @param   string  Filename
      * @return  void
      */
-    public function __construct(App $app, \Gaufrette\Filesystem $storage, $filename = null)
+    public function __construct(App $app, $filename = null)
     {
         // load and set config
         static::$app              = $app;
@@ -90,11 +95,13 @@ class Library
 // \Debug::dump($storage);
 // exit();
 
-        static::$storage    = $storage; //Config::get('tapioca.upload.storage');
-        // static::$appStorage = static::$storage.static::$app->get('slug');
+        static::$storage     = new Storage( static::$app ); 
+
+        static::$rootStorage = Config::get('tapioca.upload.storage');
+        static::$appStorage  = static::$rootStorage.static::$app->get('slug');
         
-        static::$db         = \Mongo_Db::instance();
-        static::$gfs        = \GridFs::getFs(static::$db);
+        static::$db          = \Mongo_Db::instance();
+        static::$gfs         = \GridFs::getFs(static::$db);
 
         // if a Name was passed
         if ($filename)
@@ -213,7 +220,8 @@ class Library
     public function get_path($full_path = true, $preset = null)
     {
         $path = static::$appStorage.DIRECTORY_SEPARATOR.$this->file['category'].DIRECTORY_SEPARATOR;
-
+\Debug::dump( $path );
+exit;
         if(!$full_path)
         {
             return $path;
@@ -304,6 +312,7 @@ class Library
             unset($fields['basename']);
 
             // update files name on filesystem
+            // TODO: rename
 
             $file_path = static::$appStorage.DIRECTORY_SEPARATOR.$this->file['category'].DIRECTORY_SEPARATOR;
 
@@ -591,10 +600,16 @@ class Library
             // $preview_name    = 'preview-'.$fields['filename'];
             // $preview_path    = $saved_to.DIRECTORY_SEPARATOR.$preview_tmpname;
 
-            $this->store($preview_name, $preview_path, $fields['category'], false); 
+            $this->storePreview($preview_name, $preview_path, $fields['category'], false); 
         }
 
-        $this->store($fields['filename'], $file_path, $fields['category'], $import);    
+        // get file content
+        $fileContent = File::read( $file_path, true );
+        
+        // remove original file
+        unlink($file_path);
+
+        static::$storage->store( $fields['filename'], $fields['category'], $fileContent );
     }
 
     /**
@@ -665,19 +680,19 @@ class Library
         return false;
     }
 
-    private function store($filename, $path, $category, $import)
+    private function storePreview( $filename, $path, $category )
     {
         $cat_path     = static::$appStorage.DIRECTORY_SEPARATOR.$category;
         $file_path    = $cat_path.DIRECTORY_SEPARATOR.$filename;
 
-        if(!is_dir(static::$appStorage))
+        if( !is_dir( static::$appStorage ) )
         {
-            File::create_dir(static::$storage, static::$app->get('slug'), 0755);            
+            File::create_dir( static::$rootStorage, static::$app->get('slug'), 0755);            
         }
 
         if(!is_dir($cat_path))
         {
-            File::create_dir(static::$appStorage, $category, 0755);         
+            File::create_dir( static::$appStorage, $category, 0755 );
         }
 
         if(file_exists($file_path))
@@ -686,11 +701,6 @@ class Library
         }
 
         File::copy($path, $file_path);
-
-        if(!$import)
-        {
-            unlink($path);
-        }
     }
 
     public function delete_all(User $user)
@@ -734,6 +744,7 @@ class Library
             // delete files + mongoDb data
             if(!$soft)
             {
+                // TODO: delete
                 $cat_path = static::$appStorage.DIRECTORY_SEPARATOR.$this->file['category'];
 
                 if($this->file['category'] == 'image')

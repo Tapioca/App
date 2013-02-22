@@ -6,12 +6,12 @@
         "source": {
             "type": "git",
             "url": "https://github.com/KnpLabs/Gaufrette.git",
-            "reference": "c1e4a65e08ed5d3efa3c7500ae0350417bd490b9"
+            "reference": "48564afd2b873e9dbf2f989deee374cfe921898a"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/KnpLabs/Gaufrette/zipball/c1e4a65e08ed5d3efa3c7500ae0350417bd490b9",
-            "reference": "c1e4a65e08ed5d3efa3c7500ae0350417bd490b9",
+            "url": "https://api.github.com/repos/KnpLabs/Gaufrette/zipball/48564afd2b873e9dbf2f989deee374cfe921898a",
+            "reference": "48564afd2b873e9dbf2f989deee374cfe921898a",
             "shasum": ""
         },
         "require": {
@@ -36,7 +36,7 @@
             "ext-zip": "to use the Zip adapter",
             "knplabs/knp-gaufrette-bundle": "*"
         },
-        "time": "2013-02-15 18:55:41",
+        "time": "2013-02-22 18:46:51",
         "type": "library",
         "extra": {
             "branch-alias": {

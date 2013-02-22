@@ -31,30 +31,65 @@ class StorageException extends FuelException {}
 
 class Storage
 {
-    public static function setAdaptator( App $app )
+    // filesystem instances
+    private $fs = array();
+
+    private $adapter;
+
+    private $app;
+
+    public function __construct( App $app )
     {
+        $this->app = $app;
+
         try
         {
-            $storageMethod = $app->get('storage');            
+            $this->method = $app->get('storage.method');            
         }
         catch( AppException $e )
         {
-            $storageMethod = 'locale';
+            $this->method = 'locale';
+        }
+    }
+
+    private function getApadtapor( $category )
+    {
+        if( array_key_exists( $category,  $this->fs ) )
+        {
+            return $this->fs[ $category ];
         }
 
-
-        switch( $storageMethod )
+        switch( $this->method )
         {
             case 'ftp':
                         $adapter    = new FtpAdapter('/test', 'unik.ultranoir.com', array('username' => 'unik', 'password' => 'n0iru1tr@', 'create' => true));
                         break;
             default:
                         $path       = Config::get('tapioca.upload.storage');
-                        $appStorage = $path.$app->get('slug');
+                        $appStorage = $path.$this->app->get('slug');
 
-                        $adapter = new LocalAdapter( $appStorage, true );
+                        $adapter = new LocalAdapter( $appStorage.DIRECTORY_SEPARATOR.$category, true );
         }
 
-        return new Filesystem($adapter);
+        $this->fs[ $category ] = new Filesystem( $adapter );
+
+        return $this->fs[ $category ];
+    }
+
+    public function store( $filename, $category, $fileContent )
+    {
+        $fs = $this->getApadtapor( $category );
+
+        return $fs->write( $filename, $fileContent );
+    }
+
+    public function rename()
+    {
+
+    }
+
+    public function delete()
+    {
+        
     }
 }

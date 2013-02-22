@@ -43,7 +43,7 @@ class Controller_Api_Library extends Controller_Api
         // filename
         $filename  = $this->param('filename', null);
         $extension = Input::extension();
-        $storage   = Storage::setAdaptator( static::$app );
+        // $storage   = Storage::setAdaptator( static::$app );
 
         if(  !is_null( $filename ) &&  !is_null( $extension ))
         {
@@ -54,7 +54,7 @@ class Controller_Api_Library extends Controller_Api
         {
             try
             {
-                static::$file = Tapioca::library( static::$app, $storage, static::$filename );
+                static::$file = Tapioca::library( static::$app, static::$filename );
             }
             catch( \TapiocaException $e)
             {
@@ -63,7 +63,7 @@ class Controller_Api_Library extends Controller_Api
         }
         else
         {
-            static::$file = Tapioca::library( static::$app, $storage );
+            static::$file = Tapioca::library( static::$app );
         }
     }
 
