@@ -17,6 +17,7 @@ use FuelException;
 use Config;
 use Upload;
 use File;
+use Gaufrette\Filesystem;
 
 class LibraryException extends FuelException {}
 
@@ -75,18 +76,22 @@ class Library
     /**
      * Loads in the File object
      *
-     * @param   string  App instance
+     * @param   object  App instance
+     * @param   object  Filesystem instance
      * @param   string  Filename
      * @return  void
      */
-    public function __construct(App $app, $filename = null)
+    public function __construct(App $app, \Gaufrette\Filesystem $storage, $filename = null)
     {
         // load and set config
         static::$app              = $app;
         static::$dbCollectionName = static::$app->get('slug').'--library';
 
-        static::$storage    = Config::get('tapioca.upload.storage');
-        static::$appStorage = static::$storage.static::$app->get('slug');
+// \Debug::dump($storage);
+// exit();
+
+        static::$storage    = $storage; //Config::get('tapioca.upload.storage');
+        // static::$appStorage = static::$storage.static::$app->get('slug');
         
         static::$db         = \Mongo_Db::instance();
         static::$gfs        = \GridFs::getFs(static::$db);
@@ -338,8 +343,6 @@ class Library
 
         if( $ret )
         {
-            // TODO: worker update dependencies
-
             $resqueArgs = array(
                 'appslug'    => static::$app->get('slug'),
                 '_ref'       => $this->file['_ref']

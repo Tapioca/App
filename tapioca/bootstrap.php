@@ -54,6 +54,7 @@ Autoloader::add_classes(array(
     'Tapioca\\Document'                   => APPPATH.'classes/tapioca/document.php',
     'Tapioca\\Rules'                      => APPPATH.'classes/tapioca/rules.php',
     'Tapioca\\Library'                    => APPPATH.'classes/tapioca/library.php',
+    'Tapioca\\Storage'                    => APPPATH.'classes/tapioca/storage.php',
     'Tapioca\\Hook'                       => APPPATH.'classes/tapioca/hook.php',
     'Tapioca\\Cast'                       => APPPATH.'classes/tapioca/cast.php',
     'Tapioca\\Preview'                    => APPPATH.'classes/tapioca/preview.php',
