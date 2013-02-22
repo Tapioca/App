@@ -68,6 +68,9 @@ Autoloader::add_classes(array(
 // Register the autoloader
 Autoloader::register();
 
+// Composer
+require APPPATH.'vendor/autoload.php';
+
 /**
  * Your environment.  Can be set to any of the following:
  *

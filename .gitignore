@@ -11,4 +11,5 @@ hooks/*
 public/assets/cache/*
 public/temp
 public/files/*/*/*
+composer.phar
 !.gitkeep

@@ -1,0 +1,8 @@
+{
+     "config": {
+        "vendor-dir": "tapioca/vendor"
+    },
+    "require": {
+        "knplabs/gaufrette": "dev-master"
+    }
+}
