@@ -103,6 +103,12 @@ class App
         unset( $this->app['locales_keys'] );
         unset( $this->app['locale_default'] );
         unset( $this->app['api'] );
+
+        if( isset( $this->app['storage'] ))
+        {
+            unset( $this->app['storage']['password'] );
+            unset( $this->app['storage']['username'] );
+        }
     }
 
 
@@ -269,13 +275,14 @@ class App
             throw new \AppException(__('tapioca.no_app_selected'));
         }
 
-        $collections = \Collection::getAll( $this->app['slug'], $collectionStatus );
-
-        $this->app['collections'] = $collections->results;
-
         // if no fields were passed - return entire app
         if ( is_null( $field ) )
         {
+
+            $collections = \Collection::getAll( $this->app['slug'], $collectionStatus );
+
+            $this->app['collections'] = $collections->results;
+
             $public = clone $this;
 
             return $public->app;

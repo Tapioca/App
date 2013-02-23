@@ -44,7 +44,7 @@ class Storage
 
         try
         {
-            $this->method = $app->get('storage.method');            
+            $this->method = $app->get('storage.method');
         }
         catch( AppException $e )
         {
@@ -62,7 +62,15 @@ class Storage
         switch( $this->method )
         {
             case 'ftp':
-                        $adapter    = new FtpAdapter('/test', 'unik.ultranoir.com', array('username' => 'unik', 'password' => 'n0iru1tr@', 'create' => true));
+                        $path     = $this->app->get('storage.path');
+                        $host     = $this->app->get('storage.host');
+                        $username = $this->app->get('storage.username');
+                        $password = $this->app->get('storage.password');
+
+                        if( substr( $path, -1) != '/' )
+                            $path .=  '/';
+
+                        $adapter    = new FtpAdapter( $path.$category, $host, array('username' => $username, 'password' => $password, 'create' => true));
                         break;
             default:
                         $path       = Config::get('tapioca.upload.storage');
