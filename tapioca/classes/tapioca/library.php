@@ -71,7 +71,7 @@ class Library
     /**
      * @var  array  prefix for presets
      */
-    protected static $presets = array('', 'preview');
+    protected static $presets = array('');
 
     /**
      * @var  array Errors list
@@ -220,8 +220,7 @@ class Library
     public function get_path($full_path = true, $preset = null)
     {
         $path = static::$appStorage.DIRECTORY_SEPARATOR.$this->file['category'].DIRECTORY_SEPARATOR;
-\Debug::dump( $path );
-exit;
+
         if(!$full_path)
         {
             return $path;
@@ -311,23 +310,26 @@ exit;
 
             unset($fields['basename']);
 
-            // update files name on filesystem
-            // TODO: rename
-
-            $file_path = static::$appStorage.DIRECTORY_SEPARATOR.$this->file['category'].DIRECTORY_SEPARATOR;
+            // update filenames
 
             $prefix    = array_merge( static::$presets, $this->file['presets'] );
 
             foreach( $prefix as $p)
             {
-                if( !empty( $p))
+                if( !empty( $p ))
                     $p = $p.'-';
 
-                $old = $file_path.$p.$this->file['filename'];
-                $new = $file_path.$p.$update['filename'];
+                $old = $p.$this->file['filename'];
+                $new = $p.$update['filename'];
 
-                File::rename( $old, $new );
+                static::$storage->rename( $this->file['category'], $old, $new );
             }
+
+            // update preview filename
+
+            $previewStorage = new Storage( static::$app, true ); 
+            $previewStorage->rename( $this->file['category'], 'preview-'.$this->file['filename'], 'preview-'.$update['filename'] );
+
         }
 
         // if updating tags
@@ -595,12 +597,15 @@ exit;
                 ->crop_resize(100, 100)
                 ->save($preview_path);
 
-            // $saved_to        = Config::get('tapioca.upload.path');
-            // $preview_tmpname = 'preview-'.$saved_as;
-            // $preview_name    = 'preview-'.$fields['filename'];
-            // $preview_path    = $saved_to.DIRECTORY_SEPARATOR.$preview_tmpname;
+            // get file content
+            $fileContent = File::read( $preview_path, true );
 
-            $this->storePreview($preview_name, $preview_path, $fields['category'], false); 
+            // remove preview file
+            unlink($preview_path);
+
+            $previewStorage = new Storage( static::$app, true ); 
+
+            $previewStorage->store($preview_name, $fields['category'], $fileContent ); 
         }
 
         // get file content
@@ -680,28 +685,28 @@ exit;
         return false;
     }
 
-    private function storePreview( $filename, $path, $category )
-    {
-        $cat_path     = static::$appStorage.DIRECTORY_SEPARATOR.$category;
-        $file_path    = $cat_path.DIRECTORY_SEPARATOR.$filename;
+    // private function storePreview( $filename, $path, $category )
+    // {
+    //     $cat_path     = static::$appStorage.DIRECTORY_SEPARATOR.$category;
+    //     $file_path    = $cat_path.DIRECTORY_SEPARATOR.$filename;
 
-        if( !is_dir( static::$appStorage ) )
-        {
-            File::create_dir( static::$rootStorage, static::$app->get('slug'), 0755);            
-        }
+    //     if( !is_dir( static::$appStorage ) )
+    //     {
+    //         File::create_dir( static::$rootStorage, static::$app->get('slug'), 0755);            
+    //     }
 
-        if(!is_dir($cat_path))
-        {
-            File::create_dir( static::$appStorage, $category, 0755 );
-        }
+    //     if(!is_dir($cat_path))
+    //     {
+    //         File::create_dir( static::$appStorage, $category, 0755 );
+    //     }
 
-        if(file_exists($file_path))
-        {
-            File::delete($file_path);
-        }
+    //     if(file_exists($file_path))
+    //     {
+    //         File::delete($file_path);
+    //     }
 
-        File::copy($path, $file_path);
-    }
+    //     File::copy($path, $file_path);
+    // }
 
     public function delete_all(User $user)
     {
@@ -742,26 +747,24 @@ exit;
             static::$gfs->delete($fileGfs->file['_id']);
 
             // delete files + mongoDb data
-            if(!$soft)
+            if( !$soft )
             {
-                // TODO: delete
-                $cat_path = static::$appStorage.DIRECTORY_SEPARATOR.$this->file['category'];
-
-                if($this->file['category'] == 'image')
+                if( $this->file['category'] == 'image' )
                 {
-                    foreach(static::$presets as $preset)
+                    foreach( static::$presets as $preset )
                     {
                         $filename  = (empty($preset)) ? $this->filename : $preset.'-'.$this->filename;
 
-                        $file_path = $cat_path.DIRECTORY_SEPARATOR.$filename;
-
-                        File::delete($file_path);
+                        static::$storage->delete( $this->file['category'], $filename ); 
                     }
+
+                    $previewStorage = new Storage( static::$app, true ); 
+
+                    $previewStorage->delete( $this->file['category'], 'preview-'.$this->filename ); 
                 }
                 else
                 {
-                    $file_path = $cat_path.DIRECTORY_SEPARATOR.$this->filename;
-                    File::delete($file_path);
+                    static::$storage->delete( $this->file['category'], $this->filename ); 
                 }
 
                 $delete =  static::$db

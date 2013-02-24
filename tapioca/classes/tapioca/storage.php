@@ -38,9 +38,15 @@ class Storage
 
     private $app;
 
-    public function __construct( App $app )
+    public function __construct( App $app, $forceLocale = false )
     {
         $this->app = $app;
+
+        if( $forceLocale )
+        {
+            $this->method = 'locale';
+            return;
+        }
 
         try
         {
@@ -88,16 +94,25 @@ class Storage
     {
         $fs = $this->getApadtapor( $category );
 
+        if( $fs->has( $filename ) )
+        {
+            $this->delete( $category, $filename );
+        }
+
         return $fs->write( $filename, $fileContent );
     }
 
-    public function rename()
+    public function rename( $category, $sourceKey, $targetKey )
     {
+        $fs = $this->getApadtapor( $category );
 
+        return $fs->rename( $sourceKey, $targetKey );
     }
 
-    public function delete()
+    public function delete( $category, $filename )
     {
-        
+        $fs = $this->getApadtapor( $category );
+
+        return $fs->delete( $filename );
     }
 }
