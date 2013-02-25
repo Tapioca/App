@@ -34,6 +34,11 @@ ini_set('display_errors', 1);
 define('DOCROOT', __DIR__.DIRECTORY_SEPARATOR);
 
 /**
+ * Public directory
+ */
+define('PUBPATH', __DIR__.DIRECTORY_SEPARATOR);
+
+/**
  * Path to the application directory.
  */
 define('APPPATH', realpath(__DIR__.'/../tapioca/').DIRECTORY_SEPARATOR);

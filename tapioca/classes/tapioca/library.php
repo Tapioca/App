@@ -319,10 +319,20 @@ class Library
                 if( !empty( $p ))
                     $p = $p.'-';
 
-                $old = $p.$this->file['filename'];
-                $new = $p.$update['filename'];
+                // $old = $p.$this->file['filename'];
+                // $new = $p.$update['filename'];
 
-                static::$storage->rename( $this->file['category'], $old, $new );
+                // static::$storage->rename( $this->file['category'], $old, $new );
+
+                $resqueArgs = array(
+                    'appslug'  => static::$app->get('slug'),
+                    'old'      => $p.$this->file['filename'],
+                    'new'      => $p.$update['filename'],
+                    'category' => $this->file['category']
+                );
+                
+                // check for documents to update
+                Tapioca::enqueueJob( static::$app->get('slug'), '\\Tapioca\\Jobs\\Storage\\Rename', $resqueArgs, null);
             }
 
             // update preview filename
@@ -520,7 +530,7 @@ class Library
      */
     public function create(array &$fields, User $user, $update = false, $import = false)
     {
-        $file_path = $fields['path'];
+        $filePath = $fields['path'];
         $saved_as  = $fields['saved_as'];
 
         unset($fields['path']);
@@ -547,7 +557,7 @@ class Library
         try
         {
             $fields['uid'] = (string) static::$gfs
-                                        ->storeFile($file_path, array(
+                                        ->storeFile($filePath, array(
                                             'filename' => $fields['filename'],
                                             'appid'    => static::$app->get('id'),
                                             'category' => $fields['category']
@@ -590,7 +600,7 @@ class Library
             $preview_name    = 'preview-'.$fields['filename'];
             $preview_path    = $saved_to.DIRECTORY_SEPARATOR.$preview_tmpname;
 
-            \Image::load($file_path)
+            \Image::load($filePath)
                 ->config('bgcolor', null)
                 ->config('quality', 60)
                 ->config('filetype', 'png')
@@ -608,13 +618,23 @@ class Library
             $previewStorage->store($preview_name, $fields['category'], $fileContent ); 
         }
 
-        // get file content
-        $fileContent = File::read( $file_path, true );
+        // // get file content
+        // $fileContent = File::read( $filePath, true );
         
-        // remove original file
-        unlink($file_path);
+        // // remove original file
+        // unlink($filePath);
 
-        static::$storage->store( $fields['filename'], $fields['category'], $fileContent );
+        // static::$storage->store( $fields['filename'], $fields['category'], $fileContent );
+
+        $resqueArgs = array(
+            'appslug'  => static::$app->get('slug'),
+            'filePath' => $filePath,
+            'filename' => $fields['filename'], 
+            'category' => $fields['category']
+        );
+        
+        // check for documents to update
+        Tapioca::enqueueJob( static::$app->get('slug'), '\\Tapioca\\Jobs\\Storage\\Create', $resqueArgs, null);
     }
 
     /**
@@ -685,29 +705,6 @@ class Library
         return false;
     }
 
-    // private function storePreview( $filename, $path, $category )
-    // {
-    //     $cat_path     = static::$appStorage.DIRECTORY_SEPARATOR.$category;
-    //     $file_path    = $cat_path.DIRECTORY_SEPARATOR.$filename;
-
-    //     if( !is_dir( static::$appStorage ) )
-    //     {
-    //         File::create_dir( static::$rootStorage, static::$app->get('slug'), 0755);            
-    //     }
-
-    //     if(!is_dir($cat_path))
-    //     {
-    //         File::create_dir( static::$appStorage, $category, 0755 );
-    //     }
-
-    //     if(file_exists($file_path))
-    //     {
-    //         File::delete($file_path);
-    //     }
-
-    //     File::copy($path, $file_path);
-    // }
-
     public function delete_all(User $user)
     {
         $files = static::$db->get(static::$dbCollectionName);
@@ -755,7 +752,14 @@ class Library
                     {
                         $filename  = (empty($preset)) ? $this->filename : $preset.'-'.$this->filename;
 
-                        static::$storage->delete( $this->file['category'], $filename ); 
+                        $resqueArgs = array(
+                            'appslug'  => static::$app->get('slug'),
+                            'filename' => $filename,
+                            'category' => $this->file['category']
+                        );
+                        
+                        // check for documents to update
+                        Tapioca::enqueueJob( static::$app->get('slug'), '\\Tapioca\\Jobs\\Storage\\Delete', $resqueArgs, null);
                     }
 
                     $previewStorage = new Storage( static::$app, true ); 
@@ -764,7 +768,14 @@ class Library
                 }
                 else
                 {
-                    static::$storage->delete( $this->file['category'], $this->filename ); 
+                    $resqueArgs = array(
+                        'appslug'  => static::$app->get('slug'),
+                        'filename' => $this->filename,
+                        'category' => $this->file['category']
+                    );
+                    
+                    // check for documents to update
+                    Tapioca::enqueueJob( static::$app->get('slug'), '\\Tapioca\\Jobs\\Storage\\Delete', $resqueArgs, null);
                 }
 
                 $delete =  static::$db
