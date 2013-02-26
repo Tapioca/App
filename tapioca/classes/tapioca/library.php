@@ -734,8 +734,8 @@ class Library
 
         $fileGfs  = static::$gfs
                         ->findOne(array(
-                            'filename' => $this->filename,
-                            'appid'    => static::$app->get('id')
+                            '_id'   => new \MongoId( $this->file['uid'] ),
+                            'appid' => static::$app->get('id')
                         ));
 
         if(count($fileGfs) > 0)
