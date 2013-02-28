@@ -130,7 +130,7 @@ class Tapioca
             return static::$dbInstances[ $name ];
         }
 
-        static::$dbInstances[ $name ] = \Mongo_Db::instance();
+        static::$dbInstances[ $name ] = \Mongo_Db::instance( $name );
 
         return static::$dbInstances[ $name ];
     }
