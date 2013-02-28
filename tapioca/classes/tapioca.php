@@ -30,9 +30,11 @@ class Tapioca
     protected static $version = '0.8.0';
 
     /**
-     * @var  string  Database instance
+     * All the Mongo_Db instances
+     *
+     * @var  array
      */
-    private static $db = null;
+    protected static $dbInstances = array();
 
     /**
      * @var  bool  Whether suspension feature should be used or not
@@ -114,6 +116,27 @@ class Tapioca
     {
         return Config::get('tapioca.skip_update');
     }
+
+    /**
+     * Manage global MongoDb connection.
+     * Acts as a Multiton.  Will return the requested instance, or will create
+     * a new one if it does not exist.
+     *
+     * @param   string    $name  The instance name
+     * @return  Mongo_Db
+     */
+    public static function db( $name = 'default' )
+    {
+        if (\array_key_exists($name, static::$dbInstances))
+        {
+            return static::$dbInstances[ $name ];
+        }
+
+        static::$dbInstances[ $name ] = \Mongo_Db::instance();
+
+        return static::$dbInstances[ $name ];
+    }
+
 
     /**
      * @param   string app slug
@@ -509,10 +532,10 @@ class Tapioca
      */
     public static function getDeleteToken( $object, $id )
     {
-        if( is_null( static::$db ) )
-        {
-            static::$db = \Mongo_Db::instance();
-        }
+        // if( is_null( static::$db ) )
+        // {
+        //     static::$db = \Mongo_Db::instance();
+        // }
 
         $collection = Config::get('tapioca.collections.deletes');
 
@@ -525,7 +548,7 @@ class Tapioca
                         'date'   => new \MongoDate()
                     );
 
-        $action = static::$db->insert( $collection, $array);
+        $action = static::db()->insert( $collection, $array);
 
         if( !$action )
         {
@@ -547,15 +570,15 @@ class Tapioca
      */
     public static function checkDeleteToken( $token, $object, $id )
     {
-        if( is_null( static::$db ) )
-        {
-            static::$db = \Mongo_Db::instance();            
-        }
+        // if( is_null( static::$db ) )
+        // {
+        //     static::$db = \Mongo_Db::instance();            
+        // }
 
         $collection = Config::get('tapioca.collections.deletes');
         $limitDate  = ( time() - Config::get('tapioca.deleteToken') );
 
-        $object = static::$db->get_where( $collection, array(
+        $object = static::db()->get_where( $collection, array(
                 'token'  => $token,
                 'object' => $object,
                 'id'     => $id,
@@ -572,7 +595,7 @@ class Tapioca
         }
 
 
-        static::$db->where( array('token' => $token) )->delete( $collection );
+        static::db()->where( array('token' => $token) )->delete( $collection );
 
         return true;
     }

@@ -97,13 +97,13 @@ class Library
         // static::$rootStorage = Config::get('tapioca.upload.storage');
         // static::$appStorage  = static::$rootStorage.static::$app->get('slug');
         
-        static::$db          = \Mongo_Db::instance();
-        static::$gfs         = \GridFs::getFs(static::$db);
+        // static::$db          = \Mongo_Db::instance();
+        static::$gfs         = \GridFs::getFs(Tapioca::db());
 
         // if a Name was passed
         if ($filename)
         {
-            $file =  static::$db
+            $file =  Tapioca::db()
                         ->select( array(), array('_id'))
                         ->get_where(static::$dbCollectionName, array(
                             'filename' => $filename
@@ -213,7 +213,7 @@ class Library
             $where['tags.key'] = $tag;
         }
 
-        $hash = static::$db
+        $hash = Tapioca::db()
                     ->where($where)
                     ->hash( static::$dbCollectionName, true );
 
@@ -370,7 +370,7 @@ class Library
         $update['updated'] = new \MongoDate();
         $update['user']    = $user->get('id');
 
-        $ret = static::$db
+        $ret = Tapioca::db()
                 ->where(array('_ref' => $this->file['_ref']))
                 ->update(static::$dbCollectionName, $update);
 
@@ -593,7 +593,7 @@ class Library
         $this->file      = $new_file;
         $this->filename  = $new_file['filename'];
 
-        $ret = static::$db
+        $ret = Tapioca::db()
                 ->where(array(
                     'filename' => $new_file['filename']
                 ))
@@ -660,7 +660,7 @@ class Library
     private function exists($filename, $md5)
     {
         // query db to check for filename
-        $result = static::$db
+        $result = Tapioca::db()
                         ->or_where(array(
                             'filename' => $filename,
                             'md5'      => $md5
@@ -697,7 +697,7 @@ class Library
     private function filenameAvalaible($filename)
     {
         // query db to check for filename
-        $result = static::$db
+        $result = Tapioca::db()
                         ->where(array(
                             'filename' => $filename
                         ))
@@ -719,7 +719,7 @@ class Library
 
     public function delete_all(User $user)
     {
-        $files = static::$db->get(static::$dbCollectionName);
+        $files = Tapioca::db()->get(static::$dbCollectionName);
 
         foreach($files as $file)
         {
@@ -790,7 +790,7 @@ class Library
                     Tapioca::enqueueJob( static::$app->get('slug'), '\\Tapioca\\Jobs\\Storage\\Delete', $resqueArgs, null);
                 }
 
-                $delete =  static::$db
+                $delete =  Tapioca::db()
                             ->where(array(
                                     '_ref' => $this->file['_ref']
                             ))
