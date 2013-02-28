@@ -15,6 +15,9 @@ namespace Tapioca\Jobs\Library;
 
 use Tapioca;
 use File;
+use Config;
+use Image;
+use Mongo_Db;
 
 class Preset
 {
@@ -26,49 +29,64 @@ class Preset
      */
     public function perform()
     {
-        \Cli::write('call perform'."\n", 'green');
-        \Cli::write(print_r($this->args, true));
+        // \Cli::write('call perform'."\n", 'green');
+        // \Cli::write(print_r($this->args, true));
 
         Tapioca::base();
 
-        if( is_null( $this->filename ) )
-        {
-            throw new \JobsException(__('tapioca.no_file_selected'));
-        }
+        $db           = Mongo_Db::instance();
+        $dbCollection = $this->args['appslug'].'--library';
 
-        if( in_array( $preset_name, $this->file['presets'] ) )
-        {
-            return true;
-        }
+        $app   = Tapioca::app( array( 'slug' => $this->args['appslug'] ) );
+        $file  = Tapioca::library( $app, $this->args['filename'] );
+        $bytes = $file->getBytes();
 
-        $presets = static::$app->get('library.presets');
+        $uploadPath  = Config::get('tapioca.upload.path');
+        $tmpFilename = $this->args['appslug'].'-'.$file->file['_ref'].'.'.$file->file['extension'];
+        $tmpFilePath = $uploadPath.'/'.$tmpFilename;
 
-        if( !isset( $presets[$preset_name] ) )
-        {
-            throw new \JobsException(__('tapioca.preset_not_define'));
-        }
+        File::create( $uploadPath, $tmpFilename, $bytes->getBytes() );
 
-        $original_file = $this->get_path();
-        $path          = $this->get_path(false);
-        $new_file_path = $path.$preset_name.'-'.$this->filename;
-        $resource      = \Image::load($original_file);
+        $newFilename = $this->args['presetName'].'-'.$file->file['filename'];
+        $newFilePath = $uploadPath.'/'.$newFilename;
+
+        $presets  = $app->get('library.presets');
+        $resource = Image::load( $tmpFilePath );
         
         $resource->config('presets', $presets);
-        $resource->preset($preset_name)->save($new_file_path);
+        $resource->preset( $this->args['presetName'] )->save( $newFilePath );
 
-        if( file_exists( $new_file_path ) )
+        if( file_exists( $newFilePath ) )
         {
-            $ret = static::$db
-                    ->where(array(
-                        'filename' => $this->filename
-                    ))
-                    ->update(static::$dbCollectionName, array(
-                        '$addToSet' => array(
-                            'presets' => $preset_name
-                        )
-                    ), array(), true);
+            $storage = new \Tapioca\Storage( $app ); 
 
-            return $ret;
+            // get file content
+            $fileContent = File::read( $newFilePath, true );
+
+            // remove generated files
+            unlink( $newFilePath );
+            unlink( $tmpFilePath );
+
+            $ret = $storage->store( $newFilename, $file->file['category'], $fileContent );
+
+            if( $ret )
+            {
+                $ret = $db
+                        ->where(array(
+                            'filename' => $this->args['filename']
+                        ))
+                        ->update( $dbCollection, array(
+                            '$addToSet' => array(
+                                'presets' => $this->args['presetName']
+                            )
+                        ), array(), true);
+                
+                return $ret;
+            }
+
+            return false;
         }
+
+        return false;
     }
 }

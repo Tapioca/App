@@ -92,9 +92,6 @@ class Library
         static::$app              = $app;
         static::$dbCollectionName = static::$app->get('slug').'--library';
 
-// \Debug::dump($storage);
-// exit();
-
         static::$storage     = new Storage( static::$app ); 
 
         static::$rootStorage = Config::get('tapioca.upload.storage');
@@ -143,47 +140,63 @@ class Library
      * @param   string preset name
      * @return  bool
      */
-    public function preset($preset_name)
+    public function preset( $presetName )
     {
         if( is_null( $this->filename ) )
         {
             throw new LibraryException(__('tapioca.no_file_selected'));
         }
 
-        if( in_array( $preset_name, $this->file['presets'] ) )
+        if( $this->file['category'] != 'image' )
+        {
+            throw new LibraryException( __('tapioca.wrong_filetype_for_preset') );
+        }
+
+        if( in_array( $presetName, $this->file['presets'] ) )
         {
             return true;
         }
 
         $presets = static::$app->get('library.presets');
 
-        if( !isset( $presets[$preset_name] ) )
+        if( !isset( $presets[ $presetName ] ) )
         {
             throw new LibraryException(__('tapioca.preset_not_define'));
         }
 
-        $original_file = $this->get_path();
-        $path          = $this->get_path(false);
-        $new_file_path = $path.$preset_name.'-'.$this->filename;
-        $resource      = \Image::load($original_file);
+        $resqueArgs = array(
+            'appslug'    => static::$app->get('slug'),
+            'filename'   => $this->filename,
+            'presetName' => $presetName
+        );
         
-        $resource->config('presets', $presets);
-        $resource->preset($preset_name)->save($new_file_path);
+        // delegate to worker
+        Tapioca::enqueueJob( 'bdn', '\\Tapioca\\Jobs\\Library\\Preset', $resqueArgs, null);
 
-        if( file_exists( $new_file_path ) )
-        {
-            $ret = static::$db
-                    ->where(array(
-                        'filename' => $this->filename
-                    ))
-                    ->update(static::$dbCollectionName, array(
-                        '$addToSet' => array(
-                            'presets' => $preset_name
-                        )
-                    ), array(), true);
+        return true;
 
-            return $ret;
-        }
+        // $original_file = $this->get_path();
+        // $path          = $this->get_path(false);
+        // $new_file_path = $path.$preset_name.'-'.$this->filename;
+        // $resource      = \Image::load($original_file);
+        
+        // $resource->config('presets', $presets);
+        // $resource->preset($preset_name)->save($new_file_path);
+
+        // if( file_exists( $new_file_path ) )
+        // {
+        //     $ret = static::$db
+        //             ->where(array(
+        //                 'filename' => $this->filename
+        //             ))
+        //             ->update(static::$dbCollectionName, array(
+        //                 '$addToSet' => array(
+        //                     'presets' => $preset_name
+        //                 )
+        //             ), array(), true);
+
+        //     return $ret;
+        // }
     }
 
     public function getAll($category = null, $tag = null)
@@ -242,21 +255,20 @@ class Library
             //throw new LibraryException(__('tapioca.no_file_selected'));
         }
         
-        $query = array( 'filename' => $this->filename,
-                        'appid'    => static::$app->get('id'));
+        $query = array( '_id'   => new \MongoId( $this->file['uid'] ),
+                        'appid' => static::$app->get('id') );
 
         $query['preview'] = ($preview) ? true : array( '$exists' => false );
 
-        $cursor = static::$gfs
-                    ->find($query);
+        return static::$gfs->findOne( $query );
 
-        $result = array();
+        // $result = array();
 
-        foreach($cursor as $c)
-        {
-            $result[] = $c;
-        }
-        return $result;
+        // foreach($cursor as $c)
+        // {
+        //     $result[] = $c;
+        // }
+        // return $result;
     }
 
     /**

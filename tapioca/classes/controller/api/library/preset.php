@@ -50,6 +50,7 @@ class Controller_Api_Library_Preset extends Controller_Api
 
     public function post_index()
     {
+        // TODO: define capability
         if( static::$granted )
         {
             $preset = $this->param('preset', null);
