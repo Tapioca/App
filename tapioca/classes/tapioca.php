@@ -22,6 +22,12 @@ use Cookie;
 class TapiocaException extends FuelException {}
 class AuthException extends FuelException {}
 
+/**
+ * Tapioca users management based on Sentry package
+ *
+ * https://github.com/cartalyst/sentry
+ */
+
 class Tapioca 
 {
     /**
