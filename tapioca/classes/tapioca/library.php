@@ -92,10 +92,10 @@ class Library
         static::$app              = $app;
         static::$dbCollectionName = static::$app->get('slug').'--library';
 
-        static::$storage     = new Storage( static::$app ); 
+        // static::$storage     = new Storage( static::$app ); 
 
-        static::$rootStorage = Config::get('tapioca.upload.storage');
-        static::$appStorage  = static::$rootStorage.static::$app->get('slug');
+        // static::$rootStorage = Config::get('tapioca.upload.storage');
+        // static::$appStorage  = static::$rootStorage.static::$app->get('slug');
         
         static::$db          = \Mongo_Db::instance();
         static::$gfs         = \GridFs::getFs(static::$db);
@@ -230,22 +230,22 @@ class Library
         return $this->file;
     }
 
-    public function get_path($full_path = true, $preset = null)
-    {
-        $path = static::$appStorage.DIRECTORY_SEPARATOR.$this->file['category'].DIRECTORY_SEPARATOR;
+    // public function get_path($full_path = true, $preset = null)
+    // {
+    //     $path = static::$appStorage.DIRECTORY_SEPARATOR.$this->file['category'].DIRECTORY_SEPARATOR;
 
-        if(!$full_path)
-        {
-            return $path;
-        }
+    //     if(!$full_path)
+    //     {
+    //         return $path;
+    //     }
 
-        if($preset)
-        {
-            $path .= $preset.'-';
-        }
+    //     if($preset)
+    //     {
+    //         $path .= $preset.'-';
+    //     }
 
-        return $path.$this->filename;
-    }
+    //     return $path.$this->filename;
+    // }
 
     public function getBytes($preview = false)
     {
