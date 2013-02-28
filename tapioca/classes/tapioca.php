@@ -536,11 +536,6 @@ class Tapioca
      */
     public static function getDeleteToken( $object, $id )
     {
-        // if( is_null( static::$db ) )
-        // {
-        //     static::$db = \Mongo_Db::instance();
-        // }
-
         $collection = Config::get('tapioca.collections.deletes');
 
         $token = \Str::random('alnum', 16);
@@ -574,11 +569,6 @@ class Tapioca
      */
     public static function checkDeleteToken( $token, $object, $id )
     {
-        // if( is_null( static::$db ) )
-        // {
-        //     static::$db = \Mongo_Db::instance();            
-        // }
-
         $collection = Config::get('tapioca.collections.deletes');
         $limitDate  = ( time() - Config::get('tapioca.deleteToken') );
 

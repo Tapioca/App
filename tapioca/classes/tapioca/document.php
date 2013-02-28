@@ -21,14 +21,9 @@ class DocumentException extends FuelException {}
 class Document
 {
     /**
-     * @var  string  Database instance
-     */
-    protected static $db = null;
-
-    /**
      * @var  string  MongoDb collection's name
      */
-    protected static $dbCollectionName = null;
+    protected static $dbCollection = null;
 
     /**
      * @var  object  App instance
@@ -107,11 +102,9 @@ class Document
     public function __construct(App $app, Collection $collection, $ref = null, $locale = null )
     {
         // load and set config
-        static::$app              = $app;
-        static::$collection       = $collection;
-        static::$dbCollectionName = static::$app->get('slug').'-'.static::$collection->namespace;
-        
-        static::$db = \Mongo_Db::instance();
+        static::$app          = $app;
+        static::$collection   = $collection;
+        static::$dbCollection = static::$app->get('slug').'-'.static::$collection->namespace;
 
         // Set Locale
         if( !is_null( $locale )  
@@ -130,9 +123,9 @@ class Document
             static::$ref = $ref; 
 
             // query database for document's abstract
-            $abstract = static::$db
+            $abstract = Tapioca::db()
                         ->select(array(), array('_id'))
-                        ->get_where( static::$dbCollectionName, array(
+                        ->get_where( static::$dbCollection, array(
                             '_ref'      => $ref,
                             '_abstract' => array( '$exists' => true )
                         ), 1);
@@ -188,7 +181,7 @@ class Document
      */
     public function reset()
     {
-        static::$dbCollectionName = null;
+        static::$dbCollection = null;
         static::$app              = null;
         static::$ref              = null;
         static::$locale           = null;
@@ -225,7 +218,7 @@ class Document
         }
 
         //query database for collections's abstracts
-        $query =  static::$db
+        $query =  Tapioca::db()
                     ->select( array(), array('_abstract'))
                     ->where($where)
                     ->order_by(array(
@@ -234,7 +227,7 @@ class Document
 
         if( !is_null( $ref ) )
         {
-            $ret = $query->get_one( static::$dbCollectionName );
+            $ret = $query->get_one( static::$dbCollection );
 
             if( $ret )
             {
@@ -250,7 +243,7 @@ class Document
         }
         else
         {
-            return $query->hash( static::$dbCollectionName, true);
+            return $query->hash( static::$dbCollection, true);
         }
     }
 
@@ -361,11 +354,11 @@ class Document
             $this->set('where', array('_tapioca.revision' => static::$revisionActive));
         }
 
-        $result = static::$db
+        $result = Tapioca::db()
             ->select( $this->select, array('_id', '_tapioca') )// always exclude _id && _tapioca properties
             ->where( $this->where )
             ->order_by( $this->sort )
-            ->get( static::$dbCollectionName );
+            ->get( static::$dbCollection );
 
         if( $result )
         {
@@ -424,13 +417,13 @@ class Document
                     '_tapioca.locale' => static::$locale
                 ));
 
-        $result = static::$db
+        $result = Tapioca::db()
             ->select( $this->select, array('_tapioca') ) // always exclude _tapioca property
             ->where( $this->where )
             ->order_by( $this->sort )
             ->limit( $this->limit )
             ->offset( $this->skip )
-            ->hash( static::$dbCollectionName, true );
+            ->hash( static::$dbCollection, true );
 
         return $result;
     }
@@ -544,11 +537,11 @@ class Document
             )
         ) + $digest;
 
-        $new_data = static::$db->insert(static::$dbCollectionName, $data);
+        $new_data = Tapioca::db()->insert(static::$dbCollection, $data);
 
         if($new_data)
         {
-            $new_abstract = static::$db->insert(static::$dbCollectionName, $abstract);
+            $new_abstract = Tapioca::db()->insert(static::$dbCollection, $abstract);
 
             if($new_abstract)
             {
@@ -601,28 +594,28 @@ class Document
         // update active revision to false
         if( $is_active )
         {
-            $update_active = static::$db
+            $update_active = Tapioca::db()
                                 ->where(array(
                                     '_ref'            => static::$ref,
                                     '_tapioca.locale' => static::$locale
                                 ))
-                                ->update_all(static::$dbCollectionName, array('_tapioca.active' => (bool) false));
+                                ->update_all(static::$dbCollection, array('_tapioca.active' => (bool) false));
 
             $this->abstract['revisions']['active'][static::$locale] = (int) static::$revisionLast;
         }
 
         // insert new revision
-        $new_data = static::$db->insert(static::$dbCollectionName, $data);
+        $new_data = Tapioca::db()->insert(static::$dbCollection, $data);
 
         // update document abstract
         if( $new_data )
         {
-            $new_abstract = static::$db
+            $new_abstract = Tapioca::db()
                                 ->where(array(
                                     '_ref'      => static::$ref,
                                     '_abstract' => (bool) true
                                 ))
-                                ->update(static::$dbCollectionName, $this->abstract);
+                                ->update(static::$dbCollection, $this->abstract);
         }
     }
 
@@ -638,11 +631,11 @@ class Document
             throw new \DocumentException(__('tapioca.no_document_selected'));
         }
 
-        $delete =  static::$db
+        $delete =  Tapioca::db()
                         ->where(array(
                                 '_ref' => static::$ref
                         ))
-                        ->delete_all(static::$dbCollectionName);
+                        ->delete_all(static::$dbCollection);
 
         if($delete)
         {
@@ -739,14 +732,14 @@ class Document
         {
             $this->abstract['revisions']['active'][static::$locale] = $revision;
 
-            $update_no_active = static::$db
+            $update_no_active = Tapioca::db()
                                     ->where(array(
                                         '_ref'              => static::$ref,
                                         '_tapioca.revision' => array('$ne' => $revision),
                                         '_tapioca.locale'   => static::$locale,
                                         '_abstract'         => array( '$exists' => false )
                                     ))
-                                    ->update_all(static::$dbCollectionName, array(
+                                    ->update_all(static::$dbCollection, array(
                                         '_tapioca.active' => (bool) false,
                                         '_tapioca.status' => (int) -1
                                     ));
@@ -755,12 +748,12 @@ class Document
         }
 
         // Update revision status
-        $update_doc = static::$db
+        $update_doc = Tapioca::db()
                             ->where(array(
                                 '_ref'              => static::$ref,
                                 '_tapioca.revision' => $revision
                             ))
-                            ->update(static::$dbCollectionName, $update);
+                            ->update(static::$dbCollection, $update);
 
         // prevent mongodb crash
         if(isset($this->abstract['_id']))
@@ -769,12 +762,12 @@ class Document
         }
 
         // Update Documant abstract 
-        $new_abstract = static::$db
+        $new_abstract = Tapioca::db()
                             ->where(array(
                                 '_ref'      => static::$ref,
                                 '_abstract' => (bool) true
                             ))
-                            ->update(static::$dbCollectionName, $this->abstract);
+                            ->update(static::$dbCollection, $this->abstract);
 
         // if new status is 100,
         // update dependencies
@@ -847,7 +840,7 @@ class Document
         }
 
         $database = Config::get('db.mongo.default.database');
-        $delete   = static::$db->drop_collection($database, static::$dbCollectionName);
+        $delete   = Tapioca::db()->drop_collection($database, static::$dbCollection);
 
         if($delete)
         {
