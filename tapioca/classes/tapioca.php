@@ -30,9 +30,7 @@ class Tapioca
     protected static $version = '0.8.0';
 
     /**
-     * All the Mongo_Db instances
-     *
-     * @var  array
+     * @var  array  All the Mongo_Db instances
      */
     protected static $dbInstances = array();
 
@@ -49,12 +47,12 @@ class Tapioca
     /**
      * @var  array  Caches all users accessed
      */
-    protected static $user_cache = array();
+    protected static $userCache = array();
 
     /**
      * @var  object  Caches the current logged in user object
      */
-    protected static $current_user = null;
+    protected static $currentUser = null;
 
     /**
      * @var  array   List document validation error
@@ -253,28 +251,28 @@ class Tapioca
      */
     public static function user($id = null, $recache = false)
     {
-        if ($id === null and $recache === false and static::$current_user !== null)
+        if ($id === null and $recache === false and static::$currentUser !== null)
         {
-            return static::$current_user;
+            return static::$currentUser;
         }
-        elseif ($id !== null and $recache === false and isset(static::$user_cache[$id]))
+        elseif ($id !== null and $recache === false and isset(static::$userCache[$id]))
         {
-            return static::$user_cache[$id];
+            return static::$userCache[$id];
         }
 
         try
         {
             if ($id)
             {
-                static::$user_cache[$id] = new User($id);
-                return static::$user_cache[$id];
+                static::$userCache[$id] = new User($id);
+                return static::$userCache[$id];
             }
             // if session exists - default to user session
             else if(static::check())
             {
                 $user_id = Session::get(Config::get('tapioca.session.user'));
-                static::$current_user = new User($user_id);
-                return static::$current_user;
+                static::$currentUser = new User($user_id);
+                return static::$currentUser;
             }
         }
         catch (UserNotFoundException $e)
