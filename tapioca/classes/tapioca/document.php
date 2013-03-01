@@ -71,6 +71,11 @@ class Document
     protected $abstract = null;
 
     /**
+     * @var  array  Digest instance
+     */
+    protected $digest = null;
+
+    /**
      * @var  array  document validation errors
      */
     protected $errors = array();
@@ -117,49 +122,51 @@ class Document
             static::$locale = static::$app->get('locale_default');
         }
 
-        // if a Ref was passed
+        $this->digest = new \Digest( static::$app, static::$collection, $locale, $ref );
+
+        //if a Ref was passed
         if( $ref )
         {
             static::$ref = $ref; 
 
-            // query database for document's abstract
-            $abstract = Tapioca::db()
-                        ->select(array(), array('_id'))
-                        ->get_where( static::$dbCollection, array(
-                            '_ref'      => $ref,
-                            '_abstract' => array( '$exists' => true )
-                        ), 1);
+        //     // query database for document's abstract
+        //     $abstract = Tapioca::db()
+        //                 ->select(array(), array('_id'))
+        //                 ->get_where( static::$dbCollection, array(
+        //                     '_ref'      => $ref,
+        //                     '_abstract' => array( '$exists' => true )
+        //                 ), 1);
 
-            // if there was a result
-            if( count( $abstract ) == 1 )
-            {
-                $this->abstract = $abstract[0];
+        //     // if there was a result
+        //     if( count( $abstract ) == 1 )
+        //     {
+        //         $this->abstract = $abstract[0];
                 
-                // cache data
-                static::$revisionActive = $this->abstract['revisions']['active'];
-                static::$revisionLast   = $this->abstract['revisions']['total'];
+        //         // cache data
+        //         static::$revisionActive = $this->abstract['revisions']['active'];
+        //         static::$revisionLast   = $this->abstract['revisions']['total'];
 
-                // define if document exists in selected locale
-                if( !isset($this->abstract['revisions']['active'][static::$locale]) )
-                {
-                    $this->abstract['revisions']['active'][static::$locale] = null;
-                }
+        //         // define if document exists in selected locale
+        //         if( !isset($this->abstract['revisions']['active'][static::$locale]) )
+        //         {
+        //             $this->abstract['revisions']['active'][static::$locale] = null;
+        //         }
 
-                static::$revisionActive = $this->abstract['revisions']['active'][static::$locale];
+        //         static::$revisionActive = $this->abstract['revisions']['active'][static::$locale];
 
-                $this->set('where', array(
-                        '_ref'            => static::$ref,
-                        '_abstract'       => array( '$exists' => false ),
-                        '_tapioca.locale' => static::$locale
-                    ));
-            }
-            // document doesn't exist
-            else
-            {
-                throw new \DocumentException(
-                    __('tapioca.document_not_found', array('ref' => static::$ref, 'collection' => static::$collection->namespace))
-                );
-            }
+        //         $this->set('where', array(
+        //                 '_ref'            => static::$ref,
+        //                 '_abstract'       => array( '$exists' => false ),
+        //                 '_tapioca.locale' => static::$locale
+        //             ));
+        //     }
+        //     // document doesn't exist
+        //     else
+        //     {
+        //         throw new \DocumentException(
+        //             __('tapioca.document_not_found', array('ref' => static::$ref, 'collection' => static::$collection->namespace))
+        //         );
+        //     }
         }
     }
 
@@ -319,25 +326,27 @@ class Document
             throw new \DocumentException( __('tapioca.no_collection_selected') );
         }
 
-        // check if locale exists for this document
-        if( !isset( $this->abstract['revisions']['active'][static::$locale] ) )
-        {
-            // try default locale first
-            static::$locale = static::$app->get('locale_default');
+        // // check if locale exists for this document
+        // if( !isset( $this->abstract['revisions']['active'][static::$locale] ) )
+        // {
+        //     // try default locale first
+        //     static::$locale = static::$app->get('locale_default');
 
-            // if default locale doesn't exists, use first locale found
-            if( !isset( $this->abstract['revisions']['active'][static::$locale] ) )
-            {
-                reset( $this->abstract['revisions']['active'] );
-                static::$locale = key($this->abstract['revisions']['active']);
-            }
-        }
+        //     // if default locale doesn't exists, use first locale found
+        //     if( !isset( $this->abstract['revisions']['active'][static::$locale] ) )
+        //     {
+        //         reset( $this->abstract['revisions']['active'] );
+        //         static::$locale = key($this->abstract['revisions']['active']);
+        //     }
+        // }
+
+        $locale = $this->digest->hasLocale();
 
         $this->set('where', array(
             '_ref'            => static::$ref,
             '_abstract'       => array( '$exists' => false ),
             '_tapioca.active' => true,
-            '_tapioca.locale' => static::$locale
+            '_tapioca.locale' => $locale
         ));
 
         // get a specific revison
@@ -349,9 +358,9 @@ class Document
 
             $this->set('where', array('_tapioca.revision' => (int) $revision));
         }
-        else if( !is_null(static::$revisionActive) )
+        else if( !is_null( $this->digest->revisionActive ) )
         {
-            $this->set('where', array('_tapioca.revision' => static::$revisionActive));
+            $this->set('where', array('_tapioca.revision' => $this->digest->revisionActive));
         }
 
         $result = Tapioca::db()
@@ -496,7 +505,7 @@ class Document
 
         Hook::trigger('document::after', $document);
 
-        return $this->get( static::$revisionLast );
+        return $this->get( $this->digest->revisionLast );
     }
 
     private function create($document, $digest, $user)
@@ -517,35 +526,38 @@ class Document
             )
         ) + $document;
 
-        $abstract = array(
-            '_ref'      => $ref,
-            '_abstract' => (bool) true, 
-            'created'   => $date,
-            'updated'   => $date,
-            'revisions' => array(
-                'total'   => (int) 1,
-                'active'  => array(static::$locale => (int) 1),
-                'list'    => array(
-                                array(
-                                    'revision' => (int) 1,
-                                    'date'     => $date,
-                                    'status'   => (int) 1,
-                                    'locale'   => static::$locale,
-                                    'user'     => $user->get('id'),
-                                )
-                            )
-            )
-        ) + $digest;
+        // $abstract = array(
+        //     '_ref'      => $ref,
+        //     '_abstract' => (bool) true, 
+        //     'created'   => $date,
+        //     'updated'   => $date,
+        //     'revisions' => array(
+        //         'total'   => (int) 1,
+        //         'active'  => array(static::$locale => (int) 1),
+        //         'list'    => array(
+        //                         array(
+        //                             'revision' => (int) 1,
+        //                             'date'     => $date,
+        //                             'status'   => (int) 1,
+        //                             'locale'   => static::$locale,
+        //                             'user'     => $user->get('id'),
+        //                         )
+        //                     )
+        //     )
+        // ) + $digest;
 
         $new_data = Tapioca::db()->insert(static::$dbCollection, $data);
 
         if($new_data)
         {
-            $new_abstract = Tapioca::db()->insert(static::$dbCollection, $abstract);
+
+            $new_abstract = $this->digest->create( $ref, $digest, $user->get('id'));
+
+            // $new_abstract = Tapioca::db()->insert(static::$dbCollection, $abstract);
 
             if($new_abstract)
             {
-                $this->abstract          = $abstract;
+                // $this->abstract          = $abstract;
                 static::$ref             = $ref;
                 static::$revisionActive  = 1;
 
@@ -558,7 +570,7 @@ class Document
     {
         ++static::$revisionLast;
         
-        $is_active = $this->is_active();
+        $is_active = $this->digest->isActive();
 
         $date = new \MongoDate();
 
@@ -574,7 +586,7 @@ class Document
             )
         ) + $document;
 
-        ++$this->abstract['revisions']['total'];
+        // ++$this->abstract['revisions']['total'];
 
         // update disgest only if revison is active
         if( $is_active )
@@ -610,6 +622,8 @@ class Document
         // update document abstract
         if( $new_data )
         {
+            $this->digest->update( $this->abstract );
+
             $new_abstract = Tapioca::db()
                                 ->where(array(
                                     '_ref'      => static::$ref,
@@ -923,37 +937,6 @@ class Document
         }
 
         return $localeRevision;
-    }
-
-    /**
-     * Check if new revision has higher status than the others
-     * If we found a status 100 (published), return false
-     *
-     * @return  bool
-     */
-    private function is_active()
-    {
-        $higher = 1;
-        
-        foreach ($this->abstract['revisions']['list'] as $revision)
-        {
-            if($revision['locale'] == static::$locale)
-            {
-                $higher = ($revision['status'] > $higher) ? $revision['status'] : $higher;
-
-                if($revision['status'] == 100)
-                {
-                    return false;
-                }
-            }
-        }
-
-        if($higher > 1)
-        {
-            return false;
-        }
-
-        return true;
     }
 
     /**
