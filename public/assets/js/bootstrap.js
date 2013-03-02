@@ -54,11 +54,23 @@ $.Tapioca.Bootstrap = function()
                 $.Tapioca.UserApps[ appslug ].app     = app;
                 // $.Tapioca.UserApps[ appslug ].users   = new $.Tapioca.Collections.Users( appTeam );
                 $.Tapioca.UserApps[ appslug ].library = new $.Tapioca.Collections.Files( {
-                    appslug: appslug
-                });
+                                                            appslug: appslug
+                                                        });
+                $.Tapioca.UserApps[ appslug ].searchIndex = lunr(function ()
+                                                            {
+                                                                this.field('title', {boost: 10})
+                                                                this.field('body')
+                                                                this.ref('id')
+                                                            });
                 
                 loadCollection( appslug );
             });
+
+            if( total == 1 )
+            {
+                $.Tapioca.appslug = collection.at(0).get('slug');
+                $.Tapioca.Mediator.publish('search::active');
+            }
 
             // load apps's users
             if( !isAdmin )
@@ -106,6 +118,26 @@ $.Tapioca.Bootstrap = function()
                 }
             },
             error: function(){}
+        });
+
+        // fulltext search index
+        var apiSearch = $.Tapioca.config.apiUrl + appslug +'/search';
+
+        $.getJSON( apiSearch, function ( indexes )
+        {
+            $.Tapioca.UserApps[ appslug ].searchValues = indexes;
+
+            console.time('load '+appslug+' search index')
+
+            indexes.forEach(function ( raw )
+            {
+                $.Tapioca.UserApps[ appslug ].searchIndex.add({
+                    id:    raw._ref,
+                    title: raw.title,
+                    body:  raw.body
+                })
+            })
+            console.timeEnd('load '+appslug+' search index')
         });
     };
 };

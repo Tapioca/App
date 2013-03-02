@@ -12,6 +12,8 @@ $.Tapioca.Views.CollectionEdit = $.Tapioca.Views.FormView.extend(
         this.model.bind('reset',  this.render, this);
         this.model.bind('change', this.displayJson, this);
 
+        $.Tapioca.Mediator.publish('search::disabled');
+
         return this;
     },
 

@@ -16,10 +16,10 @@
             this.onClose();
         }
 
+        $.Tapioca.Mediator.publish('search::active');
+
         this.remove();
         this.unbind();
-
-        // $.Tapioca.view = false;
     }
 
     // Length of Javascript Object
@@ -98,6 +98,7 @@
             'app/:appslug/library/c/:category'      : 'appLibraryCat',
             'app/:appslug/library'                  : 'appLibrary',
             'app/:appslug/collection/new'           : 'appCollectionNew',
+            'app/:appslug/search'                   : 'appSearchResult',
             'app/:appslug/:namespace/edit'          : 'appCollectionEdit',
             'app/:appslug/:namespace/:ref'          : 'appCollectionRef',
             'app/:appslug/:namespace'               : 'appCollectionHome',

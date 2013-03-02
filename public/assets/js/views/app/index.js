@@ -52,7 +52,8 @@ $.Tapioca.Views.App = Backbone.View.extend({
 
         this.$el.html( $.Tapioca.Tpl.index );
 
-        this.appNav = new $.Tapioca.Views.Nav();
+        this.appNav    = new $.Tapioca.Views.Nav();
+        this.appSearch = new $.Tapioca.Views.SearchForm();
 
         $.Tapioca.Bootstrap();
 

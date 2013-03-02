@@ -6,6 +6,8 @@ $.Tapioca.Views.Document = $.Tapioca.Views.FormView.extend(
 
     initialize: function( options )
     {
+        $.Tapioca.Mediator.publish('search::disabled');
+
         this.$el.appendTo('#app-content');
 
         this.appslug   = options.appslug;
@@ -278,7 +280,7 @@ $.Tapioca.Views.Document = $.Tapioca.Views.FormView.extend(
     },
 
     onClose: function()
-    {
+    {        
         if( this.vRevisions )
             this.vRevisions.close();
 

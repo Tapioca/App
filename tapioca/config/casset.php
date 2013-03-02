@@ -144,6 +144,7 @@ return array(
                     'views/app/nav/admin.js',
                     'views/app/nav/app.js',
                     'views/app/nav/app-collection.js',
+                    'views/app/nav/search.js',
 
                     'views/content.js',
                     'views/form-view.js',
@@ -161,6 +162,8 @@ return array(
                     'views/admin/workers/index.js',
 
                     'views/app/container/home/index.js',
+
+                    'views/app/container/search/index.js',
 
                     'views/app/container/user/index.js',
                     'views/app/container/user/index-row.js',
@@ -187,6 +190,7 @@ return array(
                     'controllers/app-admin.js',
                     'controllers/collection.js',
                     'controllers/library.js',
+                    'controllers/search.js',
 
                     'components/form.js',
                     // 'components/file-upload.js',

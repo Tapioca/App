@@ -208,6 +208,7 @@ return array(
             'admin_app'       => 'Tapioca Apps',
             'admin_workers'   => 'Tapioca Workers',
             'dashbord'        => 'Dashboard',
+            'search'          => 'Search results for',
             'app_users'       => '%1s users',
             'new_collection'  => 'New collection',
             'edit_collection' => 'Edit %1s collection',
