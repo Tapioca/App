@@ -38,6 +38,7 @@ Autoloader::add_classes(array(
     'Tapioca\\PermissionsException'       => APPPATH.'classes/tapioca/permissions.php',
     'Tapioca\\PreviewException'           => APPPATH.'classes/tapioca/preview.php',
     'Tapioca\\JobsException'              => APPPATH.'classes/tapioca/jobs.php',
+    'Tapioca\\SearchException'            => APPPATH.'classes/tapioca/search.php',
 
     'Tapioca\\CollectionException'        => APPPATH.'classes/tapioca/collection.php', 
     'Tapioca\\DocumentException'          => APPPATH.'classes/tapioca/document.php',  
@@ -55,6 +56,7 @@ Autoloader::add_classes(array(
     'Tapioca\\Rules'                      => APPPATH.'classes/tapioca/rules.php',
     'Tapioca\\Library'                    => APPPATH.'classes/tapioca/library.php',
     'Tapioca\\Storage'                    => APPPATH.'classes/tapioca/storage.php',
+    'Tapioca\\Search'                     => APPPATH.'classes/tapioca/search.php',
     'Tapioca\\Hook'                       => APPPATH.'classes/tapioca/hook.php',
     'Tapioca\\Cast'                       => APPPATH.'classes/tapioca/cast.php',
     'Tapioca\\Preview'                    => APPPATH.'classes/tapioca/preview.php',

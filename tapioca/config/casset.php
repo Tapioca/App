@@ -104,6 +104,8 @@ return array(
                     
                     'library::redactor/redactor.js',
 
+                    'library::lunr/lunr.js',
+
                     'library::fileupload/jquery.iframe-transport.js',
                     'library::fileupload/jquery.fileupload.js',
                     'library::fileupload/jquery.fileupload-ui.js',

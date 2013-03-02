@@ -496,6 +496,8 @@ class Document
 
         Hook::trigger('document::after', $document);
 
+        Search::index( static::$app->get('slug'), static::$collection->namespace, static::$ref, $digest['digest'] );
+
         return $this->get( static::$revisionLast );
     }
 
@@ -639,6 +641,8 @@ class Document
 
         if($delete)
         {
+            Search::delete( static::$app->get('slug'), static::$collection->namespace, static::$ref );
+
             // Get Collection Definiton
             try
             {
