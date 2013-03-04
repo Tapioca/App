@@ -56,12 +56,11 @@ $.Tapioca.Bootstrap = function()
                 $.Tapioca.UserApps[ appslug ].library = new $.Tapioca.Collections.Files( {
                                                             appslug: appslug
                                                         });
-                $.Tapioca.UserApps[ appslug ].searchIndex = lunr(function ()
-                                                            {
-                                                                this.field('title', {boost: 10})
-                                                                this.field('body')
-                                                                this.ref('id')
-                                                            });
+                $.Tapioca.UserApps[ appslug ].search  = new $.Tapioca.Collections.Search( {
+                                                            appslug: appslug
+                                                        });
+                
+                $.Tapioca.UserApps[ appslug ].search.fetch();
                 
                 loadCollection( appslug );
             });
@@ -121,23 +120,23 @@ $.Tapioca.Bootstrap = function()
         });
 
         // fulltext search index
-        var apiSearch = $.Tapioca.config.apiUrl + appslug +'/search';
+        // var apiSearch = $.Tapioca.config.apiUrl + appslug +'/search';
 
-        $.getJSON( apiSearch, function ( indexes )
-        {
-            $.Tapioca.UserApps[ appslug ].searchValues = indexes;
+        // $.getJSON( apiSearch, function ( indexes )
+        // {
+        //     $.Tapioca.UserApps[ appslug ].searchValues = indexes;
 
-            console.time('load '+appslug+' search index')
+        //     console.time('load '+appslug+' search index')
 
-            indexes.forEach(function ( raw )
-            {
-                $.Tapioca.UserApps[ appslug ].searchIndex.add({
-                    id:    raw._ref,
-                    title: raw.title,
-                    body:  raw.body
-                })
-            })
-            console.timeEnd('load '+appslug+' search index')
-        });
+        //     indexes.forEach(function ( raw )
+        //     {
+        //         $.Tapioca.UserApps[ appslug ].searchIndex.add({
+        //             id:    raw._ref,
+        //             title: raw.title,
+        //             body:  raw.body
+        //         })
+        //     })
+        //     console.timeEnd('load '+appslug+' search index')
+        // });
     };
 };

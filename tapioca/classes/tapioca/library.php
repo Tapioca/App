@@ -91,14 +91,7 @@ class Library
         // load and set config
         static::$app              = $app;
         static::$dbCollectionName = static::$app->get('slug').'--library';
-
-        // static::$storage     = new Storage( static::$app ); 
-
-        // static::$rootStorage = Config::get('tapioca.upload.storage');
-        // static::$appStorage  = static::$rootStorage.static::$app->get('slug');
-        
-        // static::$db          = \Mongo_Db::instance();
-        static::$gfs         = \GridFs::getFs(Tapioca::db());
+        static::$gfs              = \GridFs::getFs(Tapioca::db());
 
         // if a Name was passed
         if ($filename)
@@ -174,29 +167,6 @@ class Library
         Tapioca::enqueueJob( 'bdn', '\\Tapioca\\Jobs\\Library\\Preset', $resqueArgs, null);
 
         return true;
-
-        // $original_file = $this->get_path();
-        // $path          = $this->get_path(false);
-        // $new_file_path = $path.$preset_name.'-'.$this->filename;
-        // $resource      = \Image::load($original_file);
-        
-        // $resource->config('presets', $presets);
-        // $resource->preset($preset_name)->save($new_file_path);
-
-        // if( file_exists( $new_file_path ) )
-        // {
-        //     $ret = static::$db
-        //             ->where(array(
-        //                 'filename' => $this->filename
-        //             ))
-        //             ->update(static::$dbCollectionName, array(
-        //                 '$addToSet' => array(
-        //                     'presets' => $preset_name
-        //                 )
-        //             ), array(), true);
-
-        //     return $ret;
-        // }
     }
 
     public function getAll($category = null, $tag = null)
@@ -229,23 +199,6 @@ class Library
 
         return $this->file;
     }
-
-    // public function get_path($full_path = true, $preset = null)
-    // {
-    //     $path = static::$appStorage.DIRECTORY_SEPARATOR.$this->file['category'].DIRECTORY_SEPARATOR;
-
-    //     if(!$full_path)
-    //     {
-    //         return $path;
-    //     }
-
-    //     if($preset)
-    //     {
-    //         $path .= $preset.'-';
-    //     }
-
-    //     return $path.$this->filename;
-    // }
 
     public function getBytes($preview = false)
     {
@@ -331,11 +284,6 @@ class Library
                 if( !empty( $p ))
                     $p = $p.'-';
 
-                // $old = $p.$this->file['filename'];
-                // $new = $p.$update['filename'];
-
-                // static::$storage->rename( $this->file['category'], $old, $new );
-
                 $resqueArgs = array(
                     'appslug'  => static::$app->get('slug'),
                     'old'      => $p.$this->file['filename'],
@@ -384,7 +332,25 @@ class Library
             // check for documents to update
             Tapioca::enqueueJob( static::$app->get('slug'), '\\Tapioca\\Jobs\\Dependency\\File', $resqueArgs, null);
 
-            return array_merge( $this->file, $update );
+            $this->file = array_merge( $this->file, $update );
+
+            $tags = '';
+
+            foreach( $this->file['tags'] as $tag)
+            {
+                $tags = $tag['value'];
+            }
+
+
+            $digest = array(
+                'filename' => $this->file['filename'],
+                'tags'     => $tags,
+                'category' => $this->file['category'],
+            );
+
+            Search::index( static::$app->get('slug'), false, $this->file['_ref'], $digest );
+
+            return $this->file;
         }
         else
         {
@@ -413,8 +379,6 @@ class Library
             $fileinfo   = pathinfo($file['path']);
 
             $filename   = static::setFileName($file['path']);
-            // $filename    = \Inflector::friendly_title(trim(strtolower($fileinfo['filename'])));
-            // $basename   = $filename.'.'.$fileinfo['extension'];
 
             $category   = static::getFileCategory($minetype[0]);
 
@@ -630,14 +594,6 @@ class Library
             $previewStorage->store($preview_name, $fields['category'], $fileContent ); 
         }
 
-        // // get file content
-        // $fileContent = File::read( $filePath, true );
-        
-        // // remove original file
-        // unlink($filePath);
-
-        // static::$storage->store( $fields['filename'], $fields['category'], $fileContent );
-
         $resqueArgs = array(
             'appslug'  => static::$app->get('slug'),
             'filePath' => $filePath,
@@ -647,6 +603,22 @@ class Library
         
         // check for documents to update
         Tapioca::enqueueJob( static::$app->get('slug'), '\\Tapioca\\Jobs\\Storage\\Create', $resqueArgs, null);
+
+        $tags = '';
+
+        foreach( $fields['tags'] as $tag)
+        {
+            $tags = $tag['value'];
+        }
+
+
+        $digest = array(
+            'filename' => $fields['filename'],
+            'tags'     => $tags,
+            'category' => $fields['category'],
+        );
+
+        Search::index( static::$app->get('slug'), false, $new_file['_ref'], $digest );
     }
 
     /**
@@ -790,6 +762,8 @@ class Library
                     Tapioca::enqueueJob( static::$app->get('slug'), '\\Tapioca\\Jobs\\Storage\\Delete', $resqueArgs, null);
                 }
 
+                Search::delete( static::$app->get('slug'), false, $this->file['_ref'] );
+
                 $delete =  Tapioca::db()
                             ->where(array(
                                     '_ref' => $this->file['_ref']
@@ -911,8 +885,6 @@ class Library
             {
                 $file_path  = $file['saved_to'].$file['saved_as'];
 
-                // $basename    = \Inflector::friendly_title(trim(strtolower($file['filename'])));
-                // $filename   = $basename.'.'.$file['extension'];
                 $filename   = static::setFileName($file_path, $file['filename']);
                 $category   = static::getFileCategory($file['mimetype']);
 

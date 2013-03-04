@@ -104,7 +104,7 @@ return array(
                     
                     'library::redactor/redactor.js',
 
-                    'library::lunr/lunr.js',
+                    // 'library::lunr/lunr.js',
 
                     'library::fileupload/jquery.iframe-transport.js',
                     'library::fileupload/jquery.fileupload.js',
@@ -131,12 +131,14 @@ return array(
                     'models/abstract.js',
                     'models/document.js',
                     'models/file.js',
+                    'models/search.js',
 
                     'collections/users.js',
                     'collections/apps.js',
                     'collections/collections.js',
                     'collections/abstracts.js',
                     'collections/files.js',
+                    'collections/search.js',
                     
                     'views/app/index.js',
                     'views/app/nav/index.js',

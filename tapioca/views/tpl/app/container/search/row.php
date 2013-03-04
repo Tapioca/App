@@ -1,10 +1,10 @@
-{{#row}}
+{{#rows}}
     <tr>
         <td>
-            <a href="{{url}}">{{namespace}}</a>
+            <a href="{{url}}">{{name}}</a>
         </td>
         <td>
             <a href="{{url}}">{{title}}</a>
         </td>
     </tr>
-{{/row}}
+{{/rows}}

@@ -40,39 +40,70 @@ class Search
         $arr = array(
             '_ref'      => $_ref,
             'appslug'   => $appslug,
-            'namespace' => $namespace,
-            'digest'    => $digest,
+        );
+        $where = array(
+            'appslug'   => $appslug,
+            '_ref'      => $_ref,
         );
 
-        $docTitle = '';
-        $docBody  = array();
-        $i        = 0;
-
-        foreach( $digest as $str )
+        // document
+        if( $namespace )
         {
-            if( $i == 0 )
+            $arr['namespace']   = $namespace;
+            $where['namespace'] = $namespace;
+
+            $docTitle = '';
+            $docBody  = array();
+            $i        = 0;
+
+            foreach( $digest as $str )
             {
-                $docTitle = self::clean( $str );
-                $i = 1;
+                if( $i == 0 )
+                {
+                    // document title to display 
+                    $arr['title']   = $str;
+
+                    $str            = self::clean( $str );
+
+                    // string use to refine score
+                    $arr['booster'] = $str;
+
+                    // concat all digest's string
+                    $docBody[]      = $str;
+
+                    $i = 1;
+                }
+                else
+                {
+                    $docBody[] = self::clean( $str );
+                }
             }
-            else
-            {
-                $docBody[] = self::clean( $str );
-            }
+
+            $arr['body']    = join(' ', $docBody);
         }
+        // file
+        else
+        {
+            $where['library'] = true;
 
+            $arr['library']  = true;
+            $arr['title']    = $digest['filename'];
+            $arr['category'] = $digest['category'];
+            $arr['booster']  = self::clean( $digest['filename'] );
 
-        $arr['title'] = $docTitle;
-        $arr['body']  = join(' ', $docBody);
+            $docBody  = join(' ', array(
+                    $digest['filename'],
+                    $digest['tags'],
+                    $digest['category'],
+                ));
+
+            $arr['body']    = self::clean( $docBody);
+        }
 
         $dbCollectionName = $appslug.'--search';
 
         return Tapioca::db()
-                    ->where(array(
-                        'appslug'   => $appslug,
-                        'namespace' => $namespace,
-                        '_ref'      => $_ref,
-                    ))
+                    ->where( $where )
                     ->update( $dbCollectionName, $arr, array('upsert' => true) );
     }
 
@@ -91,13 +122,18 @@ class Search
     public static function delete( $appslug, $namespace, $_ref )
     {
         $dbCollectionName = $appslug.'--search';
+        $where = array(
+            'appslug'   => $appslug,
+            '_ref'      => $_ref,
+        );
+
+        if( $namespace )
+            $where['namespace'] = $namespace;
+        else
+            $where['library'] = true;
 
         $ret = Tapioca::db()
-                    ->where(array(
-                        'appslug'   => $appslug,
-                        'namespace' => $namespace,
-                        '_ref'      => $_ref,
-                    ))
+                    ->where( $where )
                     ->delete( $dbCollectionName );
     }
 }
