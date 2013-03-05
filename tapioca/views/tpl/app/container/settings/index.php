@@ -6,7 +6,7 @@
                             <a href="#locales-form" data-toggle="tab" data-bypass="true"><?= __('tapioca.ui.label.edit_app_locale'); ?></a>
                         </li>
                         <li>
-                            <a href="#medias-form" data-toggle="tab" data-bypass="true"><?= __('tapioca.ui.label.edit_app_mediatype'); ?></a>
+                            <a href="#medias-form" data-toggle="tab" data-bypass="true"><?= __('tapioca.ui.label.app_library'); ?></a>
                         </li>
                         <li>
                             <a href="#apikey-form" data-toggle="tab" data-bypass="true"><?= __('tapioca.ui.label.edit_app_apikey'); ?></a>
@@ -27,7 +27,34 @@
                                     <textarea rows="3" id="ext-whitelist" class="span7">{{ extWhitelist }}</textarea>
                                 </div>
                             </div>
-
+                            <hr>
+                            <div class="control-group">
+                                <label class="control-label"><?= __('tapioca.ui.label.storage'); ?></label>
+                                <div class="controls">
+                                    <select id="storage">
+                                        <option value=""{{isSelected storage.method default="" attribute="selected"}}><?= __('tapioca.ui.label.storage_locale'); ?></option>
+                                        <option value="ftp"{{isSelected storage.method default="ftp" attribute="selected"}}><?= __('tapioca.ui.label.storage_ftp'); ?></option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div id="storage-data">
+                                <div class="control-group" data-storage="ftp">
+                                    <label class="control-label"><?= __('tapioca.ui.label.storage_host'); ?></label>
+                                    <div class="controls"><input type="text" id="storage.host" value="{{storage.host}}"></div>
+                                </div>
+                                <div class="control-group" data-storage="ftp">
+                                    <label class="control-label"><?= __('tapioca.ui.label.storage_path'); ?></label>
+                                    <div class="controls"><input type="text" id="storage.path" value="{{storage.path}}"></div>
+                                </div>
+                                <div class="control-group" data-storage="ftp">
+                                    <label class="control-label"><?= __('tapioca.ui.label.storage_username'); ?></label>
+                                    <div class="controls"><input type="text" id="storage.username" value="{{storage.username}}"></div>
+                                </div>
+                                <div class="control-group" data-storage="ftp">
+                                    <label class="control-label"><?= __('tapioca.ui.label.storage_password'); ?></label>
+                                    <div class="controls"><input type="text" id="storage.password" placeholder="only you know"></div>
+                                </div>
+                            </div>
                         </fieldset>
 
                         <fieldset id="apikey-form" class="tab-pane">

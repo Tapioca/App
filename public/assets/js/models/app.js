@@ -91,6 +91,16 @@ $.Tapioca.Models.App = $.Tapioca.Models.Tapioca.extend(
         }
 
         return this.get('extwhitelist');
+    },
+
+    getStorage: function()
+    {
+        if( _.isUndefined( this.get('storage') ) )
+        {
+            this.set('storage', { method: ''});
+        }
+
+        return this.get('storage');
     }
 
 });

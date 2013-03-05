@@ -15,8 +15,9 @@ $.Tapioca.Views.AppAdminSettings = $.Tapioca.Views.FormView.extend(
 
     render: function()
     {
-        var model = this.model.toJSON(),
-            ext   = this.model.get('library.extwhitelist');
+        var storage = this.model.getStorage()
+          , model   = this.model.toJSON()
+          , ext   = this.model.get('library.extwhitelist');
 
         model.pageTitle    = $.Tapioca.I18n.get('title.edit_app', this.model.get('name'));
         model.extWhitelist = ext.join(', ');
