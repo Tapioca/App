@@ -53,8 +53,10 @@ class Controller_Api_Search extends Controller_Api
             static::error( $e->getMessage() , 401 );
             return;
         }
-        
-        static::$data   = Search::get( static::$appslug );
+
+        $ref       = $this->param('ref', false);
+
+        static::$data   = Search::get( static::$appslug, $ref );
         static::$status = 200;
     }
 }

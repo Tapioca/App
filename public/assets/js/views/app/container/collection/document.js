@@ -265,6 +265,9 @@ $.Tapioca.Views.Document = $.Tapioca.Views.FormView.extend(
 
                     self.abstract.fetch();
                     self.resetForm();
+
+                    // update search index
+                    $.Tapioca.UserApps[ self.appslug ].search.get( self.ref ).fetch();
                 },
                 error: function(model, response)
                 {

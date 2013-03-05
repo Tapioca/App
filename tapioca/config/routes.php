@@ -62,6 +62,7 @@ return array(
     'api/:appslug/library'                             => array('api/library',                 'name' => 'api_library'),
 
         // search index
+    'api/:appslug/search/:ref'                         => array('api/search/',                 'name' => 'api_search_doc_ref'),
     'api/:appslug/search'                              => array('api/search/',                 'name' => 'api_search'),
 
         // app

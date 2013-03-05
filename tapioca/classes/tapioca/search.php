@@ -107,16 +107,24 @@ class Search
                     ->update( $dbCollectionName, $arr, array('upsert' => true) );
     }
 
-    public static function get( $appslug )
+    public static function get( $appslug, $_ref = fasle )
     {
         $dbCollectionName = $appslug.'--search';
+        $where            = array(
+                                'appslug' => $appslug
+                            );
 
-        return Tapioca::db()
-                    ->select( array(), array('_id', 'appslug'))
-                    ->where(array(
-                        'appslug'   => $appslug
-                    ))
-                    ->get( $dbCollectionName );
+        if( $_ref )
+            $where['_ref'] = $_ref;
+
+        $db = Tapioca::db()
+                ->select( array(), array('_id', 'appslug'))
+                ->where( $where );
+
+        if( !$_ref )
+            return $db->get( $dbCollectionName );
+        else
+            return $db->get_one( $dbCollectionName );
     }
 
     public static function delete( $appslug, $namespace, $_ref )
