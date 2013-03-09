@@ -107,7 +107,6 @@ class App
         if( isset( $this->app['storage'] ))
         {
             unset( $this->app['storage']['password'] );
-            unset( $this->app['storage']['username'] );
         }
     }
 
@@ -365,6 +364,20 @@ class App
             $update['library'] = $this->get('library');
             
             $update['library']['extwhitelist'] = $fields['library']['extwhitelist'];
+        }
+
+        // update extension whitelist
+        if (array_key_exists('storage', $fields))
+        {
+            $update['storage'] = array();
+
+            foreach ($fields['storage'] as $key => $value)
+            {
+                if( $key == 'password')
+                    $value = \Crypt::encode($value, Config::get('tapioca.crypt_salt'));
+
+               $update['storage'][ $key ] = $value;
+            }   
         }
 
         if (empty($update))

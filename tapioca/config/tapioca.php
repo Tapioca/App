@@ -25,6 +25,8 @@ return array(
 
     'default_password' => 'azerty',
 
+    'crypt_salt' => 'R@nd0mK~Y',
+
     'date' => array(
         'timezone' => 'Europe/Paris',
         'format'   => '%d/%m/%G'

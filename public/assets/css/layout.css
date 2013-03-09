@@ -738,6 +738,9 @@ header#tapp {
   content: "\f067";
 }
 
+#storage-data div.control-group {
+	display: none;
+}
 
 	/* revisons
 	------------------------- */

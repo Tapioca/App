@@ -10,8 +10,12 @@ $.Tapioca.Views.AppAdminSettings = $.Tapioca.Views.FormView.extend(
         this.tplLocale = Handlebars.compile( $.Tapioca.Tpl.components.locales );
 
         this.appslug  = $.Tapioca.appslug;
-
     },
+
+
+    events: _.extend({
+        'change #storage': 'displayStorageOptions'
+    }, $.Tapioca.Views.FormView.prototype.events),
 
     render: function()
     {
@@ -27,12 +31,26 @@ $.Tapioca.Views.AppAdminSettings = $.Tapioca.Views.FormView.extend(
 
         this.html( html );
 
+        this.storageSelector = $('#storage');
+        this.storageOptions  = $('#storage-data').find('div.control-group');
+
+        this.displayStorageOptions();
+
         return this;
     },
 
     addRepeatNode: function()
     {
         this.$el.find('ul.input-repeat-list').append( this.tplLocale({}));
+    },
+
+    displayStorageOptions: function()
+    {
+        var value = this.storageSelector.val();
+
+        this.storageOptions.hide();
+
+        this.storageOptions.filter('[data-storage="' + value + '"]').show();
     },
 
     submit: function( event )
@@ -82,6 +100,31 @@ $.Tapioca.Views.AppAdminSettings = $.Tapioca.Views.FormView.extend(
         else
         {
             valid = false;
+        }
+
+        // Storage
+        var strotageMethod = this.storageSelector.val();
+
+        if( strotageMethod != '')
+        {
+            var storage = {
+                method: strotageMethod
+            };
+
+            this.storageOptions.filter(':visible').find('input').each(function()
+            {
+                var field = this.id.replace('storage.', '');
+
+                storage[ field ] = this.value;
+
+                if( this.value == '' )
+                {
+                    valid = false;
+                }
+            })
+
+            if( valid )
+                this.model.set('storage', storage);
         }
 
         if(valid)

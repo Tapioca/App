@@ -71,7 +71,7 @@ class Storage
                         $path     = $this->app->get('storage.path');
                         $host     = $this->app->get('storage.host');
                         $username = $this->app->get('storage.username');
-                        $password = $this->app->get('storage.password');
+                        $password = \Crypt::decode($this->app->get('storage.password'), Config::get('tapioca.crypt_salt'));
 
                         if( substr( $path, -1) != '/' )
                             $path .=  '/';
