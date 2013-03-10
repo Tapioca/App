@@ -44,7 +44,7 @@
                                 </div>
                                 <div class="control-group" data-storage="ftp">
                                     <label class="control-label"><?= __('tapioca.ui.label.storage_path'); ?></label>
-                                    <div class="controls"><input type="text" id="storage.path" value="{{storage.path}}"></div>
+                                    <div class="controls"><input type="text" id="storage.path" value="{{storage.path}}" placeholder="/"></div>
                                 </div>
                                 <div class="control-group" data-storage="ftp">
                                     <label class="control-label"><?= __('tapioca.ui.label.storage_username'); ?></label>
@@ -53,6 +53,13 @@
                                 <div class="control-group" data-storage="ftp">
                                     <label class="control-label"><?= __('tapioca.ui.label.storage_password'); ?></label>
                                     <div class="controls"><input type="text" id="storage.password" placeholder="only you know"></div>
+                                </div>
+                            </div>
+                            <div class="control-group" id="storage-test-holder">
+                                <label class="control-label">&nbsp;</label>
+                                <div class="controls">
+                                    <a href="javascript:;" id="storage-test" class="btn btn-mini">Test settings</a>
+                                    <p class="help-block"></p>
                                 </div>
                             </div>
                         </fieldset>

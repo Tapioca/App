@@ -14,7 +14,9 @@ $.Tapioca.Views.AppAdminSettings = $.Tapioca.Views.FormView.extend(
 
 
     events: _.extend({
-        'change #storage': 'displayStorageOptions'
+        'change #storage':              'displayStorageOptions',
+        'keyup :input[id^="storage."]': 'displayStorageTest',
+        'click #storage-test':          'testStorageOptions'
     }, $.Tapioca.Views.FormView.prototype.events),
 
     render: function()
@@ -31,8 +33,9 @@ $.Tapioca.Views.AppAdminSettings = $.Tapioca.Views.FormView.extend(
 
         this.html( html );
 
-        this.storageSelector = $('#storage');
-        this.storageOptions  = $('#storage-data').find('div.control-group');
+        this.$storageSelector = $('#storage');
+        this.$storageOptions  = $('#storage-data').find('div.control-group');
+        this.$storageTestBtn = $('#storage-test-holder');
 
         this.displayStorageOptions();
 
@@ -46,11 +49,79 @@ $.Tapioca.Views.AppAdminSettings = $.Tapioca.Views.FormView.extend(
 
     displayStorageOptions: function()
     {
-        var value = this.storageSelector.val();
+        var value = this.$storageSelector.val();
 
-        this.storageOptions.hide();
+        this.$storageOptions.hide();
+        this.$storageTestBtn.hide()
 
-        this.storageOptions.filter('[data-storage="' + value + '"]').show();
+        var $fields = this.$storageOptions.filter('[data-storage="' + value + '"]');
+
+        if( $fields.length )
+        {
+            $fields.show();
+            // this.$storageTestBtn.show();
+        }
+    },
+
+    getStorageOptions: function()
+    {
+        var method  = this.$storageSelector.val()
+          , storage = {};
+
+        this.$storageOptions.removeClass('error');
+
+        if( method != '')
+        {
+            storage.method = method;
+
+            this.$storageOptions.filter(':visible').find('input').each(function()
+            {
+                var field       = this.id.replace('storage.', '')
+                  , value       = this.value;
+
+                storage[ field ] = value;
+
+            });
+        }
+
+        return storage;
+    },
+
+    displayStorageTest: function()
+    {
+        this.$storageTestBtn.find('p.help-block').html('');
+        this.$storageTestBtn.show();
+    },
+
+    testStorageOptions: function()
+    {
+        var storage = this.getStorageOptions();
+
+        if( storage )
+        {
+            var url     = $.Tapioca.config.apiUrl + this.appslug + '/library/test-storage'
+              , $result = this.$storageTestBtn.find('p.help-block')
+              , test    = $.ajax({
+                                url:      url,
+                                data:     JSON.stringify( { storage: storage } ),
+                                dataType: 'json',
+                                type:     'POST'
+                            });
+            
+            $result.html('testing');
+
+            test.done( function( p )
+            {
+                $result.html('settings ok');
+            })
+
+            test.fail( function( p )
+            {
+                var response =  $.parseJSON( p.responseText );
+
+                $result.html( response.error );
+            });
+        }
     },
 
     submit: function( event )
@@ -102,29 +173,12 @@ $.Tapioca.Views.AppAdminSettings = $.Tapioca.Views.FormView.extend(
             valid = false;
         }
 
-        // Storage
-        var strotageMethod = this.storageSelector.val();
+        var storage = this.getStorageOptions();
 
-        if( strotageMethod != '')
+        if( storage )
         {
-            var storage = {
-                method: strotageMethod
-            };
-
-            this.storageOptions.filter(':visible').find('input').each(function()
-            {
-                var field = this.id.replace('storage.', '');
-
-                storage[ field ] = this.value;
-
-                if( this.value == '' )
-                {
-                    valid = false;
-                }
-            })
-
-            if( valid )
-                this.model.set('storage', storage);
+            this.model.set('storage', storage);
+            this.$storageOptions.not(':visible').find('input').val('')
         }
 
         if(valid)
