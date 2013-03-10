@@ -71,6 +71,11 @@ $.Tapioca.Views.App = Backbone.View.extend({
 
         this.$el.html('')
 
+        $.Tapioca.Session.clear({ silent : true }) 
+        $.Tapioca.Apps     = false;
+        $.Tapioca.Users    = false;
+        $.Tapioca.UserApps = [];
+
         $.Tapioca.view = new $.Tapioca.Views.Login();
     }
 });
