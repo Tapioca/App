@@ -158,4 +158,48 @@ class Controller_Api_Library extends Controller_Api
         static::$data   = array('status' => 'ok');
         static::$status = 200;
     }
+
+    public function post_teststorage()
+    {
+        $storage  = Input::json('storage', null);
+
+        // get file content
+        $fileContent = File::read( Config::get('tapioca.upload.storage_test'), true );
+        $filename    = 'tapioca-test.png';
+
+        switch( $storage['method'] )
+        {
+            case 'ftp':
+                        $path     = $storage['path'];
+                        $host     = $storage['host'];
+                        $username = $storage['username'];
+                        $password = $storage['password'];
+
+                        if( substr( $path, -1) != '/' )
+                            $path .=  '/';
+
+                        $path .= 'image';
+
+                        $adapter    = new Gaufrette\Adapter\Ftp( $path, $host, array('username' => $username, 'password' => $password, 'create' => true));
+                        break;
+        }
+
+        try
+        {
+            $fs   = new Gaufrette\Filesystem( $adapter );
+            $test = $fs->write( $filename, $fileContent );
+
+            if( $test )
+            {
+                $fs->delete( $filename );
+
+                static::$data   = array('status' => 'ok');
+                static::$status = 200;
+            }
+        }
+        catch( RuntimeException $e)
+        {
+            static::error( $e->getMessage(), 401);
+        }
+    }
 }

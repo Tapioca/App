@@ -259,6 +259,7 @@ return array(
         'path'                => APPPATH.'tmp',
         'storage'             => PUBPATH.'files'.DIRECTORY_SEPARATOR,
         'public'              => Config::get('base_url').'files'.DIRECTORY_SEPARATOR,
+        'storage_test'        => PUBPATH.'assets/img/logo-login.png',
         'field'               => 'tappfile',
         'randomize'           => true,
         'fileinfo_magic_path' => '',

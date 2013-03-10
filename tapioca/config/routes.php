@@ -57,6 +57,7 @@ return array(
     'api/:appslug/document/:namespace'                 => array('api/document/',               'name' => 'api_document'),
 
         // library
+    'api/:appslug/library/test-storage'                => array('api/library/teststorage',     'name' => 'api_library_test_storage'),
     'api/:appslug/library/:filename/preset/:preset'    => array('api/library/preset',          'name' => 'api_library_preset'),
     'api/:appslug/library/:filename'                   => array('api/library',                 'name' => 'api_library_filename'),
     'api/:appslug/library'                             => array('api/library',                 'name' => 'api_library'),
