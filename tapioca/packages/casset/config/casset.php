@@ -64,6 +64,7 @@ return array(
 	 */
 	'js_dir' => 'js/',
 	'css_dir' => 'css/',
+	'less_dir' => 'less/',
 	'img_dir' => 'img/',
 
 	/**

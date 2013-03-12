@@ -20,6 +20,7 @@ Autoloader::add_classes(array(
 	'Casset\\Casset_Csscompressor'  => __DIR__.'/classes/casset/csscompressor.php',
 	'Casset\\Casset_Cssurirewriter' => __DIR__.'/classes/casset/cssurirewriter.php',
 	'Casset\\Casset_Addons_Twig'    => __DIR__.'/classes/casset/addons/twig.php',
+	'Casset\\Casset_Addons_Lessphp' => __DIR__.'/classes/casset/addons/lessphp.php',
 ));
 
 /* End of file bootstrap.php */

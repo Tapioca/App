@@ -37,6 +37,7 @@ class Casset {
 	 * @var array The folders in which css, js, and images can be found.
 	 */
 	protected static $default_folders = array(
+		'less' => 'less/',
 		'css' => 'css/',
 		'js' => 'js/',
 		'img' => 'img/',
@@ -52,6 +53,7 @@ class Casset {
 	 * @var array Holds groups of assets. Is documenented fully in the config file.
 	 */
 	protected static $groups = array(
+		'less' => array(),
 		'css' => array(),
 		'js' => array(),
 	);
@@ -60,6 +62,7 @@ class Casset {
 	 * @var array Holds inline js and css.
 	 */
 	protected static $inline_assets = array(
+		'less' => array(),
 		'css' => array(),
 		'js' => array(),
 	);
@@ -114,12 +117,30 @@ class Casset {
 	 * @var array Keeps a record of which groups have been rendered.
 	 * We then check this when deciding whether to render a dep.
 	 */
-	protected static $rendered_groups = array('js' => array(), 'css' => array());
+	protected static $rendered_groups = array('js' => array(), 'css' => array(), 'less' => array());
 
 	/**
 	 * @var bool Wether we've been initialized.
 	 */
 	public static $initialized = false;
+
+	/**
+	 * @var bool Does we already load Less
+	 */
+	public static $displayLess = false;
+
+    /**
+     * @var bool Wether we've been init Less
+     */
+    protected static $initLess = false;
+
+    /**
+     * @var array Less's helpers for debug
+     */
+    protected static $less = array(
+        'debug' => false,
+        'lib'   => 'assets/lib/less/less-1.3.1.min.js'
+    );
 
 	/**
 	* Loads in the config and sets the variables
@@ -137,10 +158,17 @@ class Casset {
 		static::$asset_url = \Config::get('casset.url', \Config::get('base_url'));
 
 		static::$default_folders = array(
+			'less' => \Config::get('casset.less_dir', static::$default_folders['less']),
 			'css' => \Config::get('casset.css_dir', static::$default_folders['css']),
 			'js' => \Config::get('casset.js_dir', static::$default_folders['js']),
 			'img' => \Config::get('casset.img_dir', static::$default_folders['img']),
 		);
+
+        // LESS
+        static::$less['debug'] = \Config::get('casset.less_debug', static::$less['debug']);
+        static::$less['lib']   = \Config::get('casset.less_lib',   static::$less['lib']);
+        static::$less['lib']   = \Uri::base().static::$less['lib'];
+
 
 		$paths = \Config::get('casset.paths', static::$asset_paths);
 
@@ -174,6 +202,8 @@ class Casset {
 			static::add_group_base('js', 'global');
 		if (!static::group_exists('css', 'global'))
 			static::add_group_base('css', 'global');
+		if (!static::group_exists('less', 'global'))
+			static::add_group_base('less', 'global');
 
 		static::$show_files = \Config::get('casset.show_files', static::$show_files);
 		static::$show_files_inline = \Config::get('casset.show_files_inline', static::$show_files_inline);
@@ -235,6 +265,7 @@ class Casset {
 		$path_val['dirs'] = array(
 			'js' => array_key_exists('js_dir', $path_attr) ? $path_attr['js_dir'] : static::$default_folders['js'],
 			'css' => array_key_exists('css_dir', $path_attr) ? $path_attr['css_dir'] : static::$default_folders['css'],
+			'less' => array_key_exists('less_dir', $path_attr) ? $path_attr['less_dir'] : static::$default_folders['less'],
 			'img' => array_key_exists('img_dir', $path_attr) ? $path_attr['img_dir'] : static::$default_folders['img'],
 		);
 		static::$asset_paths[$path_key] = $path_val;
@@ -338,6 +369,7 @@ class Casset {
 	{
 		static::asset_enabled('js', $groups, true);
 		static::asset_enabled('css', $groups, true);
+		static::asset_enabled('less', $groups, true);
 	}
 
 	/**
@@ -349,6 +381,7 @@ class Casset {
 	{
 		static::asset_enabled('js', $groups, false);
 		static::asset_enabled('css', $groups, false);
+		static::asset_enabled('less', $groups, false);
 	}
 
 	/**
@@ -902,17 +935,38 @@ class Casset {
 					}
 					else
 					{
+						// $rel = (substr_compare($file['file'], '.less', -5, 5) === 0)  ? 'stylesheet/less' : 'stylesheet';
+                        $rel = 'stylesheet';
+
+                        if(substr_compare($file['file'], '.less', -5, 5) === 0)
+                        {
+                            static::$less['debug'] = true;
+                            $rel = 'stylesheet/less';
+                        }
+
 						$remote = (strpos($file['file'], '//') !== false);
 						$base = ($remote) ? '' : static::$asset_url;
 						$filepath = $base.static::process_filepath($file['file'], 'css', $remote);
 						if ($options['gen_tags'])
-							$ret .= html_tag('link', array('rel' => 'stylesheet', 'href' => $filepath)+$attr).PHP_EOL;
+							$ret .= html_tag('link', array('rel' => $rel, 'href' => $filepath)+$attr).PHP_EOL;
 						else
 							$ret[] = $filepath;
 					}
 				}
 			}
 		}
+
+		if( !static::$displayLess && static::$less['debug'] )
+		{
+			$ret .= html_tag('script', array('src' => static::$less['lib']),'').PHP_EOL;
+			$ret .= html_tag('script', array(), '
+less.env = "development";
+less.refresh();
+');
+
+			static::$displayLess = true;
+		}
+
 		return $ret;
 	}
 
@@ -1082,7 +1136,7 @@ class Casset {
 	 * Doesn't bother if none of the files have been modified since the cache
 	 * file was written.
 	 *
-	 * @param string $type 'css' / 'js'
+	 * @param string $type 'css' / 'less' / 'js'
 	 * @param array $file_group Array of ('file' => filename, 'minified' => is_minified)
 	 *        to combine and minify.
 	 * @param bool $minify whether to minify the files, as well as combining them
@@ -1104,6 +1158,8 @@ class Casset {
 				$last_mod = $mod;
 		}
 
+		//$ext = ($type == 'less') ? 'css' : $type;
+
 		$filename = md5(implode('', array_map(function($a) {
 			return $a['file'];
 		}, $file_group)).($minify ? 'min' : '').$last_mod).'.'.$type;
@@ -1116,6 +1172,16 @@ class Casset {
 			$content = '';
 			foreach ($file_group as $file)
 			{
+                if (substr_compare($file['file'], '.less', -5, 5) === 0)
+                {
+                    $type = 'less';
+
+                    if( !static::$initLess )
+                    {
+                        // Lessphp::init();
+                    }
+                }
+
 				if (static::$show_files_inline)
 					$content .= PHP_EOL.'/* '.$file['file'].' */'.PHP_EOL.PHP_EOL;
 				if ($file['minified'] || !$minify)
@@ -1123,6 +1189,7 @@ class Casset {
 				else
 				{
 					$file_content = static::load_file($file['file'], $type, $file_group);
+
 					if ($file_content === false)
 						throw new Casset_Exception("Couldn't not open file {$file['file']}");
 					if ($type == 'js')
@@ -1133,8 +1200,15 @@ class Casset {
 					{
 						$content .= Casset_Csscompressor::process($file_content).PHP_EOL;
 					}
+                    elseif ($type == 'less')
+                    {
+                        $compile  = Casset_Addons_Lessphp::compile( array($file) );
+                        // $compile  = static::css_rewrite_uris($compile, static::$cache_path.$filename, \Uri::string());
+                        $content .= Casset_Csscompressor::process( $compile ).PHP_EOL;
+                    }
 				}
 			}
+
 			file_put_contents($filepath, $content, LOCK_EX);
 			$mtime = time();
 		}

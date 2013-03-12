@@ -36,6 +36,10 @@ return array(
             'path' => 'assets/lib/',
             'js_dir' => '',
         ),
+        'less' => array(
+            'path' => 'assets/less/',
+            'css_dir' => '',
+        ),
         'fuel' => array(
             'path' => Config::get('base_url'),
             'js_dir' => '',
@@ -61,7 +65,7 @@ return array(
                     'datepicker.css',
                     'redactor.css',
                     'jquery.fileupload-ui.css',
-                    'schema-editor.css'
+                    'schema-editor.css',
                 )
             ),
             'install' => array(
