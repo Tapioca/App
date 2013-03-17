@@ -63,13 +63,13 @@ class Mongo_Db extends Fuel\Core\Mongo_Db
             }
         }
 
-        $this->_clear();
-
         $obj            = new stdClass;
         $obj->total     = $total;
         $obj->skip      = $this->offset;
         $obj->limit     = $this->limit;
         $obj->results   = $returns;
+
+        $this->_clear();
         
         return $obj;
     }
