@@ -21,10 +21,9 @@ $.Tapioca.Models.Abstract = $.Tapioca.Models.Tapioca.extend(
 
     confirmDelete: function()
     {
-        var type = __('delete.document'),
-            text = $.Tapioca.I18n.get('delete.question', this.get('name'), type),
-            self = this;
+        var type = __('delete.collection'),
+            text = $.Tapioca.I18n.get('delete.question', this.get('_ref'), type);
 
-        $.Tapioca.Dialog.confirm( _.bind( this.delete, this ), { text: text });
+        $.Tapioca.Dialog.confirm( _.bind( this.delete, this ),  _.bind( this.clearDelete, this ), { text: text });
     }
 });

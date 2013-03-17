@@ -30,13 +30,27 @@ $.Tapioca.Dialog = (function()
         $dialog.remove();
     };
 
-    var confirm = function(callback, settings)
+    var confirm = function(callback, cancel, settings)
     {
+        if( !_.isFunction( cancel ) )
+            settings = cancel,
+            cancel   = false;
+
+
         buttons.buttons[ _yes ] = function()
         {
             callback();
             $.Tapioca.BeforeUnload.clean()
             close();
+        }
+
+        if( cancel )
+        {
+            buttons.buttons[ _no ] = function()
+            {
+                cancel();
+                close();
+            }            
         }
 
         if( $('#dialog-confirm').size() == 0 )

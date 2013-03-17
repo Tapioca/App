@@ -52,6 +52,11 @@ $.Tapioca.Models.Tapioca = Backbone.NestedModel.extend({
         }
     },
 
+    clearDelete: function()
+    {
+        this.deleteToken = false;
+    },
+
     // Empty function by default. 
     // Override it with model own logic.
     confirmDelete: function(){}

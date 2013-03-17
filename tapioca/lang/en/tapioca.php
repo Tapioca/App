@@ -209,6 +209,8 @@ return array(
             'question'        => 'Are you sure you want to delete %1$s from %2$s ?',
             'user'            => 'the users',
             'file'            => 'the library',
+            'document'        => 'the document',
+            'collection'      => 'the collection',
             'question_remove' => 'Are you sure you want to remove %1$s from group ?',
         ),
         'title' => array(
