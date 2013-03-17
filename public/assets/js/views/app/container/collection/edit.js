@@ -73,8 +73,10 @@ $.Tapioca.Views.CollectionEdit = $.Tapioca.Views.FormView.extend(
         var model = this.model.toJSON();
 
         $('#schema').val( JSON.stringify( model.schema,        null, ' ') );
-        $('#digest').val( JSON.stringify( model.digest.fields, null, ' ') );
         $('#hooks').val(  JSON.stringify( model.hooks,         null, ' ') );
+
+        if( !_.isUndefined( model.digest ) )
+            $('#digest').val( JSON.stringify( model.digest.fields, null, ' ') );
     },
 
     editor: function()
