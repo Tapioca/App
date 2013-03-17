@@ -258,6 +258,8 @@ $.Tapioca.Views.Document = $.Tapioca.Views.FormView.extend(
 
                         self.abstracts.add( self.abstract );
 
+                        $.Tapioca.UserApps[ self.appslug ].search.add({ _ref: self.ref });
+
                         var href = $.Tapioca.app.setRoute('appCollectionRef', [ self.appslug, self.namespace, self.ref ] )
 
                         Backbone.history.navigate( href );
