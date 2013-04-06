@@ -71,8 +71,23 @@ class Permissions
         {
             try
             {
-                $api = Tapioca::app( array( 'api.key' => $user ) );
+                $api   = Tapioca::app( array( 'api.key' => $user ) );
+                $roles = Config::get('tapioca.roles');
 
+                try 
+                {
+                    $role = $api->get('api.role');
+                }
+                catch( AppException $e )
+                {
+                    $role = null;
+                }
+
+                if( is_null( $role ) || !in_array($role, $roles))
+                {
+                    $role  = end($roles);
+                }
+                
                 if( !is_null( $app ) && ( $api->get('name') != $app->get('name') ) )
                 {
                     throw new \PermissionsException(
@@ -80,7 +95,7 @@ class Permissions
                     );
                 }
 
-                static::$userRole = $api->get('api.role');
+                static::$userRole = $role;
             }
             catch ( AuthException $e )
             {
