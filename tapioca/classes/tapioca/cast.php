@@ -95,6 +95,11 @@ class Cast
         return $results;
     }
 
+    private static function _bool($results)
+    {
+        return static::_number($results);
+    }
+    
     // private static function makeMulti($path, $result)
     // {
     //  $multi  = array();

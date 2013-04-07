@@ -238,7 +238,8 @@ return array(
 
     'cast' => array(
         'date',
-        'number'
+        'number',
+        'bool',
     ),
 
     /*

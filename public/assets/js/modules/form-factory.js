@@ -421,7 +421,8 @@ formFactory.prototype.getSource = function( source )
 
 formFactory.prototype.bool = function(item, prefix, key)
 {
-    return this.indent(3) +'<input type="checkbox" value="1" name="' + this.getName(item, prefix) + '"{{isSelected '+ item.id + ' default="1" attribute="checked"}}>';
+    return this.indent(3) +'<label class="radio inline"><input type="radio" value="1" name="' + this.getName(item, prefix) + '"{{isSelected '+ item.id + ' default="1" attribute="checked"}}> oui</label>'
+     + this.indent(3) +'<label class="radio inline"><input type="radio" value="0" name="' + this.getName(item, prefix) + '"{{isSelected '+ item.id + ' default="0" attribute="checked"}}> non</label>';
 };
 
 formFactory.prototype.group = function(item, prefix, key)
