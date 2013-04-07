@@ -43,7 +43,15 @@ class Hook
         {
             foreach( static::$hooks[$event] as $cb)
             {
-                $data = call_user_func_array('\\'.static::$namespace .'\\'.$cb, array($data, $status));
+
+                if( filter_var($cb, FILTER_VALIDATE_URL) )
+                {
+                    static::curl_post_async($cb, $data, $status);
+                }
+                else
+                {
+                    $data = call_user_func_array('\\'.static::$namespace .'\\'.$cb, array($data, $status));
+                }
             }
         }
     }
@@ -51,5 +59,23 @@ class Hook
     public static function reset()
     {
         static::$hooks = null;
+    }
+
+    private static function curl_post_async($url, $data, $status)
+    {
+        $c = curl_init();
+        curl_setopt($c, CURLOPT_URL, $url);
+        curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($c, CURLOPT_HEADER, false);
+        curl_setopt($c, CURLOPT_POST,true);
+        curl_setopt($c, CURLOPT_POSTFIELDS, http_build_query($data));
+        
+        $output = curl_exec($c);
+        // if($output === false)
+        // {
+        //     trigger_error('Erreur curl : '.curl_error($c),E_USER_WARNING);
+        // }
+
+        curl_close($c);
     }
 }
