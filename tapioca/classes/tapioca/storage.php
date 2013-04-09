@@ -26,6 +26,7 @@ use FuelException;
 use Gaufrette\Filesystem;
 use Gaufrette\Adapter\Local as LocalAdapter;
 use Gaufrette\Adapter\Ftp as FtpAdapter;
+use Gaufrette\Adapter\Sftp2 as SftpAdapter;
 
 class StorageException extends FuelException {}
 
@@ -67,6 +68,7 @@ class Storage
 
         switch( $this->method )
         {
+            case 'sftp':
             case 'ftp':
                         $path     = $this->app->get('storage.path');
                         $host     = $this->app->get('storage.host');
@@ -76,6 +78,16 @@ class Storage
                         if( substr( $path, -1) != '/' )
                             $path .=  '/';
 
+            case 'sftp':
+                        $sftp = new \PHPSecLib\Net_SFTP('www.scenedata.com');
+
+                        if (!$sftp->login('mike', 'h8evj0w4')) {
+                            exit('Login Failed');
+                        }
+
+                        $adapter    = new SftpAdapter( $sftp, $path.$category, true);
+                        break;
+            case 'ftp':
                         $adapter    = new FtpAdapter( $path.$category, $host, array('username' => $username, 'password' => $password, 'create' => true));
                         break;
             default:

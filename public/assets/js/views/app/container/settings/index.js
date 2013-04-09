@@ -54,7 +54,7 @@ $.Tapioca.Views.AppAdminSettings = $.Tapioca.Views.FormView.extend(
         this.$storageOptions.hide();
         this.$storageTestBtn.hide()
 
-        var $fields = this.$storageOptions.filter('[data-storage="' + value + '"]');
+        var $fields = this.$storageOptions.filter('[data-storage*="' + value + '"]');
 
         if( $fields.length )
         {
