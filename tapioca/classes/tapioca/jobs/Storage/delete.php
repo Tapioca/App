@@ -24,7 +24,13 @@ class Delete
         $app     = Tapioca::app( array( 'slug' => $this->args['appslug'] ) );
         $storage = new \Tapioca\Storage( $app );
 
-        return $storage->delete( $this->args['category'], $this->args['filename'] ); 
-
+        try
+        {
+            return $storage->delete( $this->args['category'], $this->args['filename'] ); 
+        }
+        catch( \RuntimeException $e )
+        {
+            throw new \JobsException( $e->getMessage() );
+        }
     }
 }

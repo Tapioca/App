@@ -24,7 +24,13 @@ class Rename
         $app     = Tapioca::app( array( 'slug' => $this->args['appslug'] ) );
         $storage = new \Tapioca\Storage( $app ); 
 
-        return $storage->rename( $this->args['category'], $this->args['old'], $this->args['new'] );
-
+        try
+        {
+            return $storage->rename( $this->args['category'], $this->args['old'], $this->args['new'] );
+        }
+        catch( \RuntimeException $e )
+        {
+            throw new \JobsException( $e->getMessage() );
+        }
     }
 }

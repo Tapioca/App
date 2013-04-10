@@ -31,6 +31,13 @@ class Create
         // remove original file
         unlink( $this->args['filePath'] );
 
-        return $storage->store( $this->args['filename'], $this->args['category'], $fileContent );
+        try
+        {
+            return $storage->store( $this->args['filename'], $this->args['category'], $fileContent );
+        }
+        catch( \RuntimeException $e )
+        {
+            throw new \JobsException( $e->getMessage() );
+        }
     }
 }
