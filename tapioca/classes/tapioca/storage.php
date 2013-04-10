@@ -79,9 +79,9 @@ class Storage
                             $path .=  '/';
 
             case 'sftp':
-                        $sftp = new \PHPSecLib\Net_SFTP('www.scenedata.com');
+                        $sftp = new \PHPSecLib\Net_SFTP( $host );
 
-                        if (!$sftp->login('mike', 'h8evj0w4')) {
+                        if (!$sftp->login( $username , $password )) {
                             exit('Login Failed');
                         }
 
