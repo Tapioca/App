@@ -169,6 +169,7 @@ class Controller_Api_Library extends Controller_Api
 
         switch( $storage['method'] )
         {
+            case 'sftp':
             case 'ftp':
                         $path     = $storage['path'];
                         $host     = $storage['host'];
@@ -180,6 +181,17 @@ class Controller_Api_Library extends Controller_Api
 
                         $path .= 'image';
 
+            case 'sftp':
+                        $sftp = new \PHPSecLib\Net_SFTP( $host );
+
+                        if (!$sftp->login( $username , $password ))
+                        {
+                            throw new \RuntimeException('SFTP Login Failed');
+                        }
+
+                        $adapter    = new Gaufrette\Adapter\Sftp2( $sftp, $path, true);
+                        break;
+            case 'ftp':
                         $adapter    = new Gaufrette\Adapter\Ftp( $path, $host, array('username' => $username, 'password' => $password, 'create' => true));
                         break;
         }

@@ -81,8 +81,9 @@ class Storage
             case 'sftp':
                         $sftp = new \PHPSecLib\Net_SFTP( $host );
 
-                        if (!$sftp->login( $username , $password )) {
-                            exit('Login Failed');
+                        if (!$sftp->login( $username , $password ))
+                        {
+                            throw new \RuntimeException('SFTP Login Failed');
                         }
 
                         $adapter    = new SftpAdapter( $sftp, $path.$category, true);
