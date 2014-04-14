@@ -31,9 +31,9 @@ class Hook
         {
             static::$hooks     = $collection['hooks'];
             static::$slug      = $app->get('slug');
-            static::$namespace = ucfirst( static::$slug );
+            static::$namespace = ucfirst( str_replace('-', '', static::$slug ) );
 
-            \Module::load(static::$slug);
+            \Module::load(str_replace('-', '', static::$slug ));
         }
     }
 

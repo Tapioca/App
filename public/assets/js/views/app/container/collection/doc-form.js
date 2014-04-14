@@ -221,7 +221,9 @@ $.Tapioca.Views.DocForm = Backbone.View.extend(
                     });
 
                     $altField.val(epoch / 1000);
-
+console.log( _getDate)
+console.log( defaultDate)
+return
                     _parent.change();
                 }
             });
@@ -307,6 +309,7 @@ $.Tapioca.Views.DocForm = Backbone.View.extend(
     docPreview: function(data, digest, prefix)
     {
         return this.tplEmbedRef({
+            prefix: prefix,
             digest: digest,
             fields: {
                 str: this.embedData(data, '', prefix)
@@ -351,8 +354,26 @@ $.Tapioca.Views.DocForm = Backbone.View.extend(
 
     docRemove: function(event)
     {
-        var $target = $(event.target);
-        var $parent = $target.parents('table').eq(0);
+        var $target = $( event.currentTarget )
+          , prefix  = $target.attr('data-prefix')
+          , $parent = $target.parents('table').eq(0)
+//           , $inputs = $parent.find('input')
+
+//         for( var i = -1, l = $inputs.length; ++i < l; )
+//         {
+//             if( $inputs[ i ].name.substr(-3) == 'ref' )
+//             {
+//                 console.log($inputs[ i ].value)
+//                 continue
+//             }
+//         }
+
+// console.log( $inputs )
+
+        if( !_.isUndefined( this.model.get( prefix ) ) )
+        {
+            this.model.unset( prefix )
+        }
 
         $parent.prev('div.btn-group').eq(0).show();
         $parent.remove();
@@ -413,7 +434,17 @@ $.Tapioca.Views.DocForm = Backbone.View.extend(
 
     fileRemove: function(event)
     {
-        $(event.target).parents('ul.thumbnails').remove();
+        var $target = $( event.currentTarget )
+          , prefix  = $target.attr('data-prefix')
+
+        if( !_.isUndefined( this.model.get( prefix ) ) )
+        {
+            this.model.unset( prefix )
+        }
+
+        $target.parents('ul.thumbnails').remove();
+
+        this.change();
     },
 
     upload: function( event )
@@ -496,7 +527,7 @@ $.Tapioca.Views.DocForm = Backbone.View.extend(
         {
             var prefixTmp = prefix + '.' + i;
 
-            if(_.isString(hash[i]) || _.isNumber(hash[i]))
+            if(_.isString(hash[i]) || _.isNumber(hash[i]) || _.isNull(hash[i]))
             {
                 str += '<input type="hidden" name="' + prefixTmp + '" value="' + hash[i] + '">';
             }
@@ -532,13 +563,12 @@ $.Tapioca.Views.DocForm = Backbone.View.extend(
             ++iterator;
         }
 
-        if(!_.isUndefined(hash))
+        if(!_.isUndefined(hash) )
         {
             if(this.initialized)
             {
                 this.parent.change();
             }
-
             if(!_.isUndefined(hash.filename) && !_.isUndefined(hash.category))
             {
                 return this.embedDataFile(hash, str, prefix);
@@ -570,7 +600,8 @@ $.Tapioca.Views.DocForm = Backbone.View.extend(
 
         return this.tplThumb({
             hash:  hash,
-            thumb: thumb
+            thumb: thumb,
+            prefix: prefix
         });
     }
 })

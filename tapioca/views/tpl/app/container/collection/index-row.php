@@ -8,7 +8,7 @@
                                 </td>
                                 <td>
                                     <div class="btn-group float-right">
-                                        <a href="<?= Uri::create('app/'); ?>{{ appslug }}/{{ namespace }}/{{ _ref }}" class="btn btn-mini">
+                                        <a href="<?= Uri::create('app/'); ?>{{ appslug }}/{{ namespace }}/{{ _ref }}" class="btn btn-mini" data-bypass="true">
                                             <i class="icon-pencil"></i>
                                             <?= __('tapioca.ui.label.edit'); ?>
                                         </a>

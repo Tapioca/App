@@ -167,20 +167,21 @@ class Controller_Api_Library extends Controller_Api
         $fileContent = File::read( Config::get('tapioca.upload.storage_test'), true );
         $filename    = 'tapioca-test.png';
 
+        if( $storage['method'] == 'sftp' ||  $storage['method'] == 'ftp' )
+        {
+            $path     = $storage['path'];
+            $host     = $storage['host'];
+            $username = $storage['username'];
+            $password = $storage['password'];
+
+            if( substr( $path, -1) != '/' )
+                $path .=  '/';
+
+            $path .= 'image';
+        }
+
         switch( $storage['method'] )
         {
-            case 'sftp':
-            case 'ftp':
-                        $path     = $storage['path'];
-                        $host     = $storage['host'];
-                        $username = $storage['username'];
-                        $password = $storage['password'];
-
-                        if( substr( $path, -1) != '/' )
-                            $path .=  '/';
-
-                        $path .= 'image';
-
             case 'sftp':
                         $sftp = new \PHPSecLib\Net_SFTP( $host );
 

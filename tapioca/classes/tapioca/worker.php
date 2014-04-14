@@ -136,7 +136,7 @@ class Worker
 
             $this->log( $job );
 
-            $this->child = $this->fork();
+            $this->child = false; // $this->fork();
 
             // Forked and we're the child. Run the job.
             if($this->child === 0 || $this->child === false)

@@ -15,7 +15,7 @@ return array(
         // This group is used when no instance name has been provided.
         'default' => array(
             'hostname' => 'localhost',
-            'database' => 'tapiocapp_dev_v2',
+            'database' => 'tapiocapp_beta_v2',
         ),
     ),
 );

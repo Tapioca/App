@@ -245,6 +245,15 @@ $.Tapioca.Views.Document = $.Tapioca.Views.FormView.extend(
             // Sets button state to loading - disables button and swaps text to loading text
             this.$btnSubmit.button('loading');
 
+            if( !isNew )
+                formData['_ref'] = this.model.get('_ref')
+
+            this.model.clear().set( formData )
+
+// console.log( this.model.toJSON())
+// console.log( formData )
+// return
+
             this.model.save(formData, {
                 success:function (model, response)
                 {

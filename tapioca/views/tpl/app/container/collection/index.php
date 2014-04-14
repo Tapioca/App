@@ -10,7 +10,7 @@
                         </ul>
                     </div>
                     <div class="btn-group">
-                        <a class="btn" href="<?= Uri::create('app/'); ?>{{ appslug }}/{{ namespace }}/new?l={{ locale.key }}">
+                        <a class="btn" data-bypass="true" href="<?= Uri::create('app/'); ?>{{ appslug }}/{{ namespace }}/new?l={{ locale.key }}">
                             <i class="icon-plus"></i>
                             <?= __('tapioca.ui.label.add_document'); ?>
                         </a>

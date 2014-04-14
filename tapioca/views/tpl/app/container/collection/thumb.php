@@ -10,7 +10,7 @@
                             </div>
                             <h5 class="align-center word-wrap">{{hash.filename}}</h5>
                             <p class="align-center">
-                                <a href="javascript:void(0)" class="btn btn-mini file-remove-trigger">
+                                <a href="javascript:void(0)" class="btn btn-mini file-remove-trigger" data-prefix="{{prefix}}">
                                     <i class="icon-trash"></i>
                                     remove
                                 </a>

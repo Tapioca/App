@@ -17,6 +17,20 @@ use Tapioca;
 
 class Document
 {
+    private function setValue( &$data, $path, $value )
+    {
+        $temp = &$data;
+
+        foreach ( $path as $key )
+        {
+            $temp = &$temp[$key];
+        }
+
+        $temp = $value;
+
+        return $value ;
+    }
+
     public function perform()
     {
         // \Cli::write(print_r($this->args, true));
@@ -81,9 +95,25 @@ class Document
                         $set[ $field ] = \Arr::get( $originDoc, $field, null);
                     }
 
+                    // $pathKeys = explode('.', $dependency['path']);
 
-                    $update = array('$set' => array($dependency['path'].'.embedded' => $set) );
+                    // if( count( $pathKeys ) > 1 )
+                    // {
+                    //     $pathArr  = array();
+                    //     $pathVal  = array( 'embedded' => $set );
 
+                    //     $this->setValue( $pathArr, $pathKeys, $pathVal );
+                    //     $update = array('$set' => $pathArr );
+
+                    //     \Cli::write(print_r($update, true));
+                    //     exit;
+                    // }
+                    // else
+                    // {
+                        $update = array('$set' => array($dependency['path'].'.embedded' => $set) );
+                    // }
+                    // \Cli::write(print_r($update, true));
+                    // exit;
                     $where = array( $path             => $this->args['_ref'],
                                     '_tapioca.locale' => $this->args['locale'],
                                     '_tapioca.status' => 100
@@ -93,9 +123,17 @@ class Document
                     // \Cli::write(print_r($where, true));
                     // \Cli::write(print_r($update, true));
 
-                    $documents = $db
-                                    ->where( $where )
-                                    ->update_all( $dbCollectionName, $update, true );
+                    try
+                    {
+                        $documents = $db
+                                        ->where( $where )
+                                        ->update_all( $dbCollectionName, $update, true );
+
+                    }
+                    catch( \Mongo_DbException $e )
+                    {
+                        \Cli::write( $e->getMessage() );
+                    }
 
                 }
             }

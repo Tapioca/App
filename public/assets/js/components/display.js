@@ -116,7 +116,7 @@ $.Tapioca.Components.Display = {
 
         if( !_.isUndefined( options.hash.uri ) )
         {
-            urlStart = '<a href="' + options.hash.uri + '">';
+            urlStart = '<a href="' + options.hash.uri + '" data-bypass="true">';
             urlEnd   = '</a>';
         }
         

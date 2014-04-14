@@ -4,7 +4,7 @@
 		{{{displayDigest digest}}}
 		<td>
 			<div class="btn-group float-right">
-				<a href="javascript:void(0);" class="btn btn-mini doc-remove-trigger">
+				<a href="javascript:void(0);" class="btn btn-mini doc-remove-trigger" data-prefix="{{prefix}}">
 					<i class="icon-trash"></i>
 					<?= __('tapioca.ui.label.remove'); ?>
 				</a>
