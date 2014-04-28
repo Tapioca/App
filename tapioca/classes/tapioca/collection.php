@@ -1,6 +1,6 @@
 <?php
 /**
- * Tapioca: Schema Driven Data Engine 
+ * Tapioca: Schema Driven Data Engine
  * Flexible CMS build on top of MongoDB, FuelPHP and Backbone.js
  *
  * @package   Tapioca
@@ -125,7 +125,7 @@ class Collection
                 'app_id'    => static::$app->get('slug')
             ), 1);
 
-            // if there was a result 
+            // if there was a result
             if (count($summary) == 1)
             {
                 //query database for collection's summary
@@ -172,7 +172,7 @@ class Collection
     {
         static::$summaryWhere = array( 'app_id'    => static::$app->get('slug'),
                                         'namespace' => $this->namespace,
-                                        'type'      => 'summary');      
+                                        'type'      => 'summary');
     }
 
     /**
@@ -229,7 +229,7 @@ class Collection
     /**
      * Gets the current collections definition
      *
-     * @params  int Revision number 
+     * @params  int Revision number
      * @return  array
      * @throws  CollectionException
      */
@@ -299,6 +299,9 @@ class Collection
             );
         }
 
+        if( !count( $this->data ) )
+            return array();
+
         return end($this->data);
     }
 
@@ -320,7 +323,7 @@ class Collection
                     __('tapioca.collection_column_is_empty', array('column' => $item))
                 );
             }
-        }       
+        }
     }
 
     /**
@@ -346,7 +349,7 @@ class Collection
 
         // check for required fields
         $check_list = Config::get('tapioca.validation.collection.summary');
-        
+
         self::validation($fields, $check_list);
 
         $status = 'draft';
@@ -391,7 +394,7 @@ class Collection
 
         // check for required fields
         $check_list = Config::get('tapioca.validation.collection.summary');
-        
+
         self::validation($fields, $check_list);
 
         if(isset($fields['status']))
@@ -416,8 +419,8 @@ class Collection
     /**
      * Add a new schema revision to the current collection
      *
-     * @param   array  Fields 
-     * @param   object User object instance 
+     * @param   array  Fields
+     * @param   object User object instance
      * @return  bool
      * @throws  CollectionException
      */
@@ -430,7 +433,7 @@ class Collection
 
         // check for required fields
         $check_list = Config::get('tapioca.validation.collection.data');
-        
+
         self::validation($fields, $check_list);
 
         static::$castable     = Config::get('tapioca.cast');
@@ -468,7 +471,7 @@ class Collection
             'revison' => $revision,
             'date'    => new \MongoDate(),
             'user'    => $user->get('id'),
-            // 'status'  => (int) 100 
+            // 'status'  => (int) 100
         );
 
         // set previous revision as "non active"
@@ -491,7 +494,7 @@ class Collection
             // {
             //  $r['status'] = -1;
             // }
-            
+
             $this->summary['revisions'][] = $revision;
             $this->data[] = $data;
 
@@ -506,7 +509,7 @@ class Collection
             {
                 throw new \CollectionException(
                     __('tapioca.can_not_update_collection_revision', array('name' => $this->name))
-                );              
+                );
             }
 
             return true;
@@ -557,7 +560,7 @@ class Collection
         {
             throw new \CollectionException(__('tapioca.no_collection_selected'));
         }
-        
+
         $update = static::$db
                     ->where(static::$summaryWhere)
                     ->update(static::$dbCollectionName, array('$set' => array('documents' => (int) 0)), array(), true);
@@ -614,7 +617,7 @@ class Collection
     /**
      * Collection fields who need a post traitment
      *
-     * @param   object 
+     * @param   object
      * @param   string  use for recustion
      * @return  bool
      */
@@ -700,7 +703,7 @@ class Collection
                         if(!in_array('required', $item['rules']))
                         {
                             $item['rules'][] = 'required';
-                        }   
+                        }
                     }
                 }
 
