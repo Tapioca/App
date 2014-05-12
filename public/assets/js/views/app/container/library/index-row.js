@@ -31,7 +31,17 @@ $.Tapioca.Views.LibraryRow = Backbone.View.extend(
         var model = this.model.toJSON();
 
         model.appslug    = this.appslug;
-        model.isAppAdmin = $.Tapioca.Session.isAdmin();
+        model.isAppAdmin = $.Tapioca.UserApps[ this.appslug ].app.isAppAdmin()
+        model.isImage    = ( model.category == 'image' )
+
+        if( model.isImage )
+        {
+            var baseUri  = $.Tapioca.config.filesUrl + $.Tapioca.appslug + '/image/',
+                filename = this.model.get('filename'),
+                    _tmp = new Date();
+
+            model.thumb = baseUri +'preview-' + filename+'?'+_tmp.getTime()
+        }
 
         this.$el.html( this.tpl( model ) );
 

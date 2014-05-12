@@ -25,7 +25,13 @@ $.Tapioca.Views.EmbedRef = Backbone.View.extend(
     },
 
     events: {
-        'click a.btn': 'select'
+        'click a.btn': 'select',
+        'click #close-popup-list': 'closeDialog'
+    },
+
+    closeDialog: function()
+    {
+        $.Tapioca.Dialog.close()
     },
 
     select: function( event )

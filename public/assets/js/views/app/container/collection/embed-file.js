@@ -32,7 +32,13 @@ $.Tapioca.Views.EmbedFile = Backbone.View.extend(
 
     events: {
         'click #tags-list li':     'filterTags',
-        'click #category-list li': 'filterCategory'
+        'click #category-list li': 'filterCategory',
+        'click #close-popup-list': 'closeDialog'
+    },
+
+    closeDialog: function()
+    {
+        $.Tapioca.Dialog.close()
     },
 
     render: function()

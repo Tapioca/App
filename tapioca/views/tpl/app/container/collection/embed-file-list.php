@@ -1,3 +1,5 @@
+
+                <a href="javascript:;" class="close" id="close-popup-list">x</a>
                 <div class="app-content-header">
                     <h2 class="page-name"><?= __('tapioca.ui.label.app_library'); ?></h2>
                 </div><!-- /#app-content-header -->

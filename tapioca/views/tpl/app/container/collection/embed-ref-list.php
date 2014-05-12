@@ -1,3 +1,5 @@
+
+                <a href="javascript:;" class="close" id="close-popup-list">x</a>
                 <div class="app-content-header">
                     <h2 class="page-name">{{ name }}</h2>
                 </div><!-- /#app-content-header -->

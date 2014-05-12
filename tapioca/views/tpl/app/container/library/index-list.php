@@ -18,6 +18,7 @@
                                 <table class="table table-striped" id="table-file-list">
                                     <thead>
                                         <tr>
+                                            <th></th>
                                             <th><?= __('tapioca.ui.label.filename'); ?></th>
                                             <th><?= __('tapioca.ui.label.category'); ?></th>
                                             <th width="100"></th>
