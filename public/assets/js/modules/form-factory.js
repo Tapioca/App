@@ -277,9 +277,14 @@ formFactory.prototype.input = function(item, prefix, key)
         str += '<li>';
     }
 
+    var type = (item.type =='date') ? 'text' : item.type
+      , klass = (item.type =='date') ? 'input-date ' : ''
+
+    klass += (_.isUndefined( item.class )) ? 'span7' : item.class; 
+
     str += this.indent( ind );
-    str += '<input type="'+item.type+'"' + this.setRules(item, prefix) + ' class="';
-    str += (_.isUndefined(item.class)) ? 'span7' : item.class; 
+    str += '<input type="'+type+'"' + this.setRules(item, prefix) + ' class="';
+    str += klass; 
     str += '"';
     str += (item.type =='date') ? ' data-' : ' ';
     str += 'name="' + this.getName(item, prefix) + '"';

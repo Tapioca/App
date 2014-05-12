@@ -18,7 +18,7 @@ legend {
 	margin-top: 16px;
 }
 
-#tapioca-document-form input[type="date"] {
+#tapioca-document-form .input-date {
 	border: 1px solid #ccc;
 	background: #fff;
 	cursor: pointer;

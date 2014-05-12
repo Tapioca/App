@@ -201,7 +201,7 @@ $.Tapioca.Views.DocForm = Backbone.View.extend(
                 .attr('data-binded', 'true');
         });
 
-        this.$el.find('input[type="date"]').not('[data-binded="true"]').each(function()
+        this.$el.find('input.input-date').not('[data-binded="true"]').each(function()
         {
             var $this     = $(this),
                 $altField = $('input[name="'+$this.attr('data-name')+'"]');
@@ -221,9 +221,7 @@ $.Tapioca.Views.DocForm = Backbone.View.extend(
                     });
 
                     $altField.val(epoch / 1000);
-console.log( _getDate)
-console.log( defaultDate)
-return
+
                     _parent.change();
                 }
             });
