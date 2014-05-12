@@ -179,3 +179,7 @@ ul.options-attributes input[size="3"] {
   border-bottom: 1px solid #ccc; 
   font-weight: bold;
 }
+
+input.span7, textarea.span7, .uneditable-input.span7 {
+  width: 440px;
+}
