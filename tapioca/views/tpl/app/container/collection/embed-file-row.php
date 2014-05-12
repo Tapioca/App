@@ -1,6 +1,6 @@
                                     <td>
                                         {{#if isImage}}
-                                        <a href="<?= Uri::create('app/'); ?>{{ appslug }}/library/{{ filename }}">
+                                        <a href="javascript:;" class="select-file-trigger">
                                             <img src="{{ thumb }}" alt="">
                                         </a>
                                         {{/if}}
