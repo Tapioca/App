@@ -31,7 +31,7 @@ $.Tapioca.Views.Collection = $.Tapioca.Views.Content.extend(
         var tpl  = Handlebars.compile( $.Tapioca.Tpl.app.container.collection.index ),
             html = tpl({
                 appslug:    $.Tapioca.appslug,
-                isAppAdmin: $.Tapioca.Session.isAdmin(),
+                isAppAdmin: $.Tapioca.UserApps[ this.appslug ].app.isAppAdmin(), //$.Tapioca.Session.isAdmin(),
                 locale:     this.locale,
                 baseUri:    this.baseUri,
                 name:       this.model.get('name'),
