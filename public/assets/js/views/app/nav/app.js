@@ -77,7 +77,7 @@ $.Tapioca.Views.NavApp = Backbone.View.extend(
     {
         $.Tapioca.FileUpload.init({
             appslug:           this.appslug,
-            singleFileUploads: true,
+            singleFileUploads: false,
         });
     },
 
