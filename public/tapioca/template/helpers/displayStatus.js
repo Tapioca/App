@@ -17,9 +17,15 @@ define('template/helpers/displayStatus', ['Handlebars', 'tapioca'], function ( H
 			if(!_.isUndefined(revisions.active[workingLocale]))
 			{
 				var active = (revisions.active[workingLocale] - 1);
-		
-				status   = revisions.list[active].status;
-				revision = revisions.list[active].revision;
+				
+				try
+				{
+					status   = revisions.list[active].status;
+					revision = revisions.list[active].revision;
+				}
+				catch( e )
+				{
+				}
 			}
 		}
 
